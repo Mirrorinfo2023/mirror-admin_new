@@ -93,7 +93,6 @@ function TransactionHistory() {
               boxShadow: "0px 1px 4px rgba(0,0,0,0.1)",
             }}
           >
-            {/* ✅ Title + Filters Row */}
             <Box
               sx={{
                 display: "flex",
@@ -186,7 +185,6 @@ function TransactionHistory() {
         </Grid>
       </Grid>
 
-      {/* ✅ Transactions Table */}
       <Transactions showServiceTrans={filteredRows} />
     </Layout>
   );

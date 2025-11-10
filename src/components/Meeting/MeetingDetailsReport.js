@@ -133,32 +133,43 @@ const MeetingDetailsTransactions = ({ showServiceTrans }) => {
       flex: "none",
     },
   }));
-  const GradientTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
-      color: "#fff",
-      fontWeight: 700,
-      fontSize: 11,
-      whiteSpace: "nowrap",
-      padding: 8,
-      borderRight: "1px solid #e3e3e3",
-      letterSpacing: 1,
-      textTransform: "uppercase",
-    },
+ const GradientTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+    color: "#fff",
+    fontWeight: 700,
+    fontSize: 11,
+    whiteSpace: "nowrap",
+    padding: 8,
+    borderRight: "1px solid rgba(255,255,255,0.3)",
+    borderBottom: "2px solid rgba(255,255,255,0.4)",
+    borderTop: "1px solid rgba(255,255,255,0.2)",
+    borderLeft: "1px solid rgba(255,255,255,0.2)",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  "&:first-of-type": {
+    borderTopLeftRadius: 14,
+    borderLeft: "1px solid rgba(255,255,255,0.2)",
+  },
+  "&:last-of-type": {
+    borderTopRightRadius: 14,
+    borderRight: "1px solid rgba(255,255,255,0.2)",
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 13,
+    padding: 10,
+    borderRight: "1px solid #e0e0e0",
+    borderBottom: "1px solid #e0e0e0",
+    borderLeft: "1px solid #e0e0e0",
     "&:first-of-type": {
-      borderTopLeftRadius: 14,
+      borderLeft: "1px solid #e0e0e0",
     },
     "&:last-of-type": {
-      borderTopRightRadius: 14,
-      borderRight: "none",
+      borderRight: "1px solid #e0e0e0",
     },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 13,
-      padding: 10,
-      border: "none",
-
-    },
-  }));
+  },
+}));
   const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: "#ccc",

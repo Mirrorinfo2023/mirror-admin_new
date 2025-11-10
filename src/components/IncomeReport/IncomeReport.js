@@ -100,14 +100,13 @@ const IncomeTransactions = ({ showServiceTrans }) => {
       fontSize: 12,
       linHeight: 15,
       padding: 7,
-
-      borderRight: "1px solid rgba(224, 224, 224, 1)"
+        border: "1px solid #000000",
     },
     [`&.${tableCellClasses.body}`]: {
       fontSize: 12,
       linHeight: 15,
       padding: 7,
-      borderRight: "1px solid rgba(224, 224, 224, 1)"
+      border: "1px solid #000000"
     },
   }));
 

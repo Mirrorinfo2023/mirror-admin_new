@@ -16,6 +16,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Card,
+  CardContent,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -28,86 +30,25 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { styled } from "@mui/material/styles";
 
-
-
-const drawWidth = 220;
-
-const getDate = (timeZone) => {
-  const dateString = timeZone;
-  const dateObject = new Date(dateString);
-
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-
-  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-
-  return formattedDateTime;
-};
-
-const StatCard = styled(Paper)(({ bgcolor }) => ({
-  background: bgcolor,
-  color: "#fff",
-  borderRadius: 12,
-  padding: "28px 36px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  minWidth: 280,
-  minHeight: 100,
-  position: "relative",
-  overflow: "hidden",
-  marginRight: 24,
+// Compact StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '90px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+  flex: 1,
+  minWidth: '160px',
 }));
 
-const StatContent = styled("div")({
-  zIndex: 2,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-});
-
-const StatValue = styled("div")({
-  fontSize: 32,
-  fontWeight: 700,
-  lineHeight: 1.1,
-  marginBottom: 4,
-});
-
-const StatLabel = styled("div")({
-  fontSize: 12,
-  fontWeight: 500,
-  opacity: 0.85,
-  letterSpacing: 1,
-  textTransform: "uppercase",
-});
-
-const StatIcon = styled("div")({
-  position: "absolute",
-  right: 24,
-  top: "50%",
-  transform: "translateY(-50%)",
-  opacity: 0.18,
-  fontSize: 64,
-  zIndex: 1,
-});
-
-const FilterRow = styled(Box)(() => ({
-  background: "#f5faff",
-  borderRadius: 12,
-  boxShadow: "0 2px 12px 0 rgba(0,0,0,0.06)",
-  padding: "12px",
-  display: "flex",
-  alignItems: "center",
-  gap: 20,
-  marginBottom: 10,
-  flexWrap: "nowrap",
-  justifyContent: "space-between",
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '16px',
+  border: '1px solid rgba(0,0,0,0.05)',
 }));
 
 function AddMoneyRequestReport() {
@@ -118,10 +59,10 @@ function AddMoneyRequestReport() {
 
   const dispatch = useDispatch();
   const currentDate = new Date();
-  const [fromDate, setFromDate] = React.useState(
+  const [fromDate, setFromDate] = useState(
     dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
   );
-  const [toDate, setToDate] = React.useState(dayjs(getDate.date));
+  const [toDate, setToDate] = useState(dayjs());
 
   useEffect(() => {
     const getTnx = async () => {
@@ -129,34 +70,22 @@ function AddMoneyRequestReport() {
         from_date: fromDate.toISOString().split("T")[0],
         to_date: toDate.toISOString().split("T")[0],
       };
-      // console.log("🟢 reqData:", reqData);
 
       try {
-        // 🔹 Encrypt the request payload
         const encryptedPayload = DataEncrypt(JSON.stringify(reqData));
-        // console.log("🟢 encryptedPayload:", encryptedPayload);
-
-        // 🔹 Send in the expected format
         const response = await api.post("/api/add_money/add-money-list", {
           data: encryptedPayload
         });
-        // console.log("🟢 Response:", response);
 
         if (response.data) {
-          // 🔹 Decrypt the response from backend
           const decryptedData = DataDecrypt(response.data.data);
-          console.log("🟢 Decrypted Response:", decryptedData);
-
-          setShowServiceTrans(decryptedData.data);
-          setMasterReport(decryptedData.report);
+          setShowServiceTrans(decryptedData.data || []);
+          setMasterReport(decryptedData.report || {});
         }
       } catch (error) {
         console.error("🚨 Error fetching Add Money report:", error);
       }
     };
-
-
-
 
     if (fromDate || toDate) {
       getTnx();
@@ -171,168 +100,217 @@ function AddMoneyRequestReport() {
     const isStatusMatch =
       selectedValue === "" || row.status === parseInt(selectedValue);
     const isSearchTermMatch =
-      (row.user_name &&
-        row.user_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      // (row.user_id &&
-      //   row.user_id.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      // (row.mobile && row.mobile.includes(searchTerm)) ||
-      // (row.transaction_id && row.transaction_id.includes(searchTerm)) ||
+      (row.user_name && row.user_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (row.amount && row.amount.toString().includes(searchTerm));
 
     return isStatusMatch && isSearchTermMatch;
   });
 
+  const cards = [
+    {
+      label: "Total Add Money",
+      value: masterReport.totalAddmoneyCount ?? 0,
+      color: "#FFC107",
+      icon: <AccountBalanceWalletIcon />
+    },
+    {
+      label: "Pending Add Money",
+      value: masterReport.totalPendingAddMoney ?? 0,
+      color: "#5C6BC0",
+      icon: <PendingActionsIcon />
+    },
+    {
+      label: "Approved Add Money",
+      value: masterReport.totalApprovedaddMoney ?? 0,
+      color: "#26A69A",
+      icon: <CheckCircleIcon />
+    },
+    {
+      label: "Rejected Add Money",
+      value: masterReport.totalRejectedaddMoney_view ?? 0,
+      color: "#EC407A",
+      icon: <CancelIcon />
+    }
+  ];
+
   return (
     <Layout>
-      <Grid container spacing={3} sx={{ padding: 2 }}>
+      <Grid container spacing={1.5} sx={{ p: 1.5 }}>
+        {/* Compact Statistics Cards */}
         <Grid item xs={12}>
-          <Box
-            sx={{
-              display: "flex",
-              gap: 1,
-              flexWrap: "wrap",
-              justifyContent: "center",
-              mb: 1,
-            }}
-          >
-            <StatCard bgcolor="#FFC107">
-              <StatContent>
-                <StatValue>{masterReport.totalAddmoneyCount ?? 0}</StatValue>
-                <StatLabel>Total Add Money</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <AccountBalanceWalletIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
-            <StatCard bgcolor="#5C6BC0">
-              <StatContent>
-                <StatValue>{masterReport.totalPendingAddMoney ?? 0}</StatValue>
-                <StatLabel>Pending Add Money</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <PendingActionsIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
-            <StatCard bgcolor="#26A69A">
-              <StatContent>
-                <StatValue>{masterReport.totalApprovedaddMoney ?? 0}</StatValue>
-                <StatLabel>Approved Add Money</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <CheckCircleIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
-            <StatCard bgcolor="#EC407A">
-              <StatContent>
-                <StatValue>
-                  {masterReport.totalRejectedaddMoney_view ?? 0}
-                </StatValue>
-                <StatLabel>Rejected Add Money</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <CancelIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
+          <Box sx={{ 
+            display: "flex", 
+            gap: 1.5, 
+            flexWrap: "wrap",
+            mb: 2 
+          }}>
+            {cards.map((card, index) => (
+              <StatCard 
+                key={index}
+                sx={{ 
+                  backgroundColor: '#f5f5f5', 
+                  borderLeft: `4px solid ${card.color}`,
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                  '&:hover': {
+                    backgroundColor: card.color,
+                    boxShadow: `0 8px 25px ${card.color}80`,
+                    transform: 'translateY(-2px)',
+                    '& .MuiTypography-root': {
+                      color: 'white',
+                    },
+                    '& .stat-icon': {
+                      color: 'white',
+                      opacity: 0.8
+                    }
+                  }
+                }}
+              >
+                <CardContent sx={{ 
+                  padding: '12px !important', 
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  '&:last-child': { pb: '12px' }
+                }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        color: '#000000', 
+                        transition: 'color 0.3s ease', 
+                        fontWeight: 700, 
+                        fontSize: '20px', 
+                        mb: 0.5,
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.value}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: '#000000', 
+                        transition: 'color 0.3s ease', 
+                        fontWeight: 600,
+                        fontSize: '12px',
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.label}
+                    </Typography>
+                  </Box>
+                  <Box 
+                    className="stat-icon"
+                    sx={{ 
+                      color: card.color, 
+                      transition: 'color 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      ml: 1
+                    }}
+                  >
+                    {React.cloneElement(card.icon, { sx: { fontSize: 32 } })}
+                  </Box>
+                </CardContent>
+              </StatCard>
+            ))}
           </Box>
         </Grid>
 
+        {/* Compact Filter Section */}
         <Grid item xs={12}>
-          <FilterRow>
-            <Box
-              display="inline-block"
-              justifyContent="space-between"
-              alignItems="right"
-              mt={1}
-              mb={1}
-              sx={{ width: "30%", verticalAlign: "top" }}
-            >
-              <Typography variant="h5">Add Money Request Report</Typography>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Box
-                display="inline-block"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{
-                  marginTop: "25px",
-                  width: "200px",
-                  verticalAlign: "top",
-                  marginRight: "12px",
+          <FilterCard>
+            <Box sx={{ p: 2 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem'
                 }}
               >
+                Add Money Request Report
+              </Typography>
+
+              <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: 1.5,
+                alignItems: 'center'
+              }}>
                 <TextField
                   placeholder="Search"
-                  variant="standard"
-                  sx={{ width: "100%" }}
+                  variant="outlined"
+                  size="small"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
-                    startAdornment: <SearchIcon />,
+                    startAdornment: <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />,
+                  }}
+                  sx={{ 
+                    minWidth: { xs: '100%', sm: '180px' },
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(0,0,0,0.02)',
+                    }
                   }}
                 />
-              </Box>
-              <Box
-                display="inline-block"
-                justifyContent="space-between"
-                alignItems="right"
-                mt={2}
-                sx={{ width: "170px", verticalAlign: "center" }}
-              >
-                <FormControl fullWidth>
+
+                <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel>Status</InputLabel>
                   <Select
                     value={selectedValue}
+                    label="Status"
                     onChange={handleChange}
-                    sx={{ minWidth: 140, maxWidth: 170, fontSize: "13px" }}
                   >
-                    <MenuItem value="">Default</MenuItem>
+                    <MenuItem value="">All</MenuItem>
                     <MenuItem value="0">Pending</MenuItem>
                     <MenuItem value="1">Approved</MenuItem>
                     <MenuItem value="2">Rejected</MenuItem>
                   </Select>
                 </FormControl>
-              </Box>
-              <Box
-                display="inline-block"
-                justifyContent="space-between"
-                alignItems="center"
-                mt={1}
-                mb={1}
-                sx={{ verticalAlign: "top" }}
-              >
+
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <div>
+                  <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
                     <DatePicker
                       label="From Date"
                       value={fromDate}
-                      sx={{
-                        margin: 1,
-                        lineHeight: 20,
-                        minWidth: 140,
-                        maxWidth: 170,
-                      }}
                       format="DD-MM-YYYY"
                       onChange={(date) => setFromDate(date)}
+                      slotProps={{ 
+                        textField: { 
+                          size: "small",
+                          sx: { minWidth: '140px' }
+                        } 
+                      }}
                     />
                     <DatePicker
                       label="To Date"
                       value={toDate}
-                      sx={{
-                        margin: 1,
-                        lineHeight: 20,
-                        minWidth: 140,
-                        maxWidth: 170,
-                      }}
                       format="DD-MM-YYYY"
                       onChange={(date) => setToDate(date)}
+                      slotProps={{ 
+                        textField: { 
+                          size: "small",
+                          sx: { minWidth: '140px' }
+                        } 
+                      }}
                     />
-                  </div>
+                  </Box>
                 </LocalizationProvider>
               </Box>
             </Box>
-          </FilterRow>
+          </FilterCard>
         </Grid>
       </Grid>
+      
       <AddMoneyRequestTransactions showServiceTrans={filteredRows} />
     </Layout>
   );

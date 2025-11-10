@@ -10,11 +10,12 @@ import AffiliateTrackDetailsTransactions from "@/components/AffiliateLink/Affili
 import {
     Grid,
     Paper,
-    TableContainer,
     Button,
     Typography,
     Box,
     TextField,
+    Card,
+    CardContent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -23,22 +24,26 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: "#fff",
-    padding: theme.spacing(2),
-    textAlign: "center",
-    color: theme.palette.text.secondary,
-    borderRadius: "12px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+// Compact StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '90px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+  flex: 1,
+  minWidth: '160px',
 }));
 
-const getDate = (timeZone) => {
-    const dateObject = new Date(timeZone);
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObject.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-};
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '16px',
+  border: '1px solid rgba(0,0,0,0.05)',
+}));
 
 function AffiliateHistory() {
     const [showServiceTrans, setShowServiceTrans] = useState([]);
@@ -48,7 +53,6 @@ function AffiliateHistory() {
     const currentDate = new Date();
     const [fromDate, setFromDate] = useState(dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)));
     const [toDate, setToDate] = useState(dayjs(new Date()));
-
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
@@ -60,8 +64,8 @@ function AffiliateHistory() {
             try {
                 const response = await api.post("/api/affiliate_link/get-affiliate-links-Admin", reqData);
                 if (response.status === 200) {
-                    setShowServiceTrans(response.data.data);
-                    setmasterReport(response.data.report);
+                    setShowServiceTrans(response.data.data || []);
+                    setmasterReport(response.data.report || {});
                 }
             } catch (error) {
                 dispatch(callAlert({
@@ -83,118 +87,196 @@ function AffiliateHistory() {
         (row.title && row.title.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    const cardData = [
-        { title: "Total Count", value: masterReport.totalAffilatelinkListCount ?? 0, color: "#FFC107" },
-        { title: "Active", value: masterReport.totalActiveAffilatelinkList ?? 0, color: "#5C6BC0" },
-        { title: "Inactive", value: masterReport.totalInactiveAffilatelinkList ?? 0, color: "#26A69A" },
-        { title: "Deleted", value: masterReport.totalDeleteAffilatelinkList ?? 0, color: "#EC407A" },
+    const cards = [
+        { label: "Total Count", value: masterReport.totalAffilatelinkListCount ?? 0, color: "#FFC107" },
+        { label: "Active", value: masterReport.totalActiveAffilatelinkList ?? 0, color: "#5C6BC0" },
+        { label: "Inactive", value: masterReport.totalInactiveAffilatelinkList ?? 0, color: "#26A69A" },
+        { label: "Deleted", value: masterReport.totalDeleteAffilatelinkList ?? 0, color: "#EC407A" },
     ];
 
     return (
         <Layout>
-            <Box sx={{ padding: 2 }}>
-                {/* ====== Cards Section ====== */}
-                <Grid
-                    container
-                    spacing={2}
-                    justifyContent="center"
-                    alignItems="center"
-                    sx={{ marginBottom: 3 }}
-                >
-                    {cardData.map((card, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Item sx={{ backgroundColor: card.color, color: "#fff", height: 100 }}>
-                                <Typography variant="h5" fontWeight="bold">
-                                    {card.value}
-                                </Typography>
-                                <Typography variant="subtitle1">{card.title}</Typography>
-                            </Item>
-                        </Grid>
-                    ))}
+            <Box sx={{ p: 1.5 }}>
+                {/* Compact Statistics Cards */}
+                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+                    <Grid item xs={12}>
+                        <Box sx={{ 
+                            display: "flex", 
+                            gap: 1.5, 
+                            flexWrap: "wrap",
+                        }}>
+                            {cards.map((card, index) => (
+                                <StatCard 
+                                    key={index}
+                                    sx={{ 
+                                        backgroundColor: '#f5f5f5', 
+                                        borderLeft: `4px solid ${card.color}`,
+                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                        '&:hover': {
+                                            backgroundColor: card.color,
+                                            boxShadow: `0 8px 25px ${card.color}80`,
+                                            transform: 'translateY(-2px)',
+                                            '& .MuiTypography-root': {
+                                                color: 'white',
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <CardContent sx={{ 
+                                        padding: '12px !important', 
+                                        width: '100%',
+                                        textAlign: 'center',
+                                        '&:last-child': { pb: '12px' }
+                                    }}>
+                                        <Typography 
+                                            variant="h5" 
+                                            sx={{ 
+                                                color: '#000000', 
+                                                transition: 'color 0.3s ease', 
+                                                fontWeight: 700, 
+                                                fontSize: '20px', 
+                                                mb: 0.5,
+                                                lineHeight: 1.2
+                                            }}
+                                        >
+                                            {card.value}
+                                        </Typography>
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{ 
+                                                color: '#000000', 
+                                                transition: 'color 0.3s ease', 
+                                                fontWeight: 600,
+                                                fontSize: '12px',
+                                                lineHeight: 1.2
+                                            }}
+                                        >
+                                            {card.label}
+                                        </Typography>
+                                    </CardContent>
+                                </StatCard>
+                            ))}
+                        </Box>
+                    </Grid>
                 </Grid>
 
-                {/* ====== Filter & Action Section ====== */}
-                <TableContainer component={Paper} sx={{ p: 2, borderRadius: 2, boxShadow: "0 4px 10px rgba(0,0,0,0.1)" }}>
-                    <Grid container spacing={2} alignItems="center" justifyContent="space-between">
-                        <Grid item xs={12} md={3}>
-                            <Typography variant="h6">Affiliate Link List</Typography>
-                        </Grid>
-
-                        <Grid item xs={12} md={3}>
-                            <TextField
-                                placeholder="Search"
-                                variant="standard"
-                                fullWidth
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                InputProps={{
-                                    startAdornment: <SearchIcon sx={{ mr: 1, color: "gray" }} />,
+                {/* Compact Filter Section */}
+                <Grid item xs={12}>
+                    <FilterCard>
+                        <Box sx={{ p: 2 }}>
+                            <Typography 
+                                variant="h6" 
+                                sx={{ 
+                                    mb: 2,
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontWeight: 'bold',
+                                    fontSize: '1.1rem'
                                 }}
-                            />
-                        </Grid>
+                            >
+                                Affiliate Link List
+                            </Typography>
 
-                        <Grid item xs={12} md={4}>
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <Box display="flex" gap={2}>
-                                    <DatePicker
-                                        label="From Date"
-                                        value={fromDate}
-                                        format="DD-MM-YYYY"
-                                        onChange={(date) => setFromDate(date)}
-                                        sx={{ flex: 1 }}
-                                    />
-                                    <DatePicker
-                                        label="To Date"
-                                        value={toDate}
-                                        format="DD-MM-YYYY"
-                                        onChange={(date) => setToDate(date)}
-                                        sx={{ flex: 1 }}
-                                    />
+                            <Box sx={{ 
+                                display: 'flex', 
+                                flexWrap: 'wrap',
+                                gap: 1.5,
+                                alignItems: 'center'
+                            }}>
+                                <TextField
+                                    placeholder="Search"
+                                    variant="outlined"
+                                    size="small"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />,
+                                    }}
+                                    sx={{ 
+                                        minWidth: { xs: '100%', sm: '180px' },
+                                        flex: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                                        }
+                                    }}
+                                />
+
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+                                        <DatePicker
+                                            label="From Date"
+                                            value={fromDate}
+                                            format="DD-MM-YYYY"
+                                            onChange={(date) => setFromDate(date)}
+                                            slotProps={{ 
+                                                textField: { 
+                                                    size: "small",
+                                                    sx: { minWidth: '140px' }
+                                                } 
+                                            }}
+                                        />
+                                        <DatePicker
+                                            label="To Date"
+                                            value={toDate}
+                                            format="DD-MM-YYYY"
+                                            onChange={(date) => setToDate(date)}
+                                            slotProps={{ 
+                                                textField: { 
+                                                    size: "small",
+                                                    sx: { minWidth: '140px' }
+                                                } 
+                                            }}
+                                        />
+                                    </Box>
+                                </LocalizationProvider>
+
+                                <Box display="flex" gap={1} sx={{ flexWrap: 'wrap' }}>
+                                    <Button
+                                        variant="contained"
+                                        href={`/add-new-affiliate-link/`}
+                                        sx={{
+                                            minWidth: '100px',
+                                            background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
+                                            borderRadius: '8px',
+                                            fontWeight: 600,
+                                            textTransform: 'none',
+                                            fontSize: '0.875rem',
+                                            py: 1,
+                                            '&:hover': {
+                                                opacity: 0.9,
+                                            }
+                                        }}
+                                    >
+                                        Add New
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        href={`/affiliate-link-category/`}
+                                        sx={{
+                                            minWidth: '100px',
+                                            background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
+                                            borderRadius: '8px',
+                                            fontWeight: 600,
+                                            textTransform: 'none',
+                                            fontSize: '0.875rem',
+                                            py: 1,
+                                            '&:hover': {
+                                                opacity: 0.9,
+                                            }
+                                        }}
+                                    >
+                                        Category
+                                    </Button>
                                 </Box>
-                            </LocalizationProvider>
-                        </Grid>
-
-                        <Grid item xs={12} md={2} display="flex" justifyContent="flex-end" gap={1}>
-                            <Button variant="contained" color="primary" sx={{
-                                height: 40,
-                                px: 3,
-                                background: "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
-                                borderRadius: "12px",
-                                color: "#fff",
-                                fontWeight: "bold",
-                                boxShadow: "none",
-                                textTransform: "none",
-                                fontSize: "1rem",
-                                px: 3,
-                                py: 1,
-                                whiteSpace: "nowrap",
-                                "&:hover": { opacity: 0.9 },
-                            }} href={`/add-new-affiliate-link/`}>
-                                Add New
-                            </Button>
-                            <Button variant="contained" color="secondary" sx={{
-                                height: 40,
-                                px: 3,
-                                background: "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
-                                borderRadius: "12px",
-                                color: "#fff",
-                                fontWeight: "bold",
-                                boxShadow: "none",
-                                textTransform: "none",
-                                fontSize: "1rem",
-                                px: 3,
-                                py: 1,
-                                whiteSpace: "nowrap",
-                                "&:hover": { opacity: 0.9 },
-                            }} href={`/affiliate-link-category/`}>
-                                Category
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </TableContainer>
-
-                {/* ====== Table Section ====== */}
+                            </Box>
+                        </Box>
+                    </FilterCard>
+                </Grid>
             </Box>
+            
             <AffiliateTrackDetailsTransactions showServiceTrans={filteredRows} />
         </Layout>
     );

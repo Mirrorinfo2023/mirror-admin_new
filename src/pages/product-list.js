@@ -73,7 +73,7 @@ function BannersReport() {
             <Grid container spacing={4} sx={{ padding: 2 }}>
                 <Grid item xs={12}>
                     <TableContainer component={Paper} sx={{ p: 2 }}>
-                        {/* ✅ Single Responsive Row */}
+                        {/*  Single Responsive Row */}
                         <Box
                             sx={{
                                 display: "flex",

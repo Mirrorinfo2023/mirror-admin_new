@@ -173,59 +173,186 @@ function PrimeUserReport() {
     <Layout>
       <Grid container spacing={3} sx={{ padding: 2 }}>
         {/* Stats Cards */}
-        <Grid item xs={12}>
-          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2, justifyContent: "space-between" }}>
-            <StatCard bgcolor="#FFC107">
-              <StatContent>
-                <StatValue>{report?.total_count || 0}</StatValue>
-                <StatLabel>Total Count</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <LeaderboardIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
+      <Grid item xs={12}>
+  <Box sx={{ 
+    display: "flex", 
+    gap: 2, 
+    flexWrap: "wrap", 
+    mb: 2, 
+    justifyContent: { xs: "center", sm: "space-between" },
+    alignItems: "stretch" 
+  }}>
+    <StatCard sx={{ 
+      backgroundColor: '#f5f5f5', 
+      borderLeft: '4px solid #FFC107',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease-in-out',
+      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
+      flex: "1 1 auto",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "16px",
+      height: "120px",
+      '&:hover': {
+        backgroundColor: '#FFC107',
+        boxShadow: '0 8px 25px rgba(255, 193, 7, 0.5)',
+        transform: 'translateY(-4px)',
+        '& .MuiTypography-root': {
+          color: 'white',
+        }
+      }
+    }}>
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+          {report?.total_count || 0}
+        </StatValue>
+        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
+          Total Count
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
+        <LeaderboardIcon sx={{ fontSize: 48, color: "#FFC107", transition: 'color 0.3s ease' }} />
+      </StatIcon>
+    </StatCard>
 
-            <StatCard bgcolor="#5C6BC0">
-              <StatContent>
-                <StatValue>{report?.total_prime || 0}</StatValue>
-                <StatLabel>Total Prime</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <CheckCircleIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
+    <StatCard sx={{ 
+      backgroundColor: '#f5f5f5', 
+      borderLeft: '4px solid #5C6BC0',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease-in-out',
+      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
+      flex: "1 1 auto",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "16px",
+      height: "120px",
+      '&:hover': {
+        backgroundColor: '#5C6BC0',
+        boxShadow: '0 8px 25px rgba(92, 107, 192, 0.5)',
+        transform: 'translateY(-4px)',
+        '& .MuiTypography-root': {
+          color: 'white',
+        }
+      }
+    }}>
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+          {report?.total_prime || 0}
+        </StatValue>
+        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
+          Total Prime
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
+        <CheckCircleIcon sx={{ fontSize: 48, color: "#5C6BC0", transition: 'color 0.3s ease' }} />
+      </StatIcon>
+    </StatCard>
 
-            <StatCard bgcolor="#26A69A">
-              <StatContent>
-                <StatValue>{report?.total_primeB || 0}</StatValue>
-                <StatLabel>Total Prime B</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <HighlightOffIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
+    <StatCard sx={{ 
+      backgroundColor: '#f5f5f5', 
+      borderLeft: '4px solid #26A69A',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease-in-out',
+      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
+      flex: "1 1 auto",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "16px",
+      height: "120px",
+      '&:hover': {
+        backgroundColor: '#26A69A',
+        boxShadow: '0 8px 25px rgba(38, 166, 154, 0.5)',
+        transform: 'translateY(-4px)',
+        '& .MuiTypography-root': {
+          color: 'white',
+        }
+      }
+    }}>
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+          {report?.total_primeB || 0}
+        </StatValue>
+        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
+          Total Prime B
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
+        <HighlightOffIcon sx={{ fontSize: 48, color: "#26A69A", transition: 'color 0.3s ease' }} />
+      </StatIcon>
+    </StatCard>
 
-            <StatCard bgcolor="#EC407A">
-              <StatContent>
-                <StatValue>{report?.total_hybrid || 0}</StatValue>
-                <StatLabel>Total Hybrid</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <DeleteForeverIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
+    <StatCard sx={{ 
+      backgroundColor: '#f5f5f5', 
+      borderLeft: '4px solid #EC407A',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease-in-out',
+      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
+      flex: "1 1 auto",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "16px",
+      height: "120px",
+      '&:hover': {
+        backgroundColor: '#EC407A',
+        boxShadow: '0 8px 25px rgba(236, 64, 122, 0.5)',
+        transform: 'translateY(-4px)',
+        '& .MuiTypography-root': {
+          color: 'white',
+        }
+      }
+    }}>
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+          {report?.total_hybrid || 0}
+        </StatValue>
+        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
+          Total Hybrid
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
+        <DeleteForeverIcon sx={{ fontSize: 48, color: "#EC407A", transition: 'color 0.3s ease' }} />
+      </StatIcon>
+    </StatCard>
 
-            <StatCard bgcolor="#FF9800">
-              <StatContent>
-                <StatValue>{report?.total_booster || 0}</StatValue>
-                <StatLabel>Total Booster</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <LeaderboardIcon sx={{ fontSize: 64, color: "#fff" }} />
-              </StatIcon>
-            </StatCard>
-          </Box>
-        </Grid>
+    <StatCard sx={{ 
+      backgroundColor: '#f5f5f5', 
+      borderLeft: '4px solid #FF9800',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease-in-out',
+      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
+      flex: "1 1 auto",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "16px",
+      height: "120px",
+      '&:hover': {
+        backgroundColor: '#FF9800',
+        boxShadow: '0 8px 25px rgba(255, 152, 0, 0.5)',
+        transform: 'translateY(-4px)',
+        '& .MuiTypography-root': {
+          color: 'white',
+        }
+      }
+    }}>
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
+          {report?.total_booster || 0}
+        </StatValue>
+        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
+          Total Booster
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
+        <LeaderboardIcon sx={{ fontSize: 48, color: "#FF9800", transition: 'color 0.3s ease' }} />
+      </StatIcon>
+    </StatCard>
+  </Box>
+</Grid>
 
         {/* Filters */}
         <Grid item xs={12}>

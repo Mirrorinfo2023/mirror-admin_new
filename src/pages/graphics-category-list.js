@@ -150,8 +150,8 @@ function GraphicsCategoryReport(props) {
                             p: 2,
                             borderRadius: 3,
                             boxShadow: "0 4px 24px rgba(33,150,243,0.08)",
-                            overflowX: "auto", // ✅ allows horizontal scroll
-                            whiteSpace: "nowrap", // ✅ keeps in one line
+                            overflowX: "auto", 
+                            whiteSpace: "nowrap", 
                         }}
                     >
                         <Box
@@ -161,8 +161,8 @@ function GraphicsCategoryReport(props) {
                             justifyContent="space-between"
                             gap={2}
                             sx={{
-                                flexWrap: "nowrap", // ✅ no wrapping at all
-                                minWidth: "fit-content", // ✅ dynamic width (only what’s needed)
+                                flexWrap: "nowrap",
+                                minWidth: "fit-content", 
                             }}
                         >
                             {/* --- TITLE --- */}
@@ -188,7 +188,7 @@ function GraphicsCategoryReport(props) {
                                         startAdornment: <SearchIcon sx={{ color: "action.active", mr: 1 }} />,
                                     }}
                                     sx={{
-                                        width: { xs: 140, sm: 200, md: 240 }, // ✅ responsive width
+                                        width: { xs: 140, sm: 200, md: 240 }, 
                                     }}
                                 />
                             </Box>

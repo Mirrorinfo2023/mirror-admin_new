@@ -40,22 +40,14 @@ const FilterCard = styled(Card)(({ theme }) => ({
     border: '1px solid rgba(0,0,0,0.05)',
 }));
 
-const StatCard = styled(Card)(({ theme, gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }) => ({
-    background: gradient,
-    color: 'white',
+const StatCard = styled(Card)(({ theme }) => ({
     borderRadius: '12px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-    height: '100px',
+    height: '120px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
     transition: 'all 0.3s ease-in-out',
     position: 'relative',
     overflow: 'hidden',
-    '&:hover': {
-        transform: 'translateY(-3px)',
-        boxShadow: '0 8px 30px rgba(0,0,0,0.25)',
-    },
 }));
 
 const CardContentStyled = styled(CardContent)(({ theme }) => ({
@@ -186,68 +178,124 @@ function PrimeUserReport(props) {
     return (
         <Layout>
             <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 } }}>
-                {/* Header Section */}
-                <Box sx={{ mb: 4 }}>
-
-
-                    {/* Statistics Cards - Mobile Responsive */}
-                    <Grid container spacing={2} sx={{ mb: 3 }}>
-                        <Grid item xs={6} sm={3}>
-                            <StatCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-                                <CardContentStyled>
-                                    <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                                        {stats.total}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.7rem' }}>
-                                        Total
-                                    </Typography>
-                                </CardContentStyled>
-                            </StatCard>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <StatCard gradient="linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)">
-                                <CardContentStyled>
-                                    <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                                        {stats.pending}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.7rem' }}>
-                                        Pending
-                                    </Typography>
-                                </CardContentStyled>
-                            </StatCard>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <StatCard gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
-                                <CardContentStyled>
-                                    <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                                        {stats.approved}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.7rem' }}>
-                                        Approved
-                                    </Typography>
-                                </CardContentStyled>
-                            </StatCard>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <StatCard gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)">
-                                <CardContentStyled>
-                                    <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                                        {stats.rejected}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.7rem' }}>
-                                        Rejected
-                                    </Typography>
-                                </CardContentStyled>
-                            </StatCard>
-                        </Grid>
+                {/* Statistics Cards Section */}
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                    {/* Total Card */}
+                    <Grid item xs={6} sm={3}>
+                        <StatCard sx={{ 
+                            backgroundColor: '#f5f5f5', 
+                            borderLeft: '4px solid #667eea',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.3s ease-in-out',
+                            borderRadius: '8px',
+                            '&:hover': {
+                                backgroundColor: '#667eea',
+                                boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)',
+                                transform: 'translateY(-4px)',
+                                '& .MuiTypography-root': {
+                                    color: 'white',
+                                }
+                            }
+                        }}>
+                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
+                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
+                                    {stats.total}
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
+                                    Total
+                                </Typography>
+                            </Box>
+                        </StatCard>
                     </Grid>
-                </Box>
+                    
+                    {/* Pending Card */}
+                    <Grid item xs={6} sm={3}>
+                        <StatCard sx={{ 
+                            backgroundColor: '#f5f5f5', 
+                            borderLeft: '4px solid #11998e',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.3s ease-in-out',
+                            borderRadius: '8px',
+                            '&:hover': {
+                                backgroundColor: '#11998e',
+                                boxShadow: '0 8px 25px rgba(17, 153, 142, 0.5)',
+                                transform: 'translateY(-4px)',
+                                '& .MuiTypography-root': {
+                                    color: 'white',
+                                }
+                            }
+                        }}>
+                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
+                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
+                                    {stats.pending}
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
+                                    Pending
+                                </Typography>
+                            </Box>
+                        </StatCard>
+                    </Grid>
+                    
+                    {/* Approved Card */}
+                    <Grid item xs={6} sm={3}>
+                        <StatCard sx={{ 
+                            backgroundColor: '#f5f5f5', 
+                            borderLeft: '4px solid #ff6b6b',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.3s ease-in-out',
+                            borderRadius: '8px',
+                            '&:hover': {
+                                backgroundColor: '#ff6b6b',
+                                boxShadow: '0 8px 25px rgba(255, 107, 107, 0.5)',
+                                transform: 'translateY(-4px)',
+                                '& .MuiTypography-root': {
+                                    color: 'white',
+                                }
+                            }
+                        }}>
+                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
+                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
+                                    {stats.approved}
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
+                                    Approved
+                                </Typography>
+                            </Box>
+                        </StatCard>
+                    </Grid>
+                    
+                    {/* Rejected Card */}
+                    <Grid item xs={6} sm={3}>
+                        <StatCard sx={{ 
+                            backgroundColor: '#f5f5f5', 
+                            borderLeft: '4px solid #a8a8a8',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            transition: 'all 0.3s ease-in-out',
+                            borderRadius: '8px',
+                            '&:hover': {
+                                backgroundColor: '#a8a8a8',
+                                boxShadow: '0 8px 25px rgba(168, 168, 168, 0.5)',
+                                transform: 'translateY(-4px)',
+                                '& .MuiTypography-root': {
+                                    color: 'white',
+                                }
+                            }
+                        }}>
+                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
+                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
+                                    {stats.rejected}
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
+                                    Rejected
+                                </Typography>
+                            </Box>
+                        </StatCard>
+                    </Grid>
+                </Grid>
 
-                {/* Filters Section */}
+                {/* Rest of your code remains the same... */}
                 <FilterCard>
                     <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                        {/* Section Header */}
-
                         <Typography
                             variant="h5"
                             component="h1"
@@ -264,7 +312,7 @@ function PrimeUserReport(props) {
 
                         {/* Search and Filters Grid */}
                         <Grid container spacing={2} alignItems="center">
-                            {/* Search Field - Full width on mobile */}
+                            {/* Search Field */}
                             <Grid item xs={12} md={4}>
                                 <TextField
                                     fullWidth
@@ -285,7 +333,7 @@ function PrimeUserReport(props) {
                                 />
                             </Grid>
 
-                            {/* Transaction Type Filter */}
+                            {/* Status Filter */}
                             <Grid item xs={12} md={2}>
                                 <FormControl fullWidth size="small">
                                     <InputLabel>Status</InputLabel>
@@ -308,7 +356,7 @@ function PrimeUserReport(props) {
                                 </FormControl>
                             </Grid>
 
-                            {/* Date Range - Stack vertically on mobile */}
+                            {/* Date Range */}
                             <Grid item xs={12} md={4}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <Box sx={{
@@ -385,7 +433,6 @@ function PrimeUserReport(props) {
                                 </FormControl>
                             </Grid>
                         </Grid>
-
                     </CardContent>
                 </FilterCard>
 
@@ -398,7 +445,6 @@ function PrimeUserReport(props) {
                         border: '1px solid rgba(0,0,0,0.05)'
                     }}
                 >
-
                 </Paper>
             </Container>
             <PrimeUserTransactions showServiceTrans={filteredRows} />

@@ -1,87 +1,45 @@
 "use client"
-import React, { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useDispatch } from 'react-redux';
 import Cookies from "js-cookie";
 import api from "../../utils/api";
 import withAuth from "../../utils/withAuth";
 import { callAlert } from "../../redux/actions/alert";
 import Layout from "@/components/Dashboard/layout";
 import dynamic from "next/dynamic";
-const Transactions = dynamic(() => import("@/components/leads/category"), { ssr: false });
-import { Grid, Paper, TableContainer, Button, Typography, Divider, Box, TextField, Table, TableHead, TableBody, TableRow, TableCell } from "@mui/material";
-import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+const Transactions = dynamic(() => import("@/components/leads/category"), { 
+  ssr: false,
+  loading: () => <div>Loading categories...</div>
+});
+import { Grid, Paper, TableContainer, Button, Typography, Box, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { DataEncrypt, DataDecrypt } from '../../utils/encryption';
 
-const drawWidth = 220;
-const getDate = (timeZone) => {
-  const dateString = timeZone;
-  const dateObject = new Date(dateString);
-
+const getDate = () => {
+  const dateObject = new Date();
   const year = dateObject.getFullYear();
   const month = String(dateObject.getMonth() + 1).padStart(2, "0");
   const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-
-  // Determine if it's AM or PM
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-
-  // Convert hours to 12-hour format
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-
-  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-
-  return formattedDateTime;
+  
+  return `${year}-${month}-${day}`;
 };
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  borderRadius: 2,
-  boxShadow: 24, overflow: 'auto'
-};
-
-const innerStyle = {
-  overflow: 'auto',
-  width: 400,
-  height: 400,
-};
-
 
 function TransactionHistory(props) {
-
   const [showServiceTrans, setShowServiceTrans] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch();
   const uid = Cookies.get('uid');
 
-  let rows;
-
-  if (showServiceTrans && showServiceTrans.length > 0) {
-    rows = [
-      ...showServiceTrans
-    ];
-  } else {
-    rows = [];
-  }
-  // const [fromDate, setFromDate] = useState(new Date());
-  // const [toDate, setToDate] = useState(new Date());
-
-  const [fromDate, setFromDate] = React.useState(dayjs(getDate.dateObject));
-  const [toDate, setToDate] = React.useState(dayjs(getDate.dateObject));
+  let rows = showServiceTrans && showServiceTrans.length > 0 ? [...showServiceTrans] : [];
 
   useEffect(() => {
     const all_parameters = {
       "category_name1": null
-    }
+    };
+    
     const encryptedData = DataEncrypt(JSON.stringify(all_parameters));
+    
     const getTnx = async () => {
       const reqData = {
         encReq: encryptedData
@@ -106,57 +64,70 @@ function TransactionHistory(props) {
     if (uid) {
       getTnx();
     }
-  }, [uid, fromDate, toDate, dispatch]);
-
-  const handleFromDateChange = (date) => {
-    setFromDate(date);
-  };
-
-  const handleToDateChange = (date) => {
-    setToDate(date);
-  };
-
-  const [searchTerm, setSearchTerm] = useState('');
+  }, [uid, dispatch]);
 
   const filteredRows = rows.filter(row => {
     return (
-      (row.category_name && row.category_name.toLowerCase().includes(searchTerm.toLowerCase()))
-      // Add conditions for other relevant columns
+      row.category_name && 
+      row.category_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  return (
 
+  return (
     <Layout>
       <Grid container spacing={4} sx={{ padding: 2 }}>
         <Grid item xs={12}>
-          <TableContainer component={Paper}>
+          <TableContainer 
+            component={Paper}
+            sx={{
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              overflow: 'hidden'
+            }}
+          >
             <Box 
               sx={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center', 
                 padding: 2,
-                flexWrap: { xs: 'wrap', md: 'nowrap' } // Allow wrapping on small screens
+                flexWrap: { xs: 'wrap', md: 'nowrap' },
+                borderBottom: '1px solid #e0e0e0',
+                backgroundColor: '#fafafa'
               }}
             >
               {/* Title on the left */}
-              <Typography variant="h5" sx={{ flexShrink: 0, marginRight: 2 }}>
+              <Typography variant="h5" sx={{ flexShrink: 0, marginRight: 2, fontWeight: 600 }}>
                 Lead Categories
               </Typography>
 
               {/* Search and Button on the right */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, justifyContent: 'flex-end' }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 2, 
+                flexGrow: 1, 
+                justifyContent: 'flex-end',
+                flexWrap: { xs: 'wrap', sm: 'nowrap' }
+              }}>
                 {/* Search Field */}
                 <TextField 
                   id="standard-basic" 
                   placeholder="Search" 
-                  variant="standard" 
+                  variant="outlined"
+                  size="small"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
-                    startAdornment: <SearchIcon />,
+                    startAdornment: <SearchIcon color="action" />,
                   }}
-                  sx={{ minWidth: 200 }}
+                  sx={{ 
+                    minWidth: 200,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 1,
+                    }
+                  }}
                 />
 
                 {/* Add New Button */}
@@ -171,15 +142,17 @@ function TransactionHistory(props) {
                     fontWeight: 500,
                     fontSize: 15,
                     px: 2,
-                    py: 0.5,
+                    py: 1,
                     borderRadius: 2,
                     boxShadow: '0 2px 8px 0 rgba(33,203,243,0.15)',
                     textTransform: 'uppercase',
                     letterSpacing: 0,
                     whiteSpace: 'nowrap',
                     flexShrink: 0,
+                    border: '1px solid #1976d2',
                     '&:hover': {
                       background: 'linear-gradient(90deg, #21cbf3 0%, #1976d2 100%)',
+                      boxShadow: '0 4px 12px 0 rgba(33,203,243,0.3)',
                     },
                   }}
                 >
@@ -191,8 +164,9 @@ function TransactionHistory(props) {
         </Grid>
       </Grid>
 
-      <Transactions showServiceTrans={showServiceTrans} />
+      <Transactions showServiceTrans={filteredRows} />
     </Layout>
   );
 }
+
 export default withAuth(TransactionHistory);

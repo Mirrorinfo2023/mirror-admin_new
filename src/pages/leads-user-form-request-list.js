@@ -134,166 +134,238 @@ function LeadsHistory(props) {
   return (
     <Layout>
       <Grid container  sx={{ padding: 2 }}>
-     <Grid container spacing={2} alignItems="stretch" sx={{ width: "100%", flexWrap: "nowrap" }}>
-  <Grid item xs={12} md={6}>
-    <Item
-      sx={{
-        height: 120,
-        backgroundColor: "#FFC107",
-        color: "#fff",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "10px",
-        position: "relative",
-        width: "100%", // full width inside half container
-        overflow: "hidden",
-        whiteSpace: "nowrap", // ✅ prevent text wrap
-      }}
-    >
-      <LeaderboardIcon
-        sx={{
-          fontSize: 40,
-          position: "absolute",
-          top: 10,
-          right: 10,
-          opacity: 0.2,
-        }}
-      />
-      <Box>
-        <Typography
-          variant="h2"
-          sx={{ padding: 1, fontSize: "22px", color: "#fff", whiteSpace: "nowrap" }}
+     <Grid container spacing={2} sx={{ padding: 2 }}>
+  {/* First Row - Stat Cards */}
+  <Grid item xs={12}>
+    <Grid container spacing={2} alignItems="stretch" sx={{ width: "100%", flexWrap: "nowrap", mb: 3 }}>
+      <Grid item xs={12} md={6}>
+        <Item
+          sx={{
+            height: 100,
+            backgroundColor: "#f5f5f5",
+            borderLeft: "4px solid #FFC107",
+            color: "#000",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: "8px",
+            padding: "16px",
+            paddingBottom: "20px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease-in-out",
+            width: "100%",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            '&:hover': {
+              backgroundColor: "#FFC107",
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 12px rgba(255, 193, 7, 0.3)",
+              '& .MuiTypography-root, & .stat-value': {
+                color: "#fff",
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}
         >
-          Total Count
-        </Typography>
-        <Box sx={{ color: "#fff", fontSize: 24, whiteSpace: "nowrap" }}>
-          {report ? report.total_count : 0}
-        </Box>
-      </Box>
-    </Item>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{ 
+                fontSize: "16px", 
+                fontWeight: 600, 
+                color: "inherit",
+                whiteSpace: "nowrap",
+                mb: 0.5
+              }}
+            >
+              Total Count
+            </Typography>
+            <Box className="stat-value" sx={{ 
+              color: "inherit", 
+              fontSize: "22px", 
+              fontWeight: 700,
+              whiteSpace: "nowrap" 
+            }}>
+              {report?.total_count || 0}
+            </Box>
+          </Box>
+          <LeaderboardIcon 
+            className="stat-icon"
+            sx={{
+              fontSize: 36,
+              color: "#FFC107",
+              transition: "all 0.3s ease",
+              flexShrink: 0
+            }}
+          />
+        </Item>
+      </Grid>
+
+      <Grid item xs={12} md={6}>
+        <Item
+          sx={{
+            height: 100,
+            backgroundColor: "#f5f5f5",
+            borderLeft: "4px solid #2196f3",
+            color: "#000",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: "8px",
+            padding: "16px",
+            paddingBottom: "20px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease-in-out",
+            width: "100%",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            '&:hover': {
+              backgroundColor: "#2196f3",
+              transform: "translateY(-2px)",
+              boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
+              '& .MuiTypography-root, & .stat-value': {
+                color: "#fff",
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="h6"
+              sx={{ 
+                fontSize: "16px", 
+                fontWeight: 600, 
+                color: "inherit",
+                whiteSpace: "nowrap",
+                mb: 0.5
+              }}
+            >
+              Total Distributed Amt.
+            </Typography>
+            <Box className="stat-value" sx={{ 
+              color: "inherit", 
+              fontSize: "22px", 
+              fontWeight: 700,
+              whiteSpace: "nowrap" 
+            }}>
+              {report?.total_distributed_amount ?? 0}
+            </Box>
+          </Box>
+          <PaidIcon 
+            className="stat-icon"
+            sx={{
+              fontSize: 36,
+              color: "#2196f3",
+              transition: "all 0.3s ease",
+              flexShrink: 0
+            }}
+          />
+        </Item>
+      </Grid>
+    </Grid>
   </Grid>
 
-  <Grid item xs={12} md={6}>
-    <Item
-      sx={{
-        height: 120,
-        backgroundColor: "#2196f3",
-        color: "#fff",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: "10px",
-        position: "relative",
-        width: "100%",
-        overflow: "hidden",
-        whiteSpace: "nowrap", // ✅ prevent wrapping
+  {/* Second Row - Table Header with Search and Date */}
+  <Grid item xs={12}>
+    <TableContainer 
+      component={Paper} 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: '16px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        border: '1px solid #e0e0e0'
       }}
     >
-      <PaidIcon
-        sx={{
-          fontSize: 40,
-          position: "absolute",
-          top: 10,
-          right: 10,
-          opacity: 0.2,
+      <Typography 
+        variant="h5" 
+        sx={{ 
+          padding: 1,
+          whiteSpace: "nowrap",
+          flex: 1
         }}
-      />
-      <Box>
-        <Typography
-          variant="h2"
-          sx={{ padding: 1, fontSize: "22px", color: "#fff", whiteSpace: "nowrap" }}
-        >
-          Total Distributed Amt.
-        </Typography>
-        <Box sx={{ color: "#fff", fontSize: 24, whiteSpace: "nowrap" }}>
-          {report?.total_distributed_amount ?? 0}
-        </Box>
+      >
+        User Lead Form Request List
+      </Typography>
+
+      <Box
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 2,
+          flexWrap: 'wrap',
+          justifyContent: 'flex-end'
+        }}
+      >
+        {/* Search Field */}
+        <TextField
+          id="standard-basic"
+          placeholder="Search"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: <SearchIcon color="action" />,
+          }}
+          sx={{ 
+            width: "200px",
+            '& .MuiOutlinedInput-root': {
+              height: '40px'
+            }
+          }}
+        />
+
+        {/* Date Pickers */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <DatePicker
+              value={fromDate}
+              format="DD-MM-YYYY"
+              onChange={handleFromDateChange}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  sx: {
+                    width: 140,
+                    '& .MuiInputBase-root': {
+                      height: 40,
+                      fontSize: '0.875rem'
+                    }
+                  }
+                }
+              }}
+            />
+            <DatePicker
+              value={toDate}
+              format="DD-MM-YYYY"
+              onChange={handleToDateChange}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  sx: {
+                    width: 140,
+                    '& .MuiInputBase-root': {
+                      height: 40,
+                      fontSize: '0.875rem'
+                    }
+                  }
+                }
+              }}
+            />
+          </Box>
+        </LocalizationProvider>
       </Box>
-    </Item>
+    </TableContainer>
   </Grid>
 </Grid>
-
-
-        <Grid item={true} xs={12}>
-          <TableContainer component={Paper} style={{ display: 'flex', justifyContent: 'space-between' , alignItems:'center'}}>
-        
-              <Typography variant="h5" sx={{ padding: 1 }} whiteSpace={"nowrap"}>
-                User Lead Form Request List
-              </Typography>
-         
-
-            <Box
-              display={"inline-block"}
-              justifyContent={"space-between"}
-              alignItems={"right"}
-             
-              sx={{ width: "30%", verticalAlign: "top" }}
-            >
-              <TextField
-                id="standard-basic"
-                placeholder="Search"
-                variant="standard"
-                mt={2}
-                style={{ width: "100%" }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <SearchIcon />,
-                }}
-              />
-            </Box>
-
-            <Box
-              display={"inline-block"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              mt={1}
-              mb={1}
-              mr={1}
-              sx={{ verticalAlign: "top" }}
-            >
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <DatePicker
-                    value={fromDate}
-                    format="DD-MM-YYYY"
-                    onChange={handleFromDateChange}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: {
-                          width: 150,
-                          '& .MuiInputBase-root': {
-                            height: 40,
-                            fontSize: '0.875rem'
-                          }
-                        }
-                      }
-                    }}
-                  />
-                  <DatePicker
-                    value={toDate}
-                    format="DD-MM-YYYY"
-                    onChange={handleToDateChange}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: {
-                          width: 150,
-                          '& .MuiInputBase-root': {
-                            height: 40,
-                            fontSize: '0.875rem'
-                          }
-                        }
-                      }
-                    }}
-                  />
-                </Box>
-              </LocalizationProvider>
-            </Box>
-          </TableContainer>
-        </Grid>
       </Grid>
 
       <Transactions showServiceTrans={filteredRows} />

@@ -180,134 +180,190 @@ function PrimeUserReport(props) {
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {/* Total Transit Card */}
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-              <CardContentStyled>
+            <Card sx={{ 
+              backgroundColor: '#f5f5f5', 
+              borderLeft: '4px solid #667eea',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease-in-out',
+              height: '120px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '&:hover': {
+                backgroundColor: '#667eea',
+                boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)',
+                transform: 'translateY(-4px)',
+              }
+            }}>
+              <CardContent sx={{ textAlign: 'center', padding: '16px !important', width: '100%' }}>
                 <Typography variant="h4" component="div" sx={{ 
                   fontWeight: 'bold', 
                   fontSize: { xs: '1.75rem', md: '2rem' }, 
                   mb: 1,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  color: '#000000',
                 }}>
-                  {report ? report.total_count : 0}
+                  {report?.total_count || 0}
                 </Typography>
                 <Typography variant="h6" sx={{ 
                   fontSize: '0.9rem', 
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  opacity: 0.9,
-                  mb: 0.5
+                  mb: 0.5,
+                  color: '#000000',
                 }}>
                   Total Transit
                 </Typography>
                 <Typography variant="caption" sx={{ 
-                  opacity: 0.8,
                   fontSize: '0.75rem',
-                  display: 'block'
+                  display: 'block',
+                  color: '#000000',
                 }}>
-                  {report ? report.totalTransit : 0} transactions
+                  {report?.totalTransit || 0} transactions
                 </Typography>
-              </CardContentStyled>
-            </StatCard>
+              </CardContent>
+            </Card>
           </Grid>
 
           {/* Total Deliver Card */}
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
-              <CardContentStyled>
+            <Card sx={{ 
+              backgroundColor: '#f5f5f5', 
+              borderLeft: '4px solid #43e97b',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease-in-out',
+              height: '120px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '&:hover': {
+                backgroundColor: '#43e97b',
+                boxShadow: '0 8px 25px rgba(67, 233, 123, 0.5)',
+                transform: 'translateY(-4px)',
+              }
+            }}>
+              <CardContent sx={{ textAlign: 'center', padding: '16px !important', width: '100%' }}>
                 <Typography variant="h4" component="div" sx={{ 
                   fontWeight: 'bold', 
                   fontSize: { xs: '1.75rem', md: '2rem' }, 
                   mb: 1,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  color: '#000000',
                 }}>
-                  {report ? report.total_count : 0}
+                  {report?.total_count || 0}
                 </Typography>
                 <Typography variant="h6" sx={{ 
                   fontSize: '0.9rem', 
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  opacity: 0.9,
-                  mb: 0.5
+                  mb: 0.5,
+                  color: '#000000',
                 }}>
                   Total Deliver
                 </Typography>
                 <Typography variant="caption" sx={{ 
-                  opacity: 0.8,
                   fontSize: '0.75rem',
-                  display: 'block'
+                  display: 'block',
+                  color: '#000000',
                 }}>
-                  {report ? report.totalDeliver : 0} delivered
+                  {report?.totalDeliver || 0} delivered
                 </Typography>
-              </CardContentStyled>
-            </StatCard>
+              </CardContent>
+            </Card>
           </Grid>
 
           {/* Total Cancel Card */}
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)">
-              <CardContentStyled>
+            <Card sx={{ 
+              backgroundColor: '#f5f5f5', 
+              borderLeft: '4px solid #fa709a',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease-in-out',
+              height: '120px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '&:hover': {
+                backgroundColor: '#fa709a',
+                boxShadow: '0 8px 25px rgba(250, 112, 154, 0.5)',
+                transform: 'translateY(-4px)',
+              }
+            }}>
+              <CardContent sx={{ textAlign: 'center', padding: '16px !important', width: '100%' }}>
                 <Typography variant="h4" component="div" sx={{ 
                   fontWeight: 'bold', 
                   fontSize: { xs: '1.75rem', md: '2rem' }, 
                   mb: 1,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  color: '#000000',
                 }}>
-                  {report ? report.total_count : 0}
+                  {report?.total_count || 0}
                 </Typography>
                 <Typography variant="h6" sx={{ 
                   fontSize: '0.9rem', 
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  opacity: 0.9,
-                  mb: 0.5
+                  mb: 0.5,
+                  color: '#000000',
                 }}>
                   Total Cancel
                 </Typography>
                 <Typography variant="caption" sx={{ 
-                  opacity: 0.8,
                   fontSize: '0.75rem',
-                  display: 'block'
+                  display: 'block',
+                  color: '#000000',
                 }}>
-                  {report ? report.totalCancel : 0} cancelled
+                  {report?.totalCancel || 0} cancelled
                 </Typography>
-              </CardContentStyled>
-            </StatCard>
+              </CardContent>
+            </Card>
           </Grid>
 
           {/* Total Order Place Card */}
           <Grid item xs={12} sm={6} md={3}>
-            <StatCard gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
-              <CardContentStyled>
+            <Card sx={{ 
+              backgroundColor: '#f5f5f5', 
+              borderLeft: '4px solid #4facfe',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              transition: 'all 0.3s ease-in-out',
+              height: '120px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              '&:hover': {
+                backgroundColor: '#4facfe',
+                boxShadow: '0 8px 25px rgba(79, 172, 254, 0.5)',
+                transform: 'translateY(-4px)',
+              }
+            }}>
+              <CardContent sx={{ textAlign: 'center', padding: '16px !important', width: '100%' }}>
                 <Typography variant="h4" component="div" sx={{ 
                   fontWeight: 'bold', 
                   fontSize: { xs: '1.75rem', md: '2rem' }, 
                   mb: 1,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  color: '#000000',
                 }}>
-                  {report ? report.total_count : 0}
+                  {report?.total_count || 0}
                 </Typography>
                 <Typography variant="h6" sx={{ 
                   fontSize: '0.9rem', 
                   fontWeight: '600',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  opacity: 0.9,
-                  mb: 0.5
+                  mb: 0.5,
+                  color: '#000000',
                 }}>
                   Total Order Place
                 </Typography>
                 <Typography variant="caption" sx={{ 
-                  opacity: 0.8,
                   fontSize: '0.75rem',
-                  display: 'block'
+                  display: 'block',
+                  color: '#000000',
                 }}>
-                  {report ? report.totalOrderPlaced : 0} orders
+                  {report?.totalOrderPlaced || 0} orders
                 </Typography>
-              </CardContentStyled>
-            </StatCard>
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
 

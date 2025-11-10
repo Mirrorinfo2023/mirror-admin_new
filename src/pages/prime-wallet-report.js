@@ -8,6 +8,8 @@ import {
   Typography,
   Box,
   TextField,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -20,19 +22,25 @@ import { callAlert } from "../../redux/actions/alert";
 import Layout from "@/components/Dashboard/layout";
 import Transactions from "@/components/Dashboard/User/prime";
 
-const StatCard = styled(Paper)(({ theme }) => ({
-  height: 100,
-  borderRadius: 10,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  color: "#fff",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-  transition: "0.3s",
-  "&:hover": {
-    transform: "translateY(-3px)",
-  },
+// Compact StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '90px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+  flex: 1,
+  minWidth: '160px',
+}));
+
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '16px',
+  border: '1px solid rgba(0,0,0,0.05)',
 }));
 
 function TransactionHistory() {
@@ -58,8 +66,8 @@ function TransactionHistory() {
         const response = await api.post("/api/report/prime-wallet-report", reqData);
 
         if (response.status === 200) {
-          setShowServiceTrans(response.data.data);
-          setMasterReport(response.data.report);
+          setShowServiceTrans(response.data.data || []);
+          setMasterReport(response.data.report || {});
         }
       } catch (error) {
         dispatch(
@@ -77,129 +85,183 @@ function TransactionHistory() {
   // Filter logic
   const filteredRows = showServiceTrans.filter((row) => {
     return (
-      (row.first_name &&
-        row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (row.first_name && row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (row.mlm_id && row.mlm_id.includes(searchTerm)) ||
       (row.mobile && row.mobile.includes(searchTerm)) ||
       (row.email && row.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (row.sub_type &&
-        row.sub_type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (row.sub_type && row.sub_type.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (row.transaction_id && row.transaction_id == searchTerm)
     );
   });
 
+  const cards = [
+    {
+      label: "Opening Balance",
+      value: `₹${masterReport.OpeningBal ?? 0}`,
+      color: "#42A5F5"
+    },
+    {
+      label: "Closing Balance",
+      value: `₹${masterReport.ClosingBal ?? 0}`,
+      color: "#66BB6A"
+    },
+    {
+      label: "Credit",
+      value: `₹${masterReport.Credit ?? 0}`,
+      color: "#FFA726"
+    },
+    {
+      label: "Debit",
+      value: `₹${masterReport.Debit ?? 0}`,
+      color: "#EF5350"
+    }
+  ];
+
   return (
     <Layout>
-      <Box sx={{ p: { xs: 1, md: 3 } }}>
-        {/* ====== Stat Cards Row ====== */}
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={3}>
-            <StatCard sx={{ background: "linear-gradient(45deg, #42a5f5, #478ed1)" }}>
-              <Typography variant="h6">Opening Balance</Typography>
-              <Typography variant="h5" fontWeight="bold">
-                ₹{masterReport.OpeningBal ?? 0}
-              </Typography>
-            </StatCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <StatCard sx={{ background: "linear-gradient(45deg, #66bb6a, #43a047)" }}>
-              <Typography variant="h6">Closing Balance</Typography>
-              <Typography variant="h5" fontWeight="bold">
-                ₹{masterReport.ClosingBal ?? 0}
-              </Typography>
-            </StatCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <StatCard sx={{ background: "linear-gradient(45deg, #ffa726, #fb8c00)" }}>
-              <Typography variant="h6">Credit</Typography>
-              <Typography variant="h5" fontWeight="bold">
-                ₹{masterReport.Credit ?? 0}
-              </Typography>
-            </StatCard>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <StatCard sx={{ background: "linear-gradient(45deg, #ef5350, #e53935)" }}>
-              <Typography variant="h6">Debit</Typography>
-              <Typography variant="h5" fontWeight="bold">
-                ₹{masterReport.Debit ?? 0}
-              </Typography>
-            </StatCard>
+      <Box sx={{ p: 1.5 }}>
+        {/* Compact Statistics Cards */}
+        <Grid container spacing={1.5} sx={{ mb: 2 }}>
+          <Grid item xs={12}>
+            <Box sx={{ 
+              display: "flex", 
+              gap: 1.5, 
+              flexWrap: "wrap",
+            }}>
+              {cards.map((card, index) => (
+                <StatCard 
+                  key={index}
+                  sx={{ 
+                    backgroundColor: '#f5f5f5', 
+                    borderLeft: `4px solid ${card.color}`,
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    '&:hover': {
+                      backgroundColor: card.color,
+                      boxShadow: `0 8px 25px ${card.color}80`,
+                      transform: 'translateY(-2px)',
+                      '& .MuiTypography-root': {
+                        color: 'white',
+                      }
+                    }
+                  }}
+                >
+                  <CardContent sx={{ 
+                    padding: '12px !important', 
+                    width: '100%',
+                    textAlign: 'center',
+                    '&:last-child': { pb: '12px' }
+                  }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        color: '#000000', 
+                        transition: 'color 0.3s ease', 
+                        fontWeight: 700, 
+                        fontSize: '20px', 
+                        mb: 0.5,
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.value}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: '#000000', 
+                        transition: 'color 0.3s ease', 
+                        fontWeight: 600,
+                        fontSize: '12px',
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.label}
+                    </Typography>
+                  </CardContent>
+                </StatCard>
+              ))}
+            </Box>
           </Grid>
         </Grid>
 
-        {/* ====== Filters Row ====== */}
-        <Paper sx={{ p: 2, mt: 3, mb: 2 }}>
-          <Box
-            display="flex"
-            flexWrap={{ xs: "wrap", md: "nowrap" }}
-            alignItems="center"
-            justifyContent="space-between"
-            gap={2}
-          >
-            {/* Left: Title */}
-            <Typography
-              variant="h6"
-              sx={{
-                minWidth: "fit-content",
-                fontWeight: 600,
-                color: "text.primary",
-              }}
-            >
-              User Prime Wallet Report
-            </Typography>
-
-            {/* Right: Filters */}
-            <Box
-              display="flex"
-              flexWrap={{ xs: "wrap", md: "nowrap" }}
-              alignItems="center"
-              gap={2}
-              flex={1}
-              justifyContent={{ xs: "flex-start", md: "flex-end" }}
-            >
-              <TextField
-                size="small"
-                placeholder="Search by name, mobile, or ID"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <SearchIcon sx={{ mr: 1, color: "action.active", fontSize: 20 }} />
-                  ),
+        {/* Compact Filter Section */}
+        <Grid item xs={12}>
+          <FilterCard>
+            <Box sx={{ p: 2 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem'
                 }}
-                sx={{ width: { xs: "100%", sm: 200, md: 220 } }}
-              />
+              >
+                User Prime Wallet Report
+              </Typography>
 
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="From Date"
-                  value={fromDate}
-                  format="DD-MM-YYYY"
-                  onChange={(newDate) => setFromDate(newDate)}
-                  slotProps={{
-                    textField: { size: "small", sx: { minWidth: 150 } },
+              <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: 1.5,
+                alignItems: 'center'
+              }}>
+                <TextField
+                  placeholder="Search by name, mobile, or ID"
+                  variant="outlined"
+                  size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />,
+                  }}
+                  sx={{ 
+                    minWidth: { xs: '100%', sm: '200px' },
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(0,0,0,0.02)',
+                    }
                   }}
                 />
-              </LocalizationProvider>
 
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="To Date"
-                  value={toDate}
-                  format="DD-MM-YYYY"
-                  onChange={(newDate) => setToDate(newDate)}
-                  slotProps={{
-                    textField: { size: "small", sx: { minWidth: 150 } },
-                  }}
-                />
-              </LocalizationProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+                    <DatePicker
+                      label="From Date"
+                      value={fromDate}
+                      format="DD-MM-YYYY"
+                      onChange={(newDate) => setFromDate(newDate)}
+                      slotProps={{ 
+                        textField: { 
+                          size: "small",
+                          sx: { minWidth: '140px' }
+                        } 
+                      }}
+                    />
+                    <DatePicker
+                      label="To Date"
+                      value={toDate}
+                      format="DD-MM-YYYY"
+                      onChange={(newDate) => setToDate(newDate)}
+                      slotProps={{ 
+                        textField: { 
+                          size: "small",
+                          sx: { minWidth: '140px' }
+                        } 
+                      }}
+                    />
+                  </Box>
+                </LocalizationProvider>
+              </Box>
             </Box>
-          </Box>
-        </Paper>
-
-        {/* ====== Transaction Table ====== */}
+          </FilterCard>
+        </Grid>
       </Box>
-        <Transactions showServiceTrans={filteredRows} />
+      
+      <Transactions showServiceTrans={filteredRows} />
     </Layout>
   );
 }

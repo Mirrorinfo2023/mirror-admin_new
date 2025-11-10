@@ -1,12 +1,15 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import api from "../../utils/api";
 import withAuth from "../../utils/withAuth";
 import { callAlert } from "../../redux/actions/alert";
+
 import Layout from "@/components/Dashboard/layout";
 import Transactions from "@/components/IncomeReport/royality_income";
+
 import {
   Grid,
   Paper,
@@ -14,49 +17,84 @@ import {
   Box,
   TextField,
   InputAdornment,
-  TableContainer,
 } from "@mui/material";
+
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
+
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 import dayjs from "dayjs";
 
-const Item = styled(Paper)(({ theme }) => ({
-  background: "linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)", // ✅ card background
-  border: "1px solid #90CAF9",
+// ----------------------------------------------------------------------
+// ✅ Reusable Stat Card Component
+// ----------------------------------------------------------------------
+
+const StatCard = styled(Paper)(({ theme }) => ({
+  padding: "20px",
   borderRadius: "12px",
-  padding: theme.spacing(2),
-  textAlign: "center",
-  color: theme.palette.text.primary,
   height: 120,
   display: "flex",
-  flexDirection: "column",
   justifyContent: "center",
-  transition: "transform 0.2s ease, box-shadow 0.2s ease",
+  alignItems: "center",
+  transition: "all 0.3s ease",
+  cursor: "pointer",
+
   "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: "0 4px 20px rgba(33,150,243,0.25)",
+    transform: "translateY(-6px)",
   },
 }));
 
-const getDate = (timeZone) => {
-  const dateObject = new Date(timeZone);
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-  return `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-};
+const StatContent = styled("div")({
+  textAlign: "center",
+});
+
+const StatValue = styled(Typography)({
+  fontSize: "1.6rem",
+  fontWeight: "bold",
+});
+
+const StatLabel = styled(Typography)({
+  fontSize: "1rem",
+  fontWeight: 500,
+  marginTop: 6,
+});
+
+// ✅ Reusable Component
+const StatCardItem = ({ value, label, color }) => (
+  <StatCard
+    sx={{
+      backgroundColor: "#f5f5f5",
+      borderLeft: `4px solid ${color}`,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+
+      "&:hover": {
+        backgroundColor: color,
+        boxShadow: `0 8px 25px ${color}55`,
+        "& .MuiTypography-root": {
+          color: "white",
+        },
+      },
+    }}
+  >
+    <StatContent>
+      <StatValue>{value ?? 0}</StatValue>
+      <StatLabel>{label}</StatLabel>
+    </StatContent>
+  </StatCard>
+);
+
+// ----------------------------------------------------------------------
+// ✅ MAIN PAGE
+// ----------------------------------------------------------------------
 
 function TransactionHistory() {
   const [showServiceTrans, setShowServiceTrans] = useState([]);
   const [report, setReport] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
   const dispatch = useDispatch();
   const uid = Cookies.get("uid");
 
@@ -80,8 +118,8 @@ function TransactionHistory() {
         );
 
         if (response.status === 200) {
-          setShowServiceTrans(response.data.data);
-          setReport(response.data.report);
+          setShowServiceTrans(response.data.data || []);
+          setReport(response.data.report || {});
         }
       } catch (error) {
         dispatch(
@@ -92,6 +130,7 @@ function TransactionHistory() {
         );
       }
     };
+
     if (uid) getTnx();
   }, [uid, fromDate, toDate, dispatch]);
 
@@ -104,42 +143,33 @@ function TransactionHistory() {
   return (
     <Layout>
       <Box sx={{ p: 2 }}>
-        {/* --- Report Cards Section --- */}
-        <Grid container spacing={2}>
-          {[
-            {
-              label: "Total Royality Generate",
-              value: report?.total_royalitygenerate || 0,
-            },
-            {
-              label: "Today's Royality Income",
-              value: report?.todays_royalityIncome || 0,
-            },
-            {
-              label: "Month Royality Income",
-              value: report?.Month_royalityIncome || 0,
-            },
-          ].map((item, index) => (
-            <Grid key={index} item xs={12} sm={6} md={4}>
-              <Item>
-                <Typography
-                  variant="h5"
-                  sx={{ color: "#1565C0", fontWeight: 700 }}
-                >
-                  ₹{item.value}
-                </Typography>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ mt: 1, fontSize: 16, color: "#0D47A1" }}
-                >
-                  {item.label}
-                </Typography>
-              </Item>
-            </Grid>
-          ))}
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6} sm={3}>
+            <StatCardItem
+              value={report?.total_royalitygenerate}
+              label="Total Royality Generate"
+              color="#667eea"
+            />
+          </Grid>
+
+          <Grid item xs={6} sm={3}>
+            <StatCardItem
+              value={report?.todays_royalityIncome}
+              label="Today's Royality Income"
+              color="#11998e"
+            />
+          </Grid>
+
+          <Grid item xs={6} sm={3}>
+            <StatCardItem
+              value={report?.month_royalityIncome}
+              label="Month Royality Income"
+              color="#ff6b6b"
+            />
+          </Grid>
         </Grid>
 
-        {/* --- Filters Section --- */}
         <Paper
           sx={{
             p: 2,
@@ -204,11 +234,8 @@ function TransactionHistory() {
           </Grid>
         </Paper>
 
-        {/* --- Table Section --- */}
-
-
-
       </Box>
+
       <Transactions showServiceTrans={filteredRows} />
     </Layout>
   );

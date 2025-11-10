@@ -108,30 +108,41 @@ const PrimeUserTransactions = ({ showServiceTrans }) => {
 
 
 
-  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-      background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
-      color: "#fff",
-      fontWeight: 700,
-      fontSize: 12,
-      textTransform: "uppercase",
-      padding: "8px 8px",
-      borderRight: "1px solid #e3e3e3",
-      whiteSpace: "nowrap",
-      letterSpacing: 1,
+        background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+        color: "#fff",
+        fontWeight: 700,
+        fontSize: 12,
+        textTransform: "uppercase",
+        padding: "8px 8px",
+        border: "1px solid rgba(255, 255, 255, 0.3)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.3)",
+        borderBottom: "2px solid rgba(255, 255, 255, 0.5)",
+        whiteSpace: "nowrap",
+        letterSpacing: 1,
     },
     "&:first-of-type": {
-      borderTopLeftRadius: 6,
+        borderTopLeftRadius: 6,
+        borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
     },
     "&:last-of-type": {
-      borderTopRightRadius: 6,
+        borderTopRightRadius: 6,
+        borderRight: "1px solid rgba(255, 255, 255, 0.3)",
     },
     [`&.${tableCellClasses.body}`]: {
-      fontSize: 12,
-      padding: "8px 8px",
-      borderRight: "1px solid #e3e3e3",
+        fontSize: 12,
+        padding: "8px 8px",
+        border: "1px solid #e0e0e0",
+        borderTop: "none",
+        "&:first-of-type": {
+            borderLeft: "1px solid #e0e0e0",
+        },
+        "&:last-of-type": {
+            borderRight: "1px solid #e0e0e0",
+        },
     },
-  }));
+}));
   const StyledTableRow = styled(TableRow)(({ theme }) => ({
     "&:nth-of-type(odd)": {
       backgroundColor: theme.palette.action.hover,

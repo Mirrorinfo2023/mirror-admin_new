@@ -116,11 +116,10 @@ function MeetingDetailsReport() {
       <Grid container spacing={4} sx={{ padding: 2 }}>
         <Grid item xs={12}>
           <TableContainer component={Paper} sx={{ p: 2 }}>
-            {/* ✅ Single Row Layout */}
             <Box
               sx={{
                 display: "flex",
-                flexWrap: "wrap", // ✅ Responsive
+                flexWrap: "wrap",
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: 2,

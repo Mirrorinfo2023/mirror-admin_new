@@ -6,7 +6,16 @@ import api from "../../utils/api";
 import withAuth from "../../utils/withAuth";
 import Layout from "@/components/Dashboard/layout";
 import OtpTransactions from "@/components/Otp/Otp";
-import { Grid,TableContainer, Paper, Typography, Box, TextField } from "@mui/material";
+import { 
+    Grid,
+    TableContainer, 
+    Paper, 
+    Typography, 
+    Box, 
+    TextField,
+    Card,
+    CardContent 
+} from "@mui/material";
 import dayjs from "dayjs";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
@@ -14,7 +23,9 @@ import MessageIcon from "@mui/icons-material/Message";
 import TimerOffIcon from "@mui/icons-material/TimerOff";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { DataDecrypt, DataEncrypt } from "../../utils/encryption";
+
 const drawWidth = 220;
+
 const getDate = (timeZone) => {
   const dateString = timeZone;
   const dateObject = new Date(dateString);
@@ -23,70 +34,30 @@ const getDate = (timeZone) => {
   const day = String(dateObject.getDate()).padStart(2, "0");
   const hours = String(dateObject.getHours()).padStart(2, "0");
   const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-  // Determine if it's AM or PM
   const amOrPm = hours >= 12 ? "PM" : "AM";
-  // Convert hours to 12-hour format
   const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
   const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
   return formattedDateTime;
 };
-const StatCard = styled(Paper)(({ bgcolor }) => ({
-  background: bgcolor,
-  color: "#fff",
-  borderRadius: 12,
-  padding: "28px 36px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  minWidth: 280,
-  minHeight: 100,
-  position: "relative",
-  overflow: "hidden",
-  marginRight: 24,
+
+// New StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '120px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+  minWidth: '280px',
 }));
 
-const StatContent = styled("div")({
-  zIndex: 2,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-});
-
-const StatValue = styled("div")({
-  fontSize: 32,
-  fontWeight: 700,
-  lineHeight: 1.1,
-  marginBottom: 4,
-});
-
-const StatLabel = styled("div")({
-  fontSize: 12,
-  fontWeight: 500,
-  opacity: 0.85,
-  letterSpacing: 1,
-  textTransform: "uppercase",
-});
-
-const StatIcon = styled("div")({
-  position: "absolute",
-  right: 24,
-  top: "50%",
-  transform: "translateY(-50%)",
-  opacity: 0.18,
-  fontSize: 64,
-  zIndex: 1,
-});
-const FilterRow = styled(Box)(({ theme }) => ({
-  background: "#f5faff",
-  borderRadius: 12,
-  boxShadow: "0 2px 12px 0 rgba(0,0,0,0.06)",
-  padding: "16px",
-  display: "flex",
-  alignItems: "center",
-  gap: 20,
-  marginBottom: 10,
-  flexWrap: "nowrap",
-  justifyContent: "flex-start",
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '24px',
+  border: '1px solid rgba(0,0,0,0.05)',
 }));
 
 function OtpReport(props) {
@@ -101,34 +72,20 @@ function OtpReport(props) {
 
     useEffect(() => {
         const getTnx = async () => {
-            // const reqData = {
-            //     from_date: fromDate.toISOString().split('T')[0],
-            //     to_date: toDate.toISOString().split('T')[0],
-            // }
-
             try {
-
                 const response = await api.post("/api/report/otp");
                 if (response.status === 200) {
                     setShowServiceTrans(response.data.otpResult)
                     setmasterReport(response.data.report)
                 }
-
             } catch (error) {
-
-                // if (error?.response?.data?.error) {
-                //     dispatch(callAlert({ message: error.response.data.error, type: 'FAILED' }))
-                // } else {
-                //     dispatch(callAlert({ message: error.message, type: 'FAILED' }))
-                // }
-
+                // Error handling commented out in original code
             }
         }
 
         if (fromDate || toDate) {
             getTnx();
         }
-
     }, [fromDate, toDate, dispatch])
 
     const handleFromDateChange = (date) => {
@@ -138,80 +95,166 @@ function OtpReport(props) {
     const handleToDateChange = (date) => {
         setToDate(date);
     };
-    return (
 
+    // Card configurations
+    const cards = [
+        {
+            label: "Total OTP",
+            value: masterReport.totalSms ?? 0,
+            color: "#FFC107",
+            icon: <MessageIcon />
+        },
+        {
+            label: "Expired OTP",
+            value: masterReport.totalExpsms ?? 0,
+            color: "#5C6BC0",
+            icon: <TimerOffIcon />
+        },
+        {
+            label: "Active OTP",
+            value: masterReport.totalActivesms ?? 0,
+            color: "#26A69A",
+            icon: <AccessTimeIcon />
+        }
+    ];
+
+    return (
         <Layout>
-            <Grid
-                container
-                spacing={4}
-                sx={{ padding: 2 }}
-            >
-                <Grid item={true} justifyContent="center" xs={12}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            gap: 1,
-                            flexWrap: "wrap",
-                            justifyContent: "center",
-                            mb: 1,
-                        }}
-                    >
-                        <StatCard bgcolor="#FFC107">
-                            <StatContent>
-                                <StatValue> {masterReport.totalSms ?? 0}</StatValue>
-                                <StatLabel> Total OTP</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <MessageIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
-                        <StatCard bgcolor="#5C6BC0">
-                            <StatContent>
-                                <StatValue>{masterReport.totalExpsms ?? 0}</StatValue>
-                                <StatLabel> Expired OTP</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <TimerOffIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
-                        <StatCard bgcolor="#26A69A">
-                            <StatContent>
-                                <StatValue>{masterReport.totalActivesms ?? 0}</StatValue>
-                                <StatLabel> Active OTP</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <AccessTimeIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
+            <Grid container spacing={2} sx={{ p: 2 }}>
+                {/* Statistics Cards - New Design */}
+                <Grid item xs={12}>
+                    <Box sx={{ 
+                        display: "flex", 
+                        gap: 2, 
+                        flexWrap: "wrap", 
+                        justifyContent: "center", 
+                        mb: 3 
+                    }}>
+                        {cards.map((card, index) => (
+                            <StatCard 
+                                key={index}
+                                sx={{ 
+                                    backgroundColor: '#f5f5f5', 
+                                    borderLeft: `4px solid ${card.color}`,
+                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                    '&:hover': {
+                                        backgroundColor: card.color,
+                                        boxShadow: `0 8px 25px ${card.color}80`,
+                                        transform: 'translateY(-4px)',
+                                        '& .MuiTypography-root': {
+                                            color: 'white',
+                                        },
+                                        '& .stat-icon': {
+                                            color: 'white',
+                                            opacity: 0.8
+                                        }
+                                    }
+                                }}
+                            >
+                                <CardContent sx={{ 
+                                    padding: '16px !important', 
+                                    width: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between'
+                                }}>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography 
+                                            variant="h4" 
+                                            sx={{ 
+                                                color: '#000000', 
+                                                transition: 'color 0.3s ease', 
+                                                fontWeight: 700, 
+                                                fontSize: '24px', 
+                                                mb: 1,
+                                                lineHeight: 1.2
+                                            }}
+                                        >
+                                            {card.value}
+                                        </Typography>
+                                        <Typography 
+                                            variant="body1" 
+                                            sx={{ 
+                                                color: '#000000', 
+                                                transition: 'color 0.3s ease', 
+                                                fontWeight: 600,
+                                                fontSize: '14px',
+                                                lineHeight: 1.2
+                                            }}
+                                        >
+                                            {card.label}
+                                        </Typography>
+                                    </Box>
+                                    <Box 
+                                        className="stat-icon"
+                                        sx={{ 
+                                            color: card.color, 
+                                            transition: 'color 0.3s ease',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            ml: 2
+                                        }}
+                                    >
+                                        {React.cloneElement(card.icon, { sx: { fontSize: 40 } })}
+                                    </Box>
+                                </CardContent>
+                            </StatCard>
+                        ))}
                     </Box>
                 </Grid>
 
-                <Grid item={true} xs={12}   >
-                    <TableContainer component={Paper} >
-                        <Box display={'inline-block'} justifyContent={'space-between'} alignItems={'right'} mt={1} mb={1} style={{ width: '70%', verticalAlign: 'top' }} >
-                            <Typography variant="h5" sx={{ padding: 2 }}>Otp Report</Typography>
-                        </Box>
-                        <Box display={'inline-block'} justifyContent={'space-between'} alignItems={'center'} mt={3} mb={1} sx={{ width: '25%', verticalAlign: 'top' }}>
-                            <TextField id="standard-basic" placeholder="Search" variant="standard" mt={2} style={{ width: '100%' }}
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                                InputProps={{
-                                    startAdornment: (
-                                        <SearchIcon />
-                                    ),
-                                }} />
-                        </Box>
+                {/* Filter Section */}
+                <Grid item xs={12}>
+                    <FilterCard>
+                        <Box sx={{ p: 3 }}>
+                            <Typography 
+                                variant="h5" 
+                                sx={{ 
+                                    mb: 3,
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontWeight: 'bold'
+                                }}
+                            >
+                                OTP Report
+                            </Typography>
 
-
-                    </TableContainer>
+                            <Box sx={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: 2,
+                                flexWrap: 'wrap'
+                            }}>
+                                <TextField 
+                                    id="standard-basic" 
+                                    placeholder="Search" 
+                                    variant="outlined"
+                                    size="small"
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: <SearchIcon color="action" />,
+                                    }}
+                                    sx={{ 
+                                        width: { xs: '100%', sm: '300px' },
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                                        }
+                                    }} 
+                                />
+                            </Box>
+                        </Box>
+                    </FilterCard>
                 </Grid>
-
             </Grid>
+
             <OtpTransactions showServiceTrans={showServiceTrans} searchTerm={searchTerm} />
         </Layout>
-
-
     );
 }
-export default withAuth(OtpReport);
 
+export default withAuth(OtpReport);

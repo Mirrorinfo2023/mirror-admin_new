@@ -200,7 +200,6 @@ const Transactions = ({ showServiceTrans }) => {
                                                 {row.status === 1 ? "Active" : "Inactive"}
                                             </StyledTableCell>
 
-                                            {/* ✅ ACTION BUTTONS INSTEAD OF DROPDOWN */}
                                             <StyledTableCell sx={{ "& button": { m: 0.5 } }}>
                                                 <Button
                                                     variant="contained"

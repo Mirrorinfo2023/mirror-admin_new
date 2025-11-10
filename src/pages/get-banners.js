@@ -136,57 +136,116 @@ function BannersReport() {
         <Layout>
             <Grid container spacing={2} sx={{ p: 2 }}>
                 {/* --- STAT CARDS --- */}
-                <Grid item xs={12}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: 2,
-                            justifyContent: { xs: "center", sm: "flex-start" },
-                        }}
-                    >
-                        <StatCard bgcolor="#FFC107">
-                            <StatContent>
-                                <StatValue>{report?.total_count || 0}</StatValue>
-                                <StatLabel>Total</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <LeaderboardIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
+<Grid item xs={12}>
+    <Box
+        sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            justifyContent: { xs: "center", sm: "flex-start" },
+        }}
+    >
+        <StatCard 
+            sx={{ 
+                backgroundColor: '#f5f5f5', 
+                borderLeft: '4px solid #667eea',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                    backgroundColor: '#667eea',
+                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)',
+                    transform: 'translateY(-4px)',
+                    '& .MuiTypography-root': {
+                        color: 'white',
+                    }
+                }
+            }}
+        >
+            <StatContent>
+                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_count || 0}</StatValue>
+                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Total</StatLabel>
+            </StatContent>
+            <StatIcon>
+                <LeaderboardIcon sx={{ fontSize: 64, color: "#667eea", transition: 'color 0.3s ease' }} />
+            </StatIcon>
+        </StatCard>
 
-                        <StatCard bgcolor="#5C6BC0">
-                            <StatContent>
-                                <StatValue>{report?.total_active || 0}</StatValue>
-                                <StatLabel>Active</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <CheckCircleIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
+        <StatCard 
+            sx={{ 
+                backgroundColor: '#f5f5f5', 
+                borderLeft: '4px solid #11998e',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                    backgroundColor: '#11998e',
+                    boxShadow: '0 8px 25px rgba(17, 153, 142, 0.5)',
+                    transform: 'translateY(-4px)',
+                    '& .MuiTypography-root': {
+                        color: 'white',
+                    }
+                }
+            }}
+        >
+            <StatContent>
+                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_active || 0}</StatValue>
+                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Active</StatLabel>
+            </StatContent>
+            <StatIcon>
+                <CheckCircleIcon sx={{ fontSize: 64, color: "#11998e", transition: 'color 0.3s ease' }} />
+            </StatIcon>
+        </StatCard>
 
-                        <StatCard bgcolor="#26A69A">
-                            <StatContent>
-                                <StatValue>{report?.total_inactive || 0}</StatValue>
-                                <StatLabel>Inactive</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <HighlightOffIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
+        <StatCard 
+            sx={{ 
+                backgroundColor: '#f5f5f5', 
+                borderLeft: '4px solid #ff6b6b',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                    backgroundColor: '#ff6b6b',
+                    boxShadow: '0 8px 25px rgba(255, 107, 107, 0.5)',
+                    transform: 'translateY(-4px)',
+                    '& .MuiTypography-root': {
+                        color: 'white',
+                    }
+                }
+            }}
+        >
+            <StatContent>
+                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_inactive || 0}</StatValue>
+                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Inactive</StatLabel>
+            </StatContent>
+            <StatIcon>
+                <HighlightOffIcon sx={{ fontSize: 64, color: "#ff6b6b", transition: 'color 0.3s ease' }} />
+            </StatIcon>
+        </StatCard>
 
-                        <StatCard bgcolor="#EC407A">
-                            <StatContent>
-                                <StatValue>{report?.total_deleted || 0}</StatValue>
-                                <StatLabel>Deleted</StatLabel>
-                            </StatContent>
-                            <StatIcon>
-                                <DeleteForeverIcon sx={{ fontSize: 64, color: "#fff" }} />
-                            </StatIcon>
-                        </StatCard>
-                    </Box>
-                </Grid>
-
+        <StatCard 
+            sx={{ 
+                backgroundColor: '#f5f5f5', 
+                borderLeft: '4px solid #a8a8a8',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                    backgroundColor: '#a8a8a8',
+                    boxShadow: '0 8px 25px rgba(168, 168, 168, 0.5)',
+                    transform: 'translateY(-4px)',
+                    '& .MuiTypography-root': {
+                        color: 'white',
+                    }
+                }
+            }}
+        >
+            <StatContent>
+                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_deleted || 0}</StatValue>
+                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Deleted</StatLabel>
+            </StatContent>
+            <StatIcon>
+                <DeleteForeverIcon sx={{ fontSize: 64, color: "#a8a8a8", transition: 'color 0.3s ease' }} />
+            </StatIcon>
+        </StatCard>
+    </Box>
+</Grid>
                 {/* --- FILTER ROW --- */}
                 <Grid item xs={12}>
                     <FilterRow>

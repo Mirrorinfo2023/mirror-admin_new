@@ -48,7 +48,6 @@ function GraphicsReport() {
   );
   const [toDate, setToDate] = useState(dayjs());
 
-  // ✅ Fetch data
   useEffect(() => {
     const getTnx = async () => {
       const reqData = {
@@ -79,7 +78,6 @@ function GraphicsReport() {
     getTnx();
   }, [fromDate, toDate, dispatch]);
 
-  // ✅ Filtering logic
   let rows = showServiceTrans || [];
   let filteredRows;
 
@@ -96,7 +94,6 @@ function GraphicsReport() {
     );
   }
 
-  // ✅ Handlers
   const handleFromDateChange = (date) => setFromDate(date);
   const handleToDateChange = (date) => setToDate(date);
   const handleChange = (event) => setSelectedValue(event.target.value);
@@ -113,7 +110,7 @@ function GraphicsReport() {
               backgroundColor: "#fff",
             }}
           >
-            {/* ✅ Unified Header Row */}
+            {/*  Unified Header Row */}
             <Box
               sx={{
                 display: "flex",
@@ -235,7 +232,7 @@ function GraphicsReport() {
         </Grid>
       </Grid>
 
-      {/* ✅ Report Table */}
+      {/*  Report Table */}
       <GraphicsTransactions showServiceTrans={filteredRows} />
     </Layout>
   );

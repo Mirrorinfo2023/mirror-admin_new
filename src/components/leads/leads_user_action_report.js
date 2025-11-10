@@ -192,7 +192,7 @@ const Transactions = ({ showServiceTrans }) => {
     }));
 
     const ThemedTableHeadCell = styled(TableCell)(({ theme }) => ({
-        background: 'linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)',
+        background: '#2198f3',
         color: '#fff',
         fontWeight: 700,
         fontSize: 13,
@@ -204,16 +204,24 @@ const Transactions = ({ showServiceTrans }) => {
         whiteSpace:"nowrap"
     }));
 
-    const ThemedTableRow = styled(TableRow)(({ theme }) => ({
-        '&:hover': {
-            background: '#f5faff',
+ const ThemedTableRow = styled(TableRow)(({ theme }) => ({
+    '&:hover': {
+        background: '#f5faff',
+    },
+    '& td': {
+        padding: '6px 10px',
+        height: '40px',
+        fontSize: '13px',
+        borderRight: '1px solid #e0e0e0',
+        borderBottom: '1px solid #e0e0e0',
+        '&:first-of-type': {
+            borderLeft: '1px solid #e0e0e0'
         },
-        '& td': {
-            padding: '6px 10px',
-            height: '40px',
-            fontSize: '13px',
+        '&:last-of-type': {
+            borderRight: '1px solid #e0e0e0'
         }
-    }));
+    }
+}));
 
     const NoRecordsBox = styled('div')({
         display: 'flex',

@@ -58,7 +58,7 @@ function TransactionHistory() {
     );
     const [toDate, setToDate] = useState(dayjs(new Date()));
 
-    // ✅ Fetch partners
+    //  Fetch partners
     useEffect(() => {
         const getPartners = async () => {
             try {
@@ -76,7 +76,7 @@ function TransactionHistory() {
         getPartners();
     }, [dispatch]);
 
-    // ✅ Fetch transactions
+    //  Fetch transactions
     useEffect(() => {
         const getTnx = async () => {
             const reqData = {
@@ -105,7 +105,7 @@ function TransactionHistory() {
         if (fromDate || toDate || partner_id) getTnx();
     }, [fromDate, toDate, partner_id, dispatch]);
 
-    // ✅ Validation
+    //  Validation
     const validateForm = () => {
         let tempErrors = {};
         if (!selectedValue) tempErrors.selectedValue = "Please select a transaction type.";
@@ -116,7 +116,7 @@ function TransactionHistory() {
         return Object.keys(tempErrors).length === 0;
     };
 
-    // ✅ Submit Credit/Debit
+    //  Submit Credit/Debit
     const handleSubmit = async () => {
         if (!validateForm()) return;
         setButtonHidden(true);
@@ -135,7 +135,7 @@ function TransactionHistory() {
         }
     };
 
-    // ✅ Search Filter
+    //  Search Filter
     const filteredRows = showServiceTrans.filter((row) => {
         const term = searchTerm.toLowerCase();
         return (
@@ -154,7 +154,7 @@ function TransactionHistory() {
         <Layout>
             <Grid container justifyContent="center" sx={{ padding: 2 }}>
                 <Grid item xs={12}>
-                    {/* ✅ Title + Button Row */}
+                    {/*  Title + Button Row */}
                     <FormCard sx={{ position: "sticky", top: 0, zIndex: 10 }}>
                         <Box
                             display="flex"
@@ -183,7 +183,7 @@ function TransactionHistory() {
                             </Button>
                         </Box>
 
-                        {/* ✅ Filter Row */}
+                        {/*  Filter Row */}
                         <Box
                             display="flex"
                             alignItems="center"
@@ -252,14 +252,14 @@ function TransactionHistory() {
                 </Grid>
             </Grid>
 
-            {/* ✅ Transactions Table */}
+            {/*  Transactions Table */}
             <Transactions
                 showServiceTrans={filteredRows}
                 totalPageCount={totalPageCount}
                 setTotalPageCount={setTotalPageCount}
             />
 
-            {/* ✅ Credit/Debit Dialog */}
+            {/*  Credit/Debit Dialog */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="md">
                 <DialogTitle>Credit / Debit Wallet</DialogTitle>
                 <DialogContent dividers>

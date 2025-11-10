@@ -19,6 +19,8 @@ import {
     Typography,
     Box,
     TextField,
+    Card,
+    CardContent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -28,12 +30,23 @@ import SearchIcon from "@mui/icons-material/Search";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
 
-const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: "center",
-    color: theme.palette.text.secondary,
+// New StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '120px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+}));
+
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '24px',
+  border: '1px solid rgba(0,0,0,0.05)',
 }));
 
 const getDate = (timeZone) => {
@@ -98,55 +111,81 @@ function TransactionHistory() {
         }
     };
 
+    // Card configurations
+    const cards = [
+        {
+            title: "Active Users",
+            color: "#FFC107",
+            count: masterReport.totalActiveusers || 0,
+        },
+        {
+            title: "Inactive Users",
+            color: "#5C6BC0",
+            count: masterReport.totalInactiveusers || 0,
+        },
+        {
+            title: "Prime Users",
+            color: "#26A69A",
+            count: masterReport.totalPrimeusers || 0,
+        },
+        {
+            title: "Non-Prime Users",
+            color: "#EC407A",
+            count: masterReport.totalNonprimeusers || 0,
+        },
+    ];
+
     return (
         <Layout>
             <Grid container spacing={2} sx={{ p: 2 }}>
-                {/* ====== Summary Cards ====== */}
-                {[
-                    {
-                        title: "Active Users",
-                        color: "#FFC107",
-                        count: masterReport.totalActiveusers,
-                    },
-                    {
-                        title: "Inactive Users",
-                        color: "#5C6BC0",
-                        count: masterReport.totalInactiveusers,
-                    },
-                    {
-                        title: "Prime Users",
-                        color: "#26A69A",
-                        count: masterReport.totalPrimeusers,
-                    },
-                    {
-                        title: "Non-Prime Users",
-                        color: "#EC407A",
-                        count: masterReport.totalNonprimeusers,
-                    },
-                ].map((card, i) => (
-                    <Grid key={i} item xs={12} sm={6} md={3}>
-                        <Item
-                            sx={{
-                                height: 90,
+                {/* ====== Summary Cards - New Design ====== */}
+                {cards.map((card, index) => (
+                    <Grid key={index} item xs={12} sm={6} md={3}>
+                        <StatCard sx={{ 
+                            backgroundColor: '#f5f5f5', 
+                            borderLeft: `4px solid ${card.color}`,
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            '&:hover': {
                                 backgroundColor: card.color,
-                                color: "#FFF",
-                                borderRadius: "10px",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        >
-                            <Typography variant="h6" sx={{ fontSize: "16px" }}>
-                                {masterReport.totalUsers ?? 0} : {card.count ?? 0}
-                            </Typography>
-                            <Typography
-                                variant="body2"
-                                sx={{ fontSize: "16px", fontWeight: 600 }}
-                            >
-                                {card.title}
-                            </Typography>
-                        </Item>
+                                boxShadow: `0 8px 25px ${card.color}80`,
+                                transform: 'translateY(-4px)',
+                                '& .MuiTypography-root': {
+                                    color: 'white',
+                                }
+                            }
+                        }}>
+                            <CardContent sx={{ 
+                                textAlign: 'center', 
+                                padding: '16px !important', 
+                                width: '100%' 
+                            }}>
+                                <Typography 
+                                    variant="h4" 
+                                    sx={{ 
+                                        color: '#000000', 
+                                        transition: 'color 0.3s ease', 
+                                        fontWeight: 700, 
+                                        fontSize: '24px', 
+                                        mb: 1,
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    {masterReport.totalUsers || 0} : {card.count}
+                                </Typography>
+                                <Typography 
+                                    variant="body1" 
+                                    sx={{ 
+                                        color: '#000000', 
+                                        transition: 'color 0.3s ease', 
+                                        fontWeight: 600,
+                                        fontSize: '14px',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    {card.title}
+                                </Typography>
+                            </CardContent>
+                        </StatCard>
                     </Grid>
                 ))}
 
@@ -161,110 +200,158 @@ function TransactionHistory() {
                         </div>
                     )}
 
-                    <TableContainer component={Paper} sx={{ p: 2 }}>
-                        <Typography variant="h5" sx={{ mb: 2 }}>
-                            User Details
-                        </Typography>
-
-
-
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                flexWrap: "wrap",
-                                gap: 2,
-                                alignItems: "center",
-                                justifyContent: "flex-start",
-                            }}
-                        >
-                            {/* Search Input */}
-                            <TextField
-                                variant="outlined"
-                                placeholder="Search"
-                                size="small"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                InputProps={{
-                                    startAdornment: (
-                                        <SearchIcon sx={{ mr: 1, color: "action.active", fontSize: 20 }} />
-                                    ),
-                                }}
-                                sx={{
-                                    flex: 1,
-                                    minWidth: { xs: "100%", sm: 180 },
-                                    "& .MuiInputBase-root": {
-                                        height: 40, // Adjust height
-                                    },
-                                }}
-                            />
-
-
-                            {/* Date Pickers */}
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    label="From Date"
-                                    value={fromDate}
-                                    onChange={setFromDate}
-                                    format="DD-MM-YYYY"
-                                    sx={{ minWidth: { xs: "100%", sm: 180 } }}
-                                />
-                                <DatePicker
-                                    label="To Date"
-                                    value={toDate}
-                                    onChange={setToDate}
-                                    format="DD-MM-YYYY"
-                                    sx={{ minWidth: { xs: "100%", sm: 180 } }}
-                                />
-                            </LocalizationProvider>
-
-                            {/* Filter Dropdown */}
-                            <FormControl sx={{ minWidth: { xs: "100%", sm: 160 } }}>
-                                <InputLabel>Filter</InputLabel>
-                                <Select
-                                    value={selectedValue}
-                                    label="Filter"
-                                    onChange={(e) => setSelectedValue(e.target.value)}
-                                >
-                                    <MenuItem value="">Default</MenuItem>
-                                    <MenuItem value="mlm_id">User Id</MenuItem>
-                                    <MenuItem value="first_name">Name</MenuItem>
-                                    <MenuItem value="mobile">Mobile</MenuItem>
-                                    <MenuItem value="email">Email</MenuItem>
-                                    <MenuItem value="ref_mlm_id">Referral User Id</MenuItem>
-                                    <MenuItem value="ref_first_name">Referral Name</MenuItem>
-                                    <MenuItem value="wallet_balance">Wallet Balance</MenuItem>
-                                    <MenuItem value="cashback_balance">Cashback</MenuItem>
-                                    <MenuItem value="city">City</MenuItem>
-                                    <MenuItem value="state">State</MenuItem>
-                                    <MenuItem value="pincode">Pincode</MenuItem>
-                                </Select>
-                            </FormControl>
-
-
-                            {/* Search Button */}
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                size="small"
-                                onClick={handleOKButtonClick}
-                                sx={{
-                                    borderRadius: 2,
-                                    fontWeight: 700,
-                                    fontSize: 16,
-                                    px: 4,
-                                    py: 1.2,
-                                    background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
-                                    boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
-                                    textTransform: "none",
-                                    whiteSpace: "nowrap",
-
+                    <FilterCard>
+                        <Box sx={{ p: 3 }}>
+                            <Typography 
+                                variant="h5" 
+                                sx={{ 
+                                    mb: 3,
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontWeight: 'bold'
                                 }}
                             >
-                                Search
-                            </Button>
+                                User Details
+                            </Typography>
+
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 2,
+                                    alignItems: "center",
+                                    justifyContent: "flex-start",
+                                }}
+                            >
+                                {/* Search Input */}
+                                <TextField
+                                    variant="outlined"
+                                    placeholder="Search"
+                                    size="small"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <SearchIcon sx={{ mr: 1, color: "action.active", fontSize: 20 }} />
+                                        ),
+                                    }}
+                                    sx={{
+                                        flex: 1,
+                                        minWidth: { xs: "100%", sm: 180 },
+                                        "& .MuiInputBase-root": {
+                                            height: 40,
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                                        },
+                                    }}
+                                />
+
+                                {/* Date Pickers */}
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="From Date"
+                                        value={fromDate}
+                                        onChange={setFromDate}
+                                        format="DD-MM-YYYY"
+                                        slotProps={{
+                                            textField: {
+                                                size: 'small',
+                                                sx: { 
+                                                    minWidth: { xs: "100%", sm: 180 },
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        height: 40,
+                                                        backgroundColor: 'rgba(0,0,0,0.02)',
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <DatePicker
+                                        label="To Date"
+                                        value={toDate}
+                                        onChange={setToDate}
+                                        format="DD-MM-YYYY"
+                                        slotProps={{
+                                            textField: {
+                                                size: 'small',
+                                                sx: { 
+                                                    minWidth: { xs: "100%", sm: 180 },
+                                                    borderRadius: '8px',
+                                                    '& .MuiOutlinedInput-root': {
+                                                        height: 40,
+                                                        backgroundColor: 'rgba(0,0,0,0.02)',
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </LocalizationProvider>
+
+                                {/* Filter Dropdown */}
+                                <FormControl 
+                                    sx={{ 
+                                        minWidth: { xs: "100%", sm: 160 },
+                                        '& .MuiOutlinedInput-root': {
+                                            height: 40,
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                                        }
+                                    }}
+                                >
+                                    <InputLabel>Filter</InputLabel>
+                                    <Select
+                                        value={selectedValue}
+                                        label="Filter"
+                                        onChange={(e) => setSelectedValue(e.target.value)}
+                                    >
+                                        <MenuItem value="">Default</MenuItem>
+                                        <MenuItem value="mlm_id">User Id</MenuItem>
+                                        <MenuItem value="first_name">Name</MenuItem>
+                                        <MenuItem value="mobile">Mobile</MenuItem>
+                                        <MenuItem value="email">Email</MenuItem>
+                                        <MenuItem value="ref_mlm_id">Referral User Id</MenuItem>
+                                        <MenuItem value="ref_first_name">Referral Name</MenuItem>
+                                        <MenuItem value="wallet_balance">Wallet Balance</MenuItem>
+                                        <MenuItem value="cashback_balance">Cashback</MenuItem>
+                                        <MenuItem value="city">City</MenuItem>
+                                        <MenuItem value="state">State</MenuItem>
+                                        <MenuItem value="pincode">Pincode</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                {/* Search Button */}
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    onClick={handleOKButtonClick}
+                                    sx={{
+                                        borderRadius: '8px',
+                                        fontWeight: 600,
+                                        fontSize: '14px',
+                                        px: 4,
+                                        py: 1,
+                                        background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                                        boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
+                                        textTransform: "none",
+                                        whiteSpace: "nowrap",
+                                        height: '40px',
+                                        minWidth: '120px',
+                                        transition: 'all 0.3s ease-in-out',
+                                        '&:hover': {
+                                            background: "linear-gradient(90deg, #21cbf3 0%, #2196f3 100%)",
+                                            boxShadow: "0 4px 12px 0 rgba(33, 203, 243, 0.3)",
+                                            transform: 'translateY(-2px)',
+                                        }
+                                    }}
+                                >
+                                    Search
+                                </Button>
+                            </Box>
                         </Box>
-                    </TableContainer>
+                    </FilterCard>
                 </Grid>
             </Grid>
 

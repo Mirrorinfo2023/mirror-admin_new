@@ -106,18 +106,46 @@ function RedeemReport() {
     <Layout>
       <Box sx={{ p: 2 }}>
         {/* ---- Top Cards ---- */}
-        <Grid container spacing={2}>
-          {cards.map((card, idx) => (
-            <Grid key={idx} item xs={12} sm={6} md={3}>
-              <StatCard sx={{ backgroundColor: card.bg }}>
-                <Typography variant="h4" fontWeight={700}>
-                  {card.value}
-                </Typography>
-                <Typography variant="subtitle1">{card.label}</Typography>
-              </StatCard>
-            </Grid>
-          ))}
-        </Grid>
+       <Grid container spacing={2} sx={{ mb: 2 }}>
+  {cards.map((card, idx) => (
+    <Grid key={idx} item xs={12} sm={6} md={3}>
+      <StatCard sx={{ 
+        backgroundColor: '#f5f5f5', 
+        borderLeft: `4px solid ${card.bg}`,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease-in-out',
+        '&:hover': {
+          backgroundColor: card.bg,
+          boxShadow: `0 8px 25px ${card.bg}80`,
+          transform: 'translateY(-4px)',
+          '& .MuiTypography-root': {
+            color: 'white',
+          }
+        }
+      }}>
+        <Typography 
+          variant="h4" 
+          fontWeight={700}
+          sx={{ 
+            color: '#000000', 
+            transition: 'color 0.3s ease' 
+          }}
+        >
+          {card.value}
+        </Typography>
+        <Typography 
+          variant="subtitle1"
+          sx={{ 
+            color: '#000000', 
+            transition: 'color 0.3s ease' 
+          }}
+        >
+          {card.label}
+        </Typography>
+      </StatCard>
+    </Grid>
+  ))}
+</Grid>
 
         {/* ---- Filters ---- */}
         <Paper sx={{ p: 2, mt: 4 }}>

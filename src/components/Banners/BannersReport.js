@@ -29,10 +29,10 @@ const ThemedTableContainer = styled(TableContainer)(({ theme }) => ({
   boxShadow: '0 4px 24px 0 rgba(33,150,243,0.08)',
   marginTop: 16,
   marginBottom: 16,
-  overflowX: 'auto',       // ✅ allow horizontal scrolling
+  overflowX: 'auto',       
   overflowY: 'hidden',
   '&::-webkit-scrollbar': {
-    height: 8,             // ✅ visible scrollbar height
+    height: 8,            
   },
   '&::-webkit-scrollbar-thumb': {
     backgroundColor: '#90caf9',
@@ -48,7 +48,7 @@ const ThemedTableContainer = styled(TableContainer)(({ theme }) => ({
 }));
 
 const ThemedTableHeadCell = styled(TableCell)(({ theme }) => ({
-    background: 'linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)',
+    background: '#2198f3',
     color: '#fff',
     fontWeight: 700,
     fontSize: 14,
@@ -56,7 +56,7 @@ const ThemedTableHeadCell = styled(TableCell)(({ theme }) => ({
     borderRight: '1px solid #e3e3e3',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    whiteSpace: 'nowrap',   // ✅ fixed
+    whiteSpace: 'nowrap',   
 }));
 
 const ThemedTableRow = styled(TableRow)(({ theme }) => ({

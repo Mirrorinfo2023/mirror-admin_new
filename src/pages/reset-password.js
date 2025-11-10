@@ -39,7 +39,7 @@ function ResetPassword() {
         if (mobile) setMobileNo(mobile);
     }, [mobile]);
 
-    // ✅ Form Validation
+    //  Form Validation
     const validateForm = () => {
         let tempErrors = {};
 
@@ -51,7 +51,7 @@ function ResetPassword() {
         return Object.keys(tempErrors).length === 0;
     };
 
-    // ✅ Submit handler
+    //  Submit handler
     const handleSubmit = async () => {
         if (!validateForm()) return;
 

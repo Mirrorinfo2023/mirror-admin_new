@@ -53,32 +53,34 @@ const Transactions = ({ showServiceTrans }) => {
         setPage(0);
     };
 
-    const StyledTableCell = styled(TableCell)(({ theme }) => ({
-        [`&.${tableCellClasses.head}`]: {
-            backgroundColor: '#ccc',
-            color: theme.palette.common.black,
-            fontSize: 12,
-            linHeight: 15,
-            padding: 7,
-            borderRight: "1px solid rgba(224, 224, 224, 1)"
-        },
-        [`&.${tableCellClasses.body}`]: {
-            fontSize: 12,
-            linHeight: 15,
-            padding: 7,
-            borderRight: "1px solid rgba(224, 224, 224, 1)"
-        },
-    }));
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+        backgroundColor: '#ccc',
+        color: theme.palette.common.black,
+        fontSize: 12,
+        linHeight: 15,
+        padding: 7,
+        borderRight: "1px solid rgba(224, 224, 224, 1)",
+        borderBottom: "2px solid rgba(0, 0, 0, 0.3)"
+    },
+    [`&.${tableCellClasses.body}`]: {
+        fontSize: 12,
+        linHeight: 15,
+        padding: 7,
+        borderRight: "1px solid rgba(224, 224, 224, 1)",
+        borderBottom: "1px solid rgba(224, 224, 224, 1)"
+    },
+}));
 
-    const StyledTableRow = styled(TableRow)(({ theme }) => ({
-        '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover,
-        },
-        // hide last border
-        '&:last-child td, &:last-child th': {
-            border: 0,
-        },
-    }));
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+        backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+        border: 0,
+    },
+}));
 
     const [openModal1, setOpenModal1] = React.useState(false);
     const [openModal2, setOpenModal2] = React.useState(false);

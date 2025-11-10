@@ -38,22 +38,32 @@ const GradientTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 13,
     textTransform: 'uppercase',
     padding: '10px 12px',
-    border: 'none',
-    letterSpacing: 0.5,
+    border: '1px solid rgba(255,255,255,0.3)',
     borderRight: '1.5px solid #fff',
-    
+    borderBottom: '2px solid rgba(255,255,255,0.5)',
+    letterSpacing: 0.5,
   },
   '&:first-of-type': {
     borderTopLeftRadius: 16,
+    borderLeft: '1px solid rgba(255,255,255,0.3)',
   },
   '&:last-of-type': {
     borderTopRightRadius: 16,
-    borderRight: 'none',
+    borderRight: '1px solid rgba(255,255,255,0.3)',
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 12,
     padding: 10,
-    border: 'none',
+    border: '1px solid #e0e0e0',
+    borderTop: 'none',
+    borderRight: '1px solid #e0e0e0',
+    borderBottom: '1px solid #e0e0e0',
+    '&:first-of-type': {
+      borderLeft: '1px solid #e0e0e0',
+    },
+    '&:last-of-type': {
+      borderRight: '1px solid #e0e0e0',
+    },
   },
 }));
 

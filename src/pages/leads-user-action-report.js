@@ -147,49 +147,188 @@ function LeadsHistory(props) {
   return (
     <Layout>
       <Grid container spacing={2} sx={{ padding: 2 }} justifyContent="space-between" alignItems="stretch">
-        <Grid item xs={12} sm={6} md={4} lg={2} mb={2} sx={{ flexBasis: { lg: '20%' }, maxWidth: { lg: '20%' } }}>
-          <Item sx={{ height: 100, backgroundColor: '#FFC107', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '10px', position: 'relative' }}>
-            <LeaderboardIcon sx={{ fontSize: 40, position: 'absolute', top: 10, right: 10, opacity: 0.2 }} />
-            <Box>
-              <Typography variant="h2" sx={{ padding: 1, fontSize: '22px', color: '#fff' }}>Total Count</Typography>
-              <Box sx={{ color: '#fff', fontSize: 24 }}>{report ? report.total_count : 0}</Box>
+        <Grid item xs={12} sm={6} md={4} lg={2.4} sx={{ flexBasis: { lg: '19.2%' }, maxWidth: { lg: '19.2%' } }}>
+          <Item sx={{
+            height: 90,
+            backgroundColor: '#f5f5f5',
+            borderLeft: '4px solid #FFC107',
+            color: '#000',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: '#FFC107',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(255, 193, 7, 0.3)',
+              '& .MuiTypography-root, & .count-value': {
+                color: '#fff',
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: '14px', fontWeight: 600, mb: 0.5, color: 'inherit' }}>
+                Total Count
+              </Typography>
+              <Box className="count-value" sx={{ color: 'inherit', fontSize: '20px', fontWeight: 700 }}>
+                {report?.total_count || 0}
+              </Box>
             </Box>
+            <LeaderboardIcon className="stat-icon" sx={{ fontSize: 32, color: "#FFC107", transition: 'all 0.3s ease' }} />
           </Item>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={2} mb={2} sx={{ flexBasis: { lg: '20%' }, maxWidth: { lg: '20%' } }}>
-          <Item sx={{ height: 100, backgroundColor: '#5C6BC0', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '10px', position: 'relative' }}>
-            <CheckCircleIcon sx={{ fontSize: 40, position: 'absolute', top: 10, right: 10, opacity: 0.2 }} />
-            <Box>
-              <Typography variant="h2" sx={{ padding: 1, fontSize: '22px', color: '#fff' }}>Total Accept</Typography>
-              <Box sx={{ color: '#fff', fontSize: 24 }}>{report ? report.total_accept : 0}</Box>
+
+        <Grid item xs={12} sm={6} md={4} lg={2.4} sx={{ flexBasis: { lg: '19.2%' }, maxWidth: { lg: '19.2%' } }}>
+          <Item sx={{
+            height: 90,
+            backgroundColor: '#f5f5f5',
+            borderLeft: '4px solid #5C6BC0',
+            color: '#000',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: '#5C6BC0',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(92, 107, 192, 0.3)',
+              '& .MuiTypography-root, & .count-value': {
+                color: '#fff',
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: '14px', fontWeight: 600, mb: 0.5, color: 'inherit' }}>
+                Total Accept
+              </Typography>
+              <Box className="count-value" sx={{ color: 'inherit', fontSize: '20px', fontWeight: 700 }}>
+                {report?.total_accept || 0}
+              </Box>
             </Box>
+            <CheckCircleIcon className="stat-icon" sx={{ fontSize: 32, color: "#5C6BC0", transition: 'all 0.3s ease' }} />
           </Item>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={2} mb={2} sx={{ flexBasis: { lg: '20%' }, maxWidth: { lg: '20%' } }}>
-          <Item sx={{ height: 100, backgroundColor: '#26A69A', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '10px', position: 'relative' }}>
-            <HourglassEmptyIcon sx={{ fontSize: 40, position: 'absolute', top: 10, right: 10, opacity: 0.2 }} />
-            <Box>
-              <Typography variant="h2" sx={{ padding: 1, fontSize: '22px', color: '#fff' }}>Total Pending</Typography>
-              <Box sx={{ color: '#fff', fontSize: 24 }}>{report ? report.total_pending : 0}</Box>
+
+        <Grid item xs={12} sm={6} md={4} lg={2.4} sx={{ flexBasis: { lg: '19.2%' }, maxWidth: { lg: '19.2%' } }}>
+          <Item sx={{
+            height: 90,
+            backgroundColor: '#f5f5f5',
+            borderLeft: '4px solid #26A69A',
+            color: '#000',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: '#26A69A',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(38, 166, 154, 0.3)',
+              '& .MuiTypography-root, & .count-value': {
+                color: '#fff',
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: '14px', fontWeight: 600, mb: 0.5, color: 'inherit' }}>
+                Total Pending
+              </Typography>
+              <Box className="count-value" sx={{ color: 'inherit', fontSize: '20px', fontWeight: 700 }}>
+                {report?.total_pending || 0}
+              </Box>
             </Box>
+            <HourglassEmptyIcon className="stat-icon" sx={{ fontSize: 32, color: "#26A69A", transition: 'all 0.3s ease' }} />
           </Item>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={2} mb={2} sx={{ flexBasis: { lg: '20%' }, maxWidth: { lg: '20%' } }}>
-          <Item sx={{ height: 100, backgroundColor: '#29B6F6', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '10px', position: 'relative' }}>
-            <PauseCircleIcon sx={{ fontSize: 40, position: 'absolute', top: 10, right: 10, opacity: 0.2 }} />
-            <Box>
-              <Typography variant="h2" sx={{ padding: 1, fontSize: '22px', color: '#fff' }}>Total Hold</Typography>
-              <Box sx={{ color: '#fff', fontSize: 24 }}>{report ? report.total_hold : 0}</Box>
+
+        <Grid item xs={12} sm={6} md={4} lg={2.4} sx={{ flexBasis: { lg: '19.2%' }, maxWidth: { lg: '19.2%' } }}>
+          <Item sx={{
+            height: 90,
+            backgroundColor: '#f5f5f5',
+            borderLeft: '4px solid #29B6F6',
+            color: '#000',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: '#29B6F6',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(41, 182, 246, 0.3)',
+              '& .MuiTypography-root, & .count-value': {
+                color: '#fff',
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: '14px', fontWeight: 600, mb: 0.5, color: 'inherit' }}>
+                Total Hold
+              </Typography>
+              <Box className="count-value" sx={{ color: 'inherit', fontSize: '20px', fontWeight: 700 }}>
+                {report?.total_hold || 0}
+              </Box>
             </Box>
+            <PauseCircleIcon className="stat-icon" sx={{ fontSize: 32, color: "#29B6F6", transition: 'all 0.3s ease' }} />
           </Item>
         </Grid>
-        <Grid item xs={12} sm={6} md={4} lg={2} mb={2} sx={{ flexBasis: { lg: '20%' }, maxWidth: { lg: '20%' } }}>
-          <Item sx={{ height: 100, backgroundColor: '#EC407A', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '10px', position: 'relative' }}>
-            <HighlightOffIcon sx={{ fontSize: 40, position: 'absolute', top: 10, right: 10, opacity: 0.2 }} />
-            <Box>
-              <Typography variant="h2" sx={{ padding: 1, fontSize: '22px', color: '#fff' }}>Total Reject</Typography>
-              <Box sx={{ color: '#fff', fontSize: 24 }}>{report ? report.total_reject : 0}</Box>
+
+        <Grid item xs={12} sm={6} md={4} lg={2.4} sx={{ flexBasis: { lg: '19.2%' }, maxWidth: { lg: '19.2%' } }}>
+          <Item sx={{
+            height: 90,
+            backgroundColor: '#f5f5f5',
+            borderLeft: '4px solid #EC407A',
+            color: '#000',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            transition: 'all 0.3s ease-in-out',
+            '&:hover': {
+              backgroundColor: '#EC407A',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 4px 12px rgba(236, 64, 122, 0.3)',
+              '& .MuiTypography-root, & .count-value': {
+                color: '#fff',
+              },
+              '& .stat-icon': {
+                opacity: 0.8,
+              }
+            }
+          }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" sx={{ fontSize: '14px', fontWeight: 600, mb: 0.5, color: 'inherit' }}>
+                Total Reject
+              </Typography>
+              <Box className="count-value" sx={{ color: 'inherit', fontSize: '20px', fontWeight: 700 }}>
+                {report?.total_reject || 0}
+              </Box>
             </Box>
+            <HighlightOffIcon className="stat-icon" sx={{ fontSize: 32, color: "#EC407A", transition: 'all 0.3s ease' }} />
           </Item>
         </Grid>
       </Grid>

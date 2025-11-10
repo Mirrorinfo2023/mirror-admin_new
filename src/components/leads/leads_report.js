@@ -30,13 +30,13 @@ const ThemedTableContainer = styled(TableContainer)(({ theme }) => ({
   boxShadow: "0 4px 24px 0 rgba(33,150,243,0.08)",
   marginTop: 16,
   marginBottom: 16,
-  overflowX: "auto",   // ✅ allow horizontal scroll
-  overflowY: "hidden", // ✅ prevent vertical cutoffs
+  overflowX: "auto",  
+  overflowY: "hidden",
   "&::-webkit-scrollbar": {
-    height: "8px",       // ✅ visible horizontal scrollbar
+    height: "8px",      
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#90caf9", // light blue scrollbar
+    backgroundColor: "#90caf9", 
     borderRadius: "8px",
   },
   "&::-webkit-scrollbar-thumb:hover": {

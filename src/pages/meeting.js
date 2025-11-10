@@ -78,7 +78,7 @@ function MeetingReport() {
                         <Box
                             sx={{
                                 display: "flex",
-                                flexWrap: "wrap", // ✅ makes it responsive
+                                flexWrap: "wrap", //  makes it responsive
                                 alignItems: "center",
                                 justifyContent: "space-between",
                                 gap: 2,

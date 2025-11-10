@@ -6,7 +6,8 @@ import {
   Typography,
   Box,
   TextField,
-  TableContainer,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { callAlert } from "../../redux/actions/alert";
@@ -19,6 +20,28 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
+import { styled } from "@mui/material/styles";
+
+// Compact StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '90px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+  flex: 1,
+  minWidth: '160px',
+}));
+
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '16px',
+  border: '1px solid rgba(0,0,0,0.05)',
+}));
 
 function TransactionHistory() {
   const dispatch = useDispatch();
@@ -39,9 +62,9 @@ function TransactionHistory() {
       try {
         const response = await api.post("/api/report/idcard-request-report", reqData);
         if (response.status === 200) {
-          setShowServiceTrans(response.data.data);
-          setShowMasterReport(response.data.report);
-          setTotalPageCount(response.data.totalPageCount);
+          setShowServiceTrans(response.data.data || []);
+          setShowMasterReport(response.data.report || {});
+          setTotalPageCount(response.data.totalPageCount || 0);
         }
       } catch (error) {
         dispatch(
@@ -64,126 +87,179 @@ function TransactionHistory() {
     );
   });
 
-  const cardData = [
+  const cards = [
     {
       label: "Total Requests",
       value: showMasterReport.totalRequestsCount ?? 0,
-      color: "#FFC107",
+      color: "#FFC107"
     },
     {
       label: "Pending Requests",
       value: showMasterReport.totalPendingRequests ?? 0,
-      color: "#5C6BC0",
+      color: "#5C6BC0"
     },
     {
       label: "Issue Requests",
       value: showMasterReport.totalIssueRequests ?? 0,
-      color: "#26A69A",
+      color: "#26A69A"
     },
     {
       label: "Rejected Requests",
       value: showMasterReport.totalRejectedRequests_view ?? 0,
-      color: "#EC407A",
-    },
+      color: "#EC407A"
+    }
   ];
 
   return (
     <Layout>
-      <Box sx={{ p: { xs: 1, md: 3 } }}>
-        {/* ==== CARD SECTION ==== */}
-        <Grid container spacing={2} justifyContent="center" sx={{ mb: 3 }}>
-          {cardData.map((card, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Paper
-                sx={{
-                  height: 100,
-                  bgcolor: card.color,
-                  color: "#fff",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  width: "100%",
-                }}
-              >
-                <Typography variant="h6" fontWeight={600}>
-                  {card.value}
-                </Typography>
-                <Typography variant="body1">{card.label}</Typography>
-              </Paper>
-            </Grid>
-          ))}
+      <Box sx={{ p: 1.5 }}>
+        {/* Compact Statistics Cards */}
+        <Grid container spacing={1.5} sx={{ mb: 2 }}>
+          <Grid item xs={12}>
+            <Box sx={{ 
+              display: "flex", 
+              gap: 1.5, 
+              flexWrap: "wrap",
+            }}>
+              {cards.map((card, index) => (
+                <StatCard 
+                  key={index}
+                  sx={{ 
+                    backgroundColor: '#f5f5f5', 
+                    borderLeft: `4px solid ${card.color}`,
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    '&:hover': {
+                      backgroundColor: card.color,
+                      boxShadow: `0 8px 25px ${card.color}80`,
+                      transform: 'translateY(-2px)',
+                      '& .MuiTypography-root': {
+                        color: 'white',
+                      }
+                    }
+                  }}
+                >
+                  <CardContent sx={{ 
+                    padding: '12px !important', 
+                    width: '100%',
+                    textAlign: 'center',
+                    '&:last-child': { pb: '12px' }
+                  }}>
+                    <Typography 
+                      variant="h5" 
+                      sx={{ 
+                        color: '#000000', 
+                        transition: 'color 0.3s ease', 
+                        fontWeight: 700, 
+                        fontSize: '20px', 
+                        mb: 0.5,
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.value}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: '#000000', 
+                        transition: 'color 0.3s ease', 
+                        fontWeight: 600,
+                        fontSize: '12px',
+                        lineHeight: 1.2
+                      }}
+                    >
+                      {card.label}
+                    </Typography>
+                  </CardContent>
+                </StatCard>
+              ))}
+            </Box>
+          </Grid>
         </Grid>
 
-        {/* ==== FILTER SECTION ==== */}
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            mb: 3,
-            borderRadius: 2,
-            bgcolor: "#f8f9fa",
-          }}
-        >
-          <Box
-            display="flex"
-            flexWrap={{ xs: "wrap", md: "nowrap" }}
-            gap={2}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Typography variant="h6" sx={{ whiteSpace: "nowrap" }}>
-              ID Card Request
-            </Typography>
-
-            <TextField
-              size="small"
-              placeholder="Search by name, mobile, or ID"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: "action.active" }} />,
-              }}
-              sx={{ flex: 1, minWidth: { xs: "100%", md: 220 } }}
-            />
-
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="From Date"
-                value={fromDate}
-                format="DD-MM-YYYY"
-                onChange={(newDate) => setFromDate(newDate)}
-                slotProps={{
-                  textField: { size: "small", sx: { minWidth: 150 } },
+        {/* Compact Filter Section */}
+        <Grid item xs={12}>
+          <FilterCard>
+            <Box sx={{ p: 2 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem'
                 }}
-              />
-            </LocalizationProvider>
+              >
+                ID Card Request
+              </Typography>
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="To Date"
-                value={toDate}
-                format="DD-MM-YYYY"
-                onChange={(newDate) => setToDate(newDate)}
-                slotProps={{
-                  textField: { size: "small", sx: { minWidth: 150 } },
-                }}
-              />
-            </LocalizationProvider>
-          </Box>
-        </Paper>
+              <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap',
+                gap: 1.5,
+                alignItems: 'center'
+              }}>
+                <TextField
+                  placeholder="Search by name, mobile, or ID"
+                  variant="outlined"
+                  size="small"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />,
+                  }}
+                  sx={{ 
+                    minWidth: { xs: '100%', sm: '200px' },
+                    flex: 1,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(0,0,0,0.02)',
+                    }
+                  }}
+                />
 
-        {/* ==== TABLE SECTION ==== */}
-        <TableContainer component={Paper}>
-          <Transactions
-            showServiceTrans={filteredRows}
-            totalPageCount={totalPageCount}
-            setTotalPageCount={setTotalPageCount}
-          />
-        </TableContainer>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+                    <DatePicker
+                      label="From Date"
+                      value={fromDate}
+                      format="DD-MM-YYYY"
+                      onChange={(newDate) => setFromDate(newDate)}
+                      slotProps={{ 
+                        textField: { 
+                          size: "small",
+                          sx: { minWidth: '140px' }
+                        } 
+                      }}
+                    />
+                    <DatePicker
+                      label="To Date"
+                      value={toDate}
+                      format="DD-MM-YYYY"
+                      onChange={(newDate) => setToDate(newDate)}
+                      slotProps={{ 
+                        textField: { 
+                          size: "small",
+                          sx: { minWidth: '140px' }
+                        } 
+                      }}
+                    />
+                  </Box>
+                </LocalizationProvider>
+              </Box>
+            </Box>
+          </FilterCard>
+        </Grid>
       </Box>
+      
+      {/* Table Section */}
+      <Transactions
+        showServiceTrans={filteredRows}
+        totalPageCount={totalPageCount}
+        setTotalPageCount={setTotalPageCount}
+      />
     </Layout>
   );
 }

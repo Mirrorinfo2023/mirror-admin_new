@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import {
     Grid,
     Button,
-    TableContainer,
     Paper,
     Typography,
     Box,
@@ -12,6 +11,8 @@ import {
     MenuItem,
     FormControl,
     InputLabel,
+    Card,
+    CardContent,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
@@ -26,18 +27,25 @@ import Layout from "@/components/Dashboard/layout";
 import Transactions from "@/components/Dashboard/User/epin_wallet";
 import { callAlert } from "../../redux/actions/alert";
 
-// Card styling
-const Card = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(2),
-    textAlign: "center",
-    color: "#fff",
-    borderRadius: "12px",
-    height: 100,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    boxShadow: "0px 3px 10px rgba(0,0,0,0.15)",
+// Compact StatCard Design
+const StatCard = styled(Card)(({ theme }) => ({
+  borderRadius: '8px',
+  height: '90px',
+  display: 'flex',
+  alignItems: 'center',
+  transition: 'all 0.3s ease-in-out',
+  position: 'relative',
+  overflow: 'hidden',
+  flex: 1,
+  minWidth: '160px',
+}));
+
+const FilterCard = styled(Paper)(({ theme }) => ({
+  background: 'white',
+  borderRadius: '12px',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  marginBottom: '16px',
+  border: '1px solid rgba(0,0,0,0.05)',
 }));
 
 function TransactionHistory() {
@@ -93,142 +101,147 @@ function TransactionHistory() {
         return row.sub_type && row.sub_type.toLowerCase().includes(selectedValue.toLowerCase()) && matchesSearch;
     });
 
+    const cards = [
+        {
+            label: "Total Old Balance",
+            value: masterReport.totalOldBal ?? 0,
+            color: "#FFC107"
+        },
+        {
+            label: "Total New Balance",
+            value: masterReport.totalNewBal ?? 0,
+            color: "#5C6BC0"
+        },
+        {
+            label: "Total Credit",
+            value: masterReport.totalCredit ?? 0,
+            color: "#26A69A"
+        },
+        {
+            label: "Total Debit",
+            value: masterReport.totalDebit ?? 0,
+            color: "#EC407A"
+        }
+    ];
+
     return (
         <Layout>
-            <Grid container spacing={2} sx={{ p: 2 }}>
-             
-                {/* Summary Cards - Full Width Row */}
-                <Grid
-                    container
-                    spacing={2}
-                    justifyContent="space-between"
-                    sx={{ px: { xs: 2, sm: 4, md: 6 }, mt: 2, mb: 2 }}
-                >
-                    {/* Card 1 - Total Old Balance */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper
-                            sx={{
-                                backgroundColor: "#FFC107",
-                                color: "#fff",
-                                textAlign: "center",
-                                pl: 1,
-                                borderRadius: 2,
-                                height: 110,
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                boxShadow: "0px 3px 8px rgba(0,0,0,0.2)",
-                            }}
-                        >
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                {masterReport.totalOldBal ?? 0}
-                            </Typography>
-                            <Typography variant="body2">Total Old Balance</Typography>
-                        </Paper>
-                    </Grid>
-
-                    {/* Card 2 - Total New Balance */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper
-                            sx={{
-                                backgroundColor: "#5C6BC0",
-                                color: "#fff",
-                                textAlign: "center",
-                                pl: 1,
-                                borderRadius: 2,
-                                height: 110,
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                boxShadow: "0px 3px 8px rgba(0,0,0,0.2)",
-                            }}
-                        >
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                {masterReport.totalNewBal ?? 0}
-                            </Typography>
-                            <Typography variant="body2">Total New Balance</Typography>
-                        </Paper>
-                    </Grid>
-
-                    {/* Card 3 - Total Credit */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper
-                            sx={{
-                                backgroundColor: "#26A69A",
-                                color: "#fff",
-                                textAlign: "center",
-                                pl: 1,
-                                borderRadius: 2,
-                                height: 110,
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                boxShadow: "0px 3px 8px rgba(0,0,0,0.2)",
-                            }}
-                        >
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                {masterReport.totalCredit ?? 0}
-                            </Typography>
-                            <Typography variant="body2">Total Credit</Typography>
-                        </Paper>
-                    </Grid>
-
-                    {/* Card 4 - Total Debit */}
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper
-                            sx={{
-                                backgroundColor: "#EC407A",
-                                color: "#fff",
-                                textAlign: "center",
-                                pl: 1,
-                                borderRadius: 2,
-                                height: 110,
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "center",
-                                boxShadow: "0px 3px 8px rgba(0,0,0,0.2)",
-                            }}
-                        >
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                {masterReport.totalDebit ?? 0}
-                            </Typography>
-                            <Typography variant="body2">Total Debit</Typography>
-                        </Paper>
+            <Box sx={{ p: 1.5 }}>
+                {/* Compact Statistics Cards */}
+                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+                    <Grid item xs={12}>
+                        <Box sx={{ 
+                            display: "flex", 
+                            gap: 1.5, 
+                            flexWrap: "wrap",
+                        }}>
+                            {cards.map((card, index) => (
+                                <StatCard 
+                                    key={index}
+                                    sx={{ 
+                                        backgroundColor: '#f5f5f5', 
+                                        borderLeft: `4px solid ${card.color}`,
+                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                        '&:hover': {
+                                            backgroundColor: card.color,
+                                            boxShadow: `0 8px 25px ${card.color}80`,
+                                            transform: 'translateY(-2px)',
+                                            '& .MuiTypography-root': {
+                                                color: 'white',
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <CardContent sx={{ 
+                                        padding: '12px !important', 
+                                        width: '100%',
+                                        textAlign: 'center',
+                                        '&:last-child': { pb: '12px' }
+                                    }}>
+                                        <Typography 
+                                            variant="h5" 
+                                            sx={{ 
+                                                color: '#000000', 
+                                                transition: 'color 0.3s ease', 
+                                                fontWeight: 700, 
+                                                fontSize: '20px', 
+                                                mb: 0.5,
+                                                lineHeight: 1.2
+                                            }}
+                                        >
+                                            {card.value}
+                                        </Typography>
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{ 
+                                                color: '#000000', 
+                                                transition: 'color 0.3s ease', 
+                                                fontWeight: 600,
+                                                fontSize: '12px',
+                                                lineHeight: 1.2
+                                            }}
+                                        >
+                                            {card.label}
+                                        </Typography>
+                                    </CardContent>
+                                </StatCard>
+                            ))}
+                        </Box>
                     </Grid>
                 </Grid>
 
-
-
-                {/* Filter Section */}
+                {/* Compact Filter Section */}
                 <Grid item xs={12}>
-                    <TableContainer component={Paper} sx={{ p: 2, mt: 2 }}>
-                        <Box
-                            display="flex"
-                            flexWrap={{ xs: "wrap", md: "nowrap" }}
-                            justifyContent="space-between"
-                            alignItems="center"
-                            gap={2}
-                        >
-                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    <FilterCard>
+                        <Box sx={{ p: 2 }}>
+                            <Typography 
+                                variant="h6" 
+                                sx={{ 
+                                    mb: 2,
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontWeight: 'bold',
+                                    fontSize: '1.1rem'
+                                }}
+                            >
                                 User E-Pin Summary
                             </Typography>
 
-                            <Box
-                                display="flex"
-                                flexWrap={{ xs: "wrap", md: "nowrap" }}
-                                alignItems="center"
-                                gap={2}
-                                flex={1}
-                                justifyContent={{ xs: "flex-start", md: "flex-end" }}
-                            >
-                                <FormControl size="small" sx={{ minWidth: 150 }}>
+                            <Box sx={{ 
+                                display: 'flex', 
+                                flexWrap: 'wrap',
+                                gap: 1.5,
+                                alignItems: 'center'
+                            }}>
+                                <TextField
+                                    placeholder="Search"
+                                    variant="outlined"
+                                    size="small"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />,
+                                    }}
+                                    sx={{ 
+                                        minWidth: { xs: '100%', sm: '180px' },
+                                        flex: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '8px',
+                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                                        }
+                                    }}
+                                />
+
+                                <FormControl size="small" sx={{ minWidth: 160 }}>
                                     <InputLabel>Transaction Type</InputLabel>
                                     <Select
                                         value={selectedValue}
                                         label="Transaction Type"
                                         onChange={(e) => setSelectedValue(e.target.value)}
                                     >
-                                        <MenuItem value="">Default</MenuItem>
+                                        <MenuItem value="">All</MenuItem>
                                         <MenuItem value="Add Money">Add Money</MenuItem>
                                         <MenuItem value="Plan Purchase">Plan Purchase</MenuItem>
                                         <MenuItem value="Send Money">Send Money</MenuItem>
@@ -236,66 +249,67 @@ function TransactionHistory() {
                                     </Select>
                                 </FormControl>
 
-                                <TextField
-                                    size="small"
-                                    placeholder="Search"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <SearchIcon sx={{ mr: 1, color: "action.active", fontSize: 20 }} />
-                                        ),
-                                    }}
-                                    sx={{ width: { xs: "100%", sm: 200, md: 220 } }}
-                                />
-
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                        label="From Date"
-                                        value={fromDate}
-                                        format="DD-MM-YYYY"
-                                        onChange={(newDate) => setFromDate(newDate)}
-                                        slotProps={{ textField: { size: "small", sx: { minWidth: 140 } } }}
-                                    />
-                                    <DatePicker
-                                        label="To Date"
-                                        value={toDate}
-                                        format="DD-MM-YYYY"
-                                        onChange={(newDate) => setToDate(newDate)}
-                                        slotProps={{ textField: { size: "small", sx: { minWidth: 140 } } }}
-                                    />
+                                    <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+                                        <DatePicker
+                                            label="From Date"
+                                            value={fromDate}
+                                            format="DD-MM-YYYY"
+                                            onChange={(newDate) => setFromDate(newDate)}
+                                            slotProps={{ 
+                                                textField: { 
+                                                    size: "small",
+                                                    sx: { minWidth: '140px' }
+                                                } 
+                                            }}
+                                        />
+                                        <DatePicker
+                                            label="To Date"
+                                            value={toDate}
+                                            format="DD-MM-YYYY"
+                                            onChange={(newDate) => setToDate(newDate)}
+                                            slotProps={{ 
+                                                textField: { 
+                                                    size: "small",
+                                                    sx: { minWidth: '140px' }
+                                                } 
+                                            }}
+                                        />
+                                    </Box>
                                 </LocalizationProvider>
 
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    size="small"
-                                    href={`/credit-balance-to-user/?action=Credit`}
-                                >
-                                    Credit
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="warning"
-                                    size="small"
-                                    href={`/credit-balance-to-user/?action=Debit`}
-                                >
-                                    Debit
-                                </Button>
+                                <Box display="flex" gap={1} sx={{ flexWrap: 'wrap' }}>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        size="small"
+                                        href={`/credit-balance-to-user/?action=Credit`}
+                                        sx={{ minWidth: '80px' }}
+                                    >
+                                        Credit
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="warning"
+                                        size="small"
+                                        href={`/credit-balance-to-user/?action=Debit`}
+                                        sx={{ minWidth: '80px' }}
+                                    >
+                                        Debit
+                                    </Button>
+                                </Box>
                             </Box>
                         </Box>
-                    </TableContainer>
+                    </FilterCard>
                 </Grid>
-
-                {/* Table Data */}
-                <Grid item xs={12}>
-                    <Transactions
-                        showServiceTrans={filteredRows}
-                        totalPageCount={totalPageCount}
-                        setTotalPageCount={setTotalPageCount}
-                    />
-                </Grid>
-            </Grid>
+            </Box>
+            
+            {/* Table Data */}
+            <Transactions
+                showServiceTrans={filteredRows}
+                totalPageCount={totalPageCount}
+                setTotalPageCount={setTotalPageCount}
+            />
         </Layout>
     );
 }

@@ -181,37 +181,173 @@ function LeadsHistory(props) {
   return (
     <Layout>
       <Grid container spacing={4} sx={{ padding: 2 }}>
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-            <StatCard bgcolor="#FFC107">
-              <StatContent>
-                <StatValue>{report ? report.total_count : 0}</StatValue>
-                <StatLabel>Total Count</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <LeaderboardIcon sx={{ fontSize: 64, color: '#fff' }} />
-              </StatIcon>
-            </StatCard>
-            <StatCard bgcolor="#5C6BC0">
-              <StatContent>
-                <StatValue>{report ? report.total_active : 0}</StatValue>
-                <StatLabel>Active Count</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <CheckCircleIcon sx={{ fontSize: 64, color: '#fff' }} />
-              </StatIcon>
-            </StatCard>
-            <StatCard bgcolor="#26A69A">
-              <StatContent>
-                <StatValue>{report ? report.total_inactive : 0}</StatValue>
-                <StatLabel>Inactive Count</StatLabel>
-              </StatContent>
-              <StatIcon>
-                <HighlightOffIcon sx={{ fontSize: 64, color: '#fff' }} />
-              </StatIcon>
-            </StatCard>
-          </Box>
-        </Grid>
+      <Grid item xs={12}>
+  <Box 
+    sx={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      gap: 2, 
+      flexWrap: 'wrap', 
+      mb: 2 
+    }}
+  >
+    <StatCard 
+      sx={{ 
+        backgroundColor: '#f5f5f5', 
+        borderLeft: '4px solid #FFC107',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease-in-out',
+        height: '120px',
+        minWidth: '200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px',
+        '&:hover': {
+          backgroundColor: '#FFC107',
+          boxShadow: '0 8px 25px rgba(255, 193, 7, 0.5)',
+          transform: 'translateY(-4px)',
+          '& .MuiTypography-root': {
+            color: 'white',
+          }
+        }
+      }}
+    >
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ 
+          color: '#000000', 
+          transition: 'color 0.3s ease',
+          fontSize: '28px',
+          fontWeight: 600,
+          lineHeight: 1.2,
+          mb: 0.5
+        }}>
+          {report?.total_count || 0}
+        </StatValue>
+        <StatLabel sx={{ 
+          color: '#000000', 
+          transition: 'color 0.3s ease',
+          fontSize: '14px',
+          fontWeight: 500,
+          lineHeight: 1.2
+        }}>
+          Total Count
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: 'flex', alignItems: 'center' }}>
+        <LeaderboardIcon sx={{ 
+          fontSize: 40,
+          color: "#FFC107", 
+          transition: 'color 0.3s ease' 
+        }} />
+      </StatIcon>
+    </StatCard>
+
+    <StatCard 
+      sx={{ 
+        backgroundColor: '#f5f5f5', 
+        borderLeft: '4px solid #5C6BC0',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease-in-out',
+        height: '120px',
+        minWidth: '200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px',
+        '&:hover': {
+          backgroundColor: '#5C6BC0',
+          boxShadow: '0 8px 25px rgba(92, 107, 192, 0.5)',
+          transform: 'translateY(-4px)',
+          '& .MuiTypography-root': {
+            color: 'white',
+          }
+        }
+      }}
+    >
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ 
+          color: '#000000', 
+          transition: 'color 0.3s ease',
+          fontSize: '28px',
+          fontWeight: 600,
+          lineHeight: 1.2,
+          mb: 0.5
+        }}>
+          {report?.total_active || 0}
+        </StatValue>
+        <StatLabel sx={{ 
+          color: '#000000', 
+          transition: 'color 0.3s ease',
+          fontSize: '14px',
+          fontWeight: 500,
+          lineHeight: 1.2
+        }}>
+          Active Count
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: 'flex', alignItems: 'center' }}>
+        <CheckCircleIcon sx={{ 
+          fontSize: 40,
+          color: "#5C6BC0", 
+          transition: 'color 0.3s ease' 
+        }} />
+      </StatIcon>
+    </StatCard>
+
+    <StatCard 
+      sx={{ 
+        backgroundColor: '#f5f5f5', 
+        borderLeft: '4px solid #26A69A',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.3s ease-in-out',
+        height: '120px',
+        minWidth: '200px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px',
+        '&:hover': {
+          backgroundColor: '#26A69A',
+          boxShadow: '0 8px 25px rgba(38, 166, 154, 0.5)',
+          transform: 'translateY(-4px)',
+          '& .MuiTypography-root': {
+            color: 'white',
+          }
+        }
+      }}
+    >
+      <StatContent sx={{ flex: 1 }}>
+        <StatValue sx={{ 
+          color: '#000000', 
+          transition: 'color 0.3s ease',
+          fontSize: '28px',
+          fontWeight: 600,
+          lineHeight: 1.2,
+          mb: 0.5
+        }}>
+          {report?.total_inactive || 0}
+        </StatValue>
+        <StatLabel sx={{ 
+          color: '#000000', 
+          transition: 'color 0.3s ease',
+          fontSize: '14px',
+          fontWeight: 500,
+          lineHeight: 1.2
+        }}>
+          Inactive Count
+        </StatLabel>
+      </StatContent>
+      <StatIcon sx={{ display: 'flex', alignItems: 'center' }}>
+        <HighlightOffIcon sx={{ 
+          fontSize: 40,
+          color: "#26A69A", 
+          transition: 'color 0.3s ease' 
+        }} />
+      </StatIcon>
+    </StatCard>
+  </Box>
+</Grid>
 
         <Grid item={true} xs={12}>
           <TableContainer component={Paper}>
@@ -222,7 +358,7 @@ function LeadsHistory(props) {
               sx={{ p: 1, gap: 4, flexWrap: 'wrap' }}
             >
               <Typography variant="h5" sx={{ minWidth: 160, fontWeight: 500 }}>
-                Lead [List]
+                Lead 
               </Typography>
               <TextField
                 id="standard-basic"
