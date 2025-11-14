@@ -16,6 +16,7 @@ import {
   MenuItem,
   Typography,
   Paper,
+  TableContainer,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -27,68 +28,24 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
 // Styled components
-const StatCard = styled(Paper)(({ bgcolor }) => ({
-  background: bgcolor,
-  color: "#fff",
-  borderRadius: 12,
-  padding: "28px 36px",
+const StatCard = styled(Paper)(({ theme }) => ({
+  backgroundColor: '#f5f5f5',
+  borderRadius: "8px",
+  padding: "12px",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  minWidth: 280,
-  minHeight: 100,
-  position: "relative",
-  overflow: "hidden",
+  height: "70px",
+  transition: 'all 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+  }
 }));
 
-const StatContent = styled("div")({
-  zIndex: 2,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-});
-
-const StatValue = styled("div")({
-  fontSize: 32,
-  fontWeight: 700,
-  lineHeight: 1.1,
-  marginBottom: 4,
-});
-
-const StatLabel = styled("div")({
-  fontSize: 14,
-  fontWeight: 500,
-  opacity: 0.85,
-  letterSpacing: 1,
-  textTransform: "uppercase",
-});
-
-const StatIcon = styled("div")({
-  position: "absolute",
-  right: 24,
-  top: "50%",
-  transform: "translateY(-50%)",
-  opacity: 0.18,
-  fontSize: 64,
-  zIndex: 1,
-});
-
-const FilterRow = styled(Box)({
-  background: "#f5faff",
-  borderRadius: 12,
-  boxShadow: "0 2px 12px 0 rgba(0,0,0,0.06)",
-  padding: "16px",
-  display: "flex",
-  alignItems: "center",
-  gap: 16,
-  marginBottom: 16,
-  flexWrap: "nowrap",
-  overflowX: "auto", // scroll if screen is small
-});
-
-// Component
 function PrimeUserReport() {
   const dispatch = useDispatch();
 
@@ -150,18 +107,14 @@ function PrimeUserReport() {
 
     // Apply date filter based on prime_date field
     if (dateRangeFilter !== "all" && row.prime_date) {
-      // Extract day from prime_date (format: DD-MM-YYYY HH:mm:ss)
       const dateParts = row.prime_date.split(' ')[0].split('-');
       const day = parseInt(dateParts[0]);
       
       if (dateRangeFilter === "s1") {
-        // S1: 26-31 and 1-5
         return (day >= 26 && day <= 31) || (day >= 1 && day <= 5);
       } else if (dateRangeFilter === "s2") {
-        // S2: 6-15
         return day >= 6 && day <= 15;
       } else if (dateRangeFilter === "s3") {
-        // S3: 16-25
         return day >= 16 && day <= 25;
       }
     }
@@ -171,212 +124,113 @@ function PrimeUserReport() {
 
   return (
     <Layout>
-      <Grid container spacing={3} sx={{ padding: 2 }}>
-        {/* Stats Cards */}
-      <Grid item xs={12}>
-  <Box sx={{ 
-    display: "flex", 
-    gap: 2, 
-    flexWrap: "wrap", 
-    mb: 2, 
-    justifyContent: { xs: "center", sm: "space-between" },
-    alignItems: "stretch" 
-  }}>
-    <StatCard sx={{ 
-      backgroundColor: '#f5f5f5', 
-      borderLeft: '4px solid #FFC107',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      transition: 'all 0.3s ease-in-out',
-      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
-      flex: "1 1 auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px",
-      height: "120px",
-      '&:hover': {
-        backgroundColor: '#FFC107',
-        boxShadow: '0 8px 25px rgba(255, 193, 7, 0.5)',
-        transform: 'translateY(-4px)',
-        '& .MuiTypography-root': {
-          color: 'white',
-        }
-      }
-    }}>
-      <StatContent sx={{ flex: 1 }}>
-        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
-          {report?.total_count || 0}
-        </StatValue>
-        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
-          Total Count
-        </StatLabel>
-      </StatContent>
-      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
-        <LeaderboardIcon sx={{ fontSize: 48, color: "#FFC107", transition: 'color 0.3s ease' }} />
-      </StatIcon>
-    </StatCard>
+      <Box sx={{ p: 1.5 }}>
+        {/* Compact Stats Cards */}
+        <Grid container spacing={1.5} sx={{ mb: 2 }}>
+          {[
+            { 
+              label: "Total", 
+              value: report?.total_count || 0, 
+              color: "#FFC107",
+              icon: <LeaderboardIcon sx={{ fontSize: 28, color: "#FFC107" }} />
+            },
+            { 
+              label: "Prime", 
+              value: report?.total_prime || 0, 
+              color: "#5C6BC0",
+              icon: <CheckCircleIcon sx={{ fontSize: 28, color: "#5C6BC0" }} />
+            },
+            { 
+              label: "Prime B", 
+              value: report?.total_primeB || 0, 
+              color: "#26A69A",
+              icon: <HighlightOffIcon sx={{ fontSize: 28, color: "#26A69A" }} />
+            },
+            { 
+              label: "Hybrid", 
+              value: report?.total_hybrid || 0, 
+              color: "#EC407A",
+              icon: <DeleteForeverIcon sx={{ fontSize: 28, color: "#EC407A" }} />
+            },
+            { 
+              label: "Booster", 
+              value: report?.total_booster || 0, 
+              color: "#FF9800",
+              icon: <RocketLaunchIcon sx={{ fontSize: 28, color: "#FF9800" }} />
+            },
+          ].map((card, index) => (
+            <Grid item xs={12} sm={6} md={2.4} key={index}>
+              <StatCard sx={{ borderLeft: `4px solid ${card.color}` }}>
+                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    fontSize: '12px', 
+                    fontWeight: 600, 
+                    color: '#666', 
+                    mb: 0.5 
+                  }}>
+                    {card.label}
+                  </Typography>
+                  <Typography sx={{ 
+                    color: '#000', 
+                    fontSize: '18px', 
+                    fontWeight: 700, 
+                    lineHeight: 1 
+                  }}>
+                    {card.value}
+                  </Typography>
+                </Box>
+                <Box>
+                  {card.icon}
+                </Box>
+              </StatCard>
+            </Grid>
+          ))}
+        </Grid>
 
-    <StatCard sx={{ 
-      backgroundColor: '#f5f5f5', 
-      borderLeft: '4px solid #5C6BC0',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      transition: 'all 0.3s ease-in-out',
-      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
-      flex: "1 1 auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px",
-      height: "120px",
-      '&:hover': {
-        backgroundColor: '#5C6BC0',
-        boxShadow: '0 8px 25px rgba(92, 107, 192, 0.5)',
-        transform: 'translateY(-4px)',
-        '& .MuiTypography-root': {
-          color: 'white',
-        }
-      }
-    }}>
-      <StatContent sx={{ flex: 1 }}>
-        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
-          {report?.total_prime || 0}
-        </StatValue>
-        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
-          Total Prime
-        </StatLabel>
-      </StatContent>
-      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
-        <CheckCircleIcon sx={{ fontSize: 48, color: "#5C6BC0", transition: 'color 0.3s ease' }} />
-      </StatIcon>
-    </StatCard>
-
-    <StatCard sx={{ 
-      backgroundColor: '#f5f5f5', 
-      borderLeft: '4px solid #26A69A',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      transition: 'all 0.3s ease-in-out',
-      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
-      flex: "1 1 auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px",
-      height: "120px",
-      '&:hover': {
-        backgroundColor: '#26A69A',
-        boxShadow: '0 8px 25px rgba(38, 166, 154, 0.5)',
-        transform: 'translateY(-4px)',
-        '& .MuiTypography-root': {
-          color: 'white',
-        }
-      }
-    }}>
-      <StatContent sx={{ flex: 1 }}>
-        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
-          {report?.total_primeB || 0}
-        </StatValue>
-        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
-          Total Prime B
-        </StatLabel>
-      </StatContent>
-      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
-        <HighlightOffIcon sx={{ fontSize: 48, color: "#26A69A", transition: 'color 0.3s ease' }} />
-      </StatIcon>
-    </StatCard>
-
-    <StatCard sx={{ 
-      backgroundColor: '#f5f5f5', 
-      borderLeft: '4px solid #EC407A',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      transition: 'all 0.3s ease-in-out',
-      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
-      flex: "1 1 auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px",
-      height: "120px",
-      '&:hover': {
-        backgroundColor: '#EC407A',
-        boxShadow: '0 8px 25px rgba(236, 64, 122, 0.5)',
-        transform: 'translateY(-4px)',
-        '& .MuiTypography-root': {
-          color: 'white',
-        }
-      }
-    }}>
-      <StatContent sx={{ flex: 1 }}>
-        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
-          {report?.total_hybrid || 0}
-        </StatValue>
-        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
-          Total Hybrid
-        </StatLabel>
-      </StatContent>
-      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
-        <DeleteForeverIcon sx={{ fontSize: 48, color: "#EC407A", transition: 'color 0.3s ease' }} />
-      </StatIcon>
-    </StatCard>
-
-    <StatCard sx={{ 
-      backgroundColor: '#f5f5f5', 
-      borderLeft: '4px solid #FF9800',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-      transition: 'all 0.3s ease-in-out',
-      minWidth: { xs: "100%", sm: "48%", md: "30%", lg: "18%" },
-      flex: "1 1 auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px",
-      height: "120px",
-      '&:hover': {
-        backgroundColor: '#FF9800',
-        boxShadow: '0 8px 25px rgba(255, 152, 0, 0.5)',
-        transform: 'translateY(-4px)',
-        '& .MuiTypography-root': {
-          color: 'white',
-        }
-      }
-    }}>
-      <StatContent sx={{ flex: 1 }}>
-        <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "24px", fontWeight: 700, lineHeight: 1.2, mb: 1 }}>
-          {report?.total_booster || 0}
-        </StatValue>
-        <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease', fontSize: "14px", fontWeight: 600, lineHeight: 1.2 }}>
-          Total Booster
-        </StatLabel>
-      </StatContent>
-      <StatIcon sx={{ display: "flex", alignItems: "center" }}>
-        <LeaderboardIcon sx={{ fontSize: 48, color: "#FF9800", transition: 'color 0.3s ease' }} />
-      </StatIcon>
-    </StatCard>
-  </Box>
-</Grid>
-
-        {/* Filters */}
-        <Grid item xs={12}>
-          <FilterRow>
-            <Typography variant="h5" sx={{ minWidth: 180 }}>
-              Prime User Report
+        {/* Compact Filter Row */}
+        <TableContainer component={Paper} sx={{ p: 1.5, mb: 2 }}>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 2,
+            flexWrap: 'wrap'
+          }}>
+            {/* Title */}
+            <Typography variant="h6" sx={{ 
+              fontWeight: "bold",
+              whiteSpace: "nowrap",
+              fontSize: '16px',
+              minWidth: 'fit-content'
+            }}>
+              Prime Report
             </Typography>
 
+            {/* Search Field */}
             <TextField
-              placeholder="Search"
-              variant="standard"
+              placeholder="Search..."
+              variant="outlined"
               size="small"
               value={searchTerm}
               onChange={handleSearchChange}
-              InputProps={{ startAdornment: <SearchIcon /> }}
-              sx={{ minWidth: 160 }}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+              }}
+              sx={{
+                width: "160px",
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.8rem',
+                }
+              }}
             />
 
-            <FormControl sx={{ minWidth: 160 }}>
-              <InputLabel>Transaction Type</InputLabel>
-              <Select value={selectedPlan} onChange={handlePlanChange}>
-                <MenuItem value="">Default</MenuItem>
-                <MenuItem value="Hybrid Prime">Hybrid Prime</MenuItem>
-                <MenuItem value="Booster Prime">Booster Prime</MenuItem>
+            {/* Plan Filter */}
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+              <InputLabel>Type</InputLabel>
+              <Select value={selectedPlan} onChange={handlePlanChange} sx={{ height: '36px' }}>
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Hybrid Prime">Hybrid</MenuItem>
+                <MenuItem value="Booster Prime">Booster</MenuItem>
                 <MenuItem value="Prime">Prime</MenuItem>
                 <MenuItem value="Prime B">Prime B</MenuItem>
                 <MenuItem value="Repurchase">Repurchase</MenuItem>
@@ -385,36 +239,67 @@ function PrimeUserReport() {
               </Select>
             </FormControl>
 
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="From Date"
-                value={fromDate}
-                onChange={handleFromDateChange}
-                sx={{ minWidth: 140 }}
-              />
-              <DatePicker
-                label="To Date"
-                value={toDate}
-                onChange={handleToDateChange}
-                sx={{ minWidth: 140 }}
-              />
-            </LocalizationProvider>
-
-            <FormControl sx={{ minWidth: 150 }}>
-              <InputLabel>Date Range</InputLabel>
-              <Select value={dateRangeFilter} onChange={handleDateRangeChange}>
+            {/* Date Range Filter */}
+            <FormControl size="small" sx={{ minWidth: 110 }}>
+              <InputLabel>Period</InputLabel>
+              <Select value={dateRangeFilter} onChange={handleDateRangeChange} sx={{ height: '36px' }}>
                 <MenuItem value="all">All</MenuItem>
                 <MenuItem value="s1">S1 (26-5)</MenuItem>
                 <MenuItem value="s2">S2 (6-15)</MenuItem>
                 <MenuItem value="s3">S3 (16-25)</MenuItem>
               </Select>
             </FormControl>
-          </FilterRow>
-        </Grid>
-      </Grid>
 
-      {/* Transaction Table */}
-      <PrimeUserTransactions showServiceTrans={filteredTransactions} />
+            {/* Date Pickers */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <DatePicker
+                  value={fromDate}
+                  format="DD/MM"
+                  onChange={handleFromDateChange}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "From",
+                      sx: {
+                        width: 100,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
+                  }}
+                />
+                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                  to
+                </Typography>
+                <DatePicker
+                  value={toDate}
+                  format="DD/MM"
+                  onChange={handleToDateChange}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "To",
+                      sx: {
+                        width: 100,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
+                  }}
+                />
+              </Box>
+            </LocalizationProvider>
+          </Box>
+        </TableContainer>
+
+        {/* Transaction Table */}
+        <PrimeUserTransactions showServiceTrans={filteredTransactions} />
+      </Box>
     </Layout>
   );
 }

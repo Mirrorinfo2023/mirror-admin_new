@@ -136,7 +136,7 @@ const TransactionHistory = () => {
                   startIcon={<AddIcon />}
                   href="/add-new-ebook-category/"
                   sx={{
-                    background: "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
+                    background: "#2198f3",
                     borderRadius: "12px",
                     color: "#fff",
                     fontWeight: "bold",

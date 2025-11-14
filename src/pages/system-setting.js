@@ -14,10 +14,10 @@ import {
   Box,
   TextField,
   IconButton,
-  InputAdornment,
-  Divider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 function TransactionHistory() {
   const [showServiceTrans, setShowServiceTrans] = useState([]);
@@ -25,87 +25,127 @@ function TransactionHistory() {
   const dispatch = useDispatch();
   const uid = Cookies.get("uid");
 
-  useEffect(() => {
-    const getTnx = async () => {
-      try {
-        const response = await api.post("/api/setting/get-setting", {});
-        if (response.status === 200) {
-          setShowServiceTrans(response.data.data);
-        }
-      } catch (error) {
-        const message =
-          error?.response?.data?.error || error.message || "Something went wrong";
-        dispatch(callAlert({ message, type: "FAILED" }));
+  const fetchData = async () => {
+    try {
+      const response = await api.post("/api/setting/get-setting", {});
+      if (response.status === 200) {
+        setShowServiceTrans(response.data.data || []);
       }
-    };
+    } catch (error) {
+      const message =
+        error?.response?.data?.error || error.message || "Something went wrong";
+      dispatch(callAlert({ message, type: "FAILED" }));
+    }
+  };
 
-    if (uid) getTnx();
+  useEffect(() => {
+    if (uid) fetchData();
   }, [uid, dispatch]);
 
-  // optional: filtering logic for search
   const filteredSettings = showServiceTrans?.filter((item) =>
     item?.setting_name?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const resetFilters = () => {
+    setSearch("");
+  };
+
   return (
     <Layout>
-      <Box sx={{ px: { xs: 2, sm: 4 }, py: { xs: 2, sm: 4 } }}>
-        {/* Header Section */}
-        <Paper
-          elevation={3}
-          sx={{
-            p: { xs: 2, sm: 3 },
-            borderRadius: 3,
-            background: "linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)",
-            color: "white",
-            mb: 3,
-          }}
-        >
-          <Typography variant="h5" fontWeight={600}>
-            System Settings
-          </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            Manage system configurations and preferences.
-          </Typography>
-        </Paper>
-
-        {/* Search and Filter Section */}
-        <Paper
-          elevation={1}
-          sx={{
-            p: { xs: 2, sm: 3 },
-            mb: 3,
-            borderRadius: 3,
-          }}
-        >
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={8} md={5}>
-              <TextField
-                fullWidth
-                label="Search Setting"
-                variant="outlined"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton>
-                        <SearchIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
+      <Box sx={{ p: 0.5 }}>
+        {/* Ultra Compact Filter Section */}
+        <Paper sx={{ 
+          p: 0.75, 
+          mb: 1,
+          backgroundColor: '#fafafa',
+          border: '1px solid #e0e0e0'
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexWrap: 'wrap',
+            gap: 0.5,
+            alignItems: 'center'
+          }}>
+            {/* Title with Icon */}
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              mr: 0.5,
+              minWidth: 'fit-content'
+            }}>
+              <FilterAltIcon sx={{ fontSize: 16, color: '#667eea', mr: 0.5 }} />
+              <Typography 
+                variant="subtitle2" 
+                sx={{ 
+                  fontWeight: 600,
+                  color: '#667eea',
+                  fontSize: '13px',
                 }}
-              />
-            </Grid>
-          </Grid>
+              >
+                System Settings
+              </Typography>
+            </Box>
+
+            {/* Search Field */}
+            <TextField
+              placeholder="Search settings..."
+              variant="outlined"
+              size="small"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ fontSize: 16, mr: 0.5, color: '#666' }} />,
+              }}
+              sx={{ 
+                minWidth: { xs: '100%', sm: '180px' },
+                flex: 1,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  fontSize: '0.7rem',
+                  height: '30px',
+                  '& input': {
+                    padding: '6px 8px',
+                    height: '18px'
+                  }
+                }
+              }}
+            />
+
+            {/* Action Buttons */}
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', ml: 'auto' }}>
+              {/* Refresh Button */}
+              <IconButton 
+                size="small" 
+                onClick={fetchData}
+                sx={{ 
+                  width: '30px', 
+                  height: '30px',
+                  backgroundColor: '#f0f0f0',
+                  '&:hover': { backgroundColor: '#e0e0e0' }
+                }}
+              >
+                <RefreshIcon sx={{ fontSize: 16, color: '#666' }} />
+              </IconButton>
+            </Box>
+          </Box>
         </Paper>
 
-        <Divider sx={{ mb: 3 }} />
+        {/* Results Count */}
+        <Box sx={{ mb: 0.5, px: 0.5 }}>
+          <Typography variant="caption" sx={{ 
+            color: 'text.secondary', 
+            fontSize: '0.7rem',
+            fontWeight: 500
+          }}>
+            Showing {filteredSettings?.length || 0} settings
+          </Typography>
+        </Box>
 
-        {/* Main Settings Table Section */}
-     
+        {/* Settings Table Section */}
+        <Box sx={{ px: 0.5, pb: 0.5 }}>
           <Transactions showServiceTrans={filteredSettings} />
-       
+        </Box>
       </Box>
     </Layout>
   );

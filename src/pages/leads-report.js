@@ -188,7 +188,7 @@ function LeadsHistory(props) {
       justifyContent: 'center', 
       gap: 2, 
       flexWrap: 'wrap', 
-      mb: 2 
+      // mb: 2 
     }}
   >
     <StatCard 
@@ -197,7 +197,7 @@ function LeadsHistory(props) {
         borderLeft: '4px solid #FFC107',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         transition: 'all 0.3s ease-in-out',
-        height: '120px',
+        height: '100px',
         minWidth: '200px',
         display: 'flex',
         alignItems: 'center',
@@ -249,7 +249,7 @@ function LeadsHistory(props) {
         borderLeft: '4px solid #5C6BC0',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         transition: 'all 0.3s ease-in-out',
-        height: '120px',
+        height: '100px',
         minWidth: '200px',
         display: 'flex',
         alignItems: 'center',
@@ -301,12 +301,12 @@ function LeadsHistory(props) {
         borderLeft: '4px solid #26A69A',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         transition: 'all 0.3s ease-in-out',
-        height: '120px',
+        height: '100px',
         minWidth: '200px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px',
+        // padding: '16px',
         '&:hover': {
           backgroundColor: '#26A69A',
           boxShadow: '0 8px 25px rgba(38, 166, 154, 0.5)',
@@ -360,17 +360,29 @@ function LeadsHistory(props) {
               <Typography variant="h5" sx={{ minWidth: 160, fontWeight: 500 }}>
                 Lead 
               </Typography>
-              <TextField
-                id="standard-basic"
-                placeholder="Search"
-                variant="standard"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <SearchIcon sx={{ color: '#888', mr: 1 }} />,
-                }}
-                sx={{ minWidth: 240, background: '#fff', borderRadius: 2, mx: 2 }}
-              />
+            <TextField
+  id="standard-basic"
+  placeholder="Search"
+  variant="standard"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  InputProps={{
+    startAdornment: <SearchIcon sx={{ color: '#888', mr: 1 }} />,
+  }}
+  sx={{ 
+    minWidth: 240, 
+    background: '#fff', 
+    borderRadius: 2, 
+    mx: 2,
+    border: '1px solid #e0e0e0',
+    '&:hover': {
+      border: '1px solid #bdbdbd',
+    },
+    '& .MuiInputBase-root': {
+      padding: '8px 12px',
+    }
+  }}
+/>
               <Box display="flex" alignItems="center" gap={1} width="40%">
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker

@@ -10,7 +10,6 @@ import Transactions from "@/components/Dashboard/User/details";
 import {
     Grid,
     Paper,
-    TableContainer,
     FormControl,
     InputLabel,
     Select,
@@ -22,44 +21,15 @@ import {
     Card,
     CardContent,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import SearchIcon from "@mui/icons-material/Search";
 import dayjs from "dayjs";
-import { useRouter } from "next/router";
-
-// New StatCard Design
-const StatCard = styled(Card)(({ theme }) => ({
-  borderRadius: '8px',
-  height: '120px',
-  display: 'flex',
-  alignItems: 'center',
-  transition: 'all 0.3s ease-in-out',
-  position: 'relative',
-  overflow: 'hidden',
-}));
-
-const FilterCard = styled(Paper)(({ theme }) => ({
-  background: 'white',
-  borderRadius: '12px',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-  marginBottom: '24px',
-  border: '1px solid rgba(0,0,0,0.05)',
-}));
-
-const getDate = (timeZone) => {
-    const dateObject = new Date(timeZone);
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObject.getDate()).padStart(2, "0");
-    const hours = String(dateObject.getHours()).padStart(2, "0");
-    const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-    const amOrPm = hours >= 12 ? "PM" : "AM";
-    const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-    return `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-};
+import PersonIcon from '@mui/icons-material/Person';
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 function TransactionHistory() {
     const [showServiceTrans, setShowServiceTrans] = useState([]);
@@ -71,7 +41,6 @@ function TransactionHistory() {
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const uid = Cookies.get("uid");
-    const router = useRouter();
 
     useEffect(() => {
         const getTnx = async () => {
@@ -111,251 +80,233 @@ function TransactionHistory() {
         }
     };
 
-    // Card configurations
+    // Compact card configurations with icons
     const cards = [
         {
-            title: "Active Users",
+            title: "Active",
+            value: masterReport.totalActiveusers || 0,
             color: "#FFC107",
-            count: masterReport.totalActiveusers || 0,
+            icon: <PersonIcon sx={{ fontSize: 28, color: "#FFC107" }} />
         },
         {
-            title: "Inactive Users",
+            title: "Inactive",
+            value: masterReport.totalInactiveusers || 0,
             color: "#5C6BC0",
-            count: masterReport.totalInactiveusers || 0,
+            icon: <PersonOffIcon sx={{ fontSize: 28, color: "#5C6BC0" }} />
         },
         {
-            title: "Prime Users",
+            title: "Prime",
+            value: masterReport.totalPrimeusers || 0,
             color: "#26A69A",
-            count: masterReport.totalPrimeusers || 0,
+            icon: <StarIcon sx={{ fontSize: 28, color: "#26A69A" }} />
         },
         {
-            title: "Non-Prime Users",
+            title: "Non-Prime",
+            value: masterReport.totalNonprimeusers || 0,
             color: "#EC407A",
-            count: masterReport.totalNonprimeusers || 0,
+            icon: <StarBorderIcon sx={{ fontSize: 28, color: "#EC407A" }} />
         },
     ];
 
     return (
         <Layout>
-            <Grid container spacing={2} sx={{ p: 2 }}>
-                {/* ====== Summary Cards - New Design ====== */}
-                {cards.map((card, index) => (
-                    <Grid key={index} item xs={12} sm={6} md={3}>
-                        <StatCard sx={{ 
-                            backgroundColor: '#f5f5f5', 
-                            borderLeft: `4px solid ${card.color}`,
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                            '&:hover': {
-                                backgroundColor: card.color,
-                                boxShadow: `0 8px 25px ${card.color}80`,
-                                transform: 'translateY(-4px)',
-                                '& .MuiTypography-root': {
-                                    color: 'white',
+            <Box sx={{ p: 1.5 }}>
+                {/* Compact Stats Cards */}
+                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+                    {cards.map((card, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Card sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: `4px solid ${card.color}`,
+                                boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                height: '70px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px',
+                                '&:hover': {
+                                    backgroundColor: card.color,
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: `0 4px 12px ${card.color}80`,
+                                    '& .MuiTypography-root': { color: '#fff' },
+                                    '& .stat-icon': { color: '#fff' }
                                 }
-                            }
-                        }}>
-                            <CardContent sx={{ 
-                                textAlign: 'center', 
-                                padding: '16px !important', 
-                                width: '100%' 
                             }}>
-                                <Typography 
-                                    variant="h4" 
-                                    sx={{ 
-                                        color: '#000000', 
-                                        transition: 'color 0.3s ease', 
+                                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                                    <Typography variant="subtitle2" sx={{ 
+                                        fontSize: '12px', 
+                                        fontWeight: 600, 
+                                        color: '#666', 
+                                        mb: 0.5,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.title}
+                                    </Typography>
+                                    <Typography sx={{ 
+                                        color: '#000', 
+                                        fontSize: '18px', 
                                         fontWeight: 700, 
-                                        fontSize: '24px', 
-                                        mb: 1,
-                                        lineHeight: 1.2
-                                    }}
-                                >
-                                    {masterReport.totalUsers || 0} : {card.count}
-                                </Typography>
-                                <Typography 
-                                    variant="body1" 
-                                    sx={{ 
-                                        color: '#000000', 
-                                        transition: 'color 0.3s ease', 
-                                        fontWeight: 600,
-                                        fontSize: '14px',
-                                        lineHeight: 1.2
-                                    }}
-                                >
-                                    {card.title}
-                                </Typography>
-                            </CardContent>
-                        </StatCard>
-                    </Grid>
-                ))}
+                                        lineHeight: 1,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.value}
+                                    </Typography>
+                                </Box>
+                                <Box className="stat-icon" sx={{ transition: 'color 0.3s ease' }}>
+                                    {card.icon}
+                                </Box>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
 
-                {/* ====== Filters Section ====== */}
-                <Grid item xs={12}>
-                    {loading && (
-                        <div className="loader-overlay">
-                            <div className="loader-wrapper">
-                                <img src="/loader.gif" alt="Loader" width="150" height="150" />
-                                <br /> Loading...
-                            </div>
-                        </div>
-                    )}
+                {/* Compact Filter Row */}
+                <Paper sx={{ p: 1.5, mb: 2 }}>
+                    <Box sx={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: 1.5,
+                        flexWrap: 'wrap'
+                    }}>
+                        {/* Title */}
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: "bold",
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            whiteSpace: "nowrap",
+                            fontSize: '16px',
+                            minWidth: 'fit-content'
+                        }}>
+                            User Details
+                        </Typography>
 
-                    <FilterCard>
-                        <Box sx={{ p: 3 }}>
-                            <Typography 
-                                variant="h5" 
+                        {/* Search Field */}
+                        <TextField
+                            placeholder="Search..."
+                            variant="outlined"
+                            size="small"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+                            }}
+                            sx={{
+                                width: "180px",
+                                '& .MuiOutlinedInput-root': {
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                    backgroundColor: 'rgba(0,0,0,0.02)',
+                                }
+                            }}
+                        />
+
+                        {/* Filter Dropdown */}
+                        <FormControl size="small" sx={{ minWidth: 140 }}>
+                            <InputLabel>Filter</InputLabel>
+                            <Select
+                                value={selectedValue}
+                                label="Filter"
+                                onChange={(e) => setSelectedValue(e.target.value)}
                                 sx={{ 
-                                    mb: 3,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    backgroundClip: 'text',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    fontWeight: 'bold'
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                    backgroundColor: 'rgba(0,0,0,0.02)',
                                 }}
                             >
-                                User Details
-                            </Typography>
+                                <MenuItem value="">All</MenuItem>
+                                <MenuItem value="mlm_id">User ID</MenuItem>
+                                <MenuItem value="first_name">Name</MenuItem>
+                                <MenuItem value="mobile">Mobile</MenuItem>
+                                <MenuItem value="email">Email</MenuItem>
+                                <MenuItem value="ref_mlm_id">Referral ID</MenuItem>
+                                <MenuItem value="ref_first_name">Referral Name</MenuItem>
+                                <MenuItem value="wallet_balance">Wallet</MenuItem>
+                                <MenuItem value="cashback_balance">Cashback</MenuItem>
+                                <MenuItem value="city">City</MenuItem>
+                                <MenuItem value="state">State</MenuItem>
+                                <MenuItem value="pincode">Pincode</MenuItem>
+                            </Select>
+                        </FormControl>
 
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    gap: 2,
-                                    alignItems: "center",
-                                    justifyContent: "flex-start",
-                                }}
-                            >
-                                {/* Search Input */}
-                                <TextField
-                                    variant="outlined"
-                                    placeholder="Search"
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <SearchIcon sx={{ mr: 1, color: "action.active", fontSize: 20 }} />
-                                        ),
-                                    }}
-                                    sx={{
-                                        flex: 1,
-                                        minWidth: { xs: "100%", sm: 180 },
-                                        "& .MuiInputBase-root": {
-                                            height: 40,
-                                            borderRadius: '8px',
-                                            backgroundColor: 'rgba(0,0,0,0.02)',
-                                        },
+                        {/* Date Range */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <DatePicker
+                                    value={fromDate}
+                                    format="DD/MM"
+                                    onChange={setFromDate}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "From",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem',
+                                                    backgroundColor: 'rgba(0,0,0,0.02)',
+                                                }
+                                            }
+                                        }
                                     }}
                                 />
-
-                                {/* Date Pickers */}
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <DatePicker
-                                        label="From Date"
-                                        value={fromDate}
-                                        onChange={setFromDate}
-                                        format="DD-MM-YYYY"
-                                        slotProps={{
-                                            textField: {
-                                                size: 'small',
-                                                sx: { 
-                                                    minWidth: { xs: "100%", sm: 180 },
-                                                    borderRadius: '8px',
-                                                    '& .MuiOutlinedInput-root': {
-                                                        height: 40,
-                                                        backgroundColor: 'rgba(0,0,0,0.02)',
-                                                    }
+                                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                                    to
+                                </Typography>
+                                <DatePicker
+                                    value={toDate}
+                                    format="DD/MM"
+                                    onChange={setToDate}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "To",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem',
+                                                    backgroundColor: 'rgba(0,0,0,0.02)',
                                                 }
                                             }
-                                        }}
-                                    />
-                                    <DatePicker
-                                        label="To Date"
-                                        value={toDate}
-                                        onChange={setToDate}
-                                        format="DD-MM-YYYY"
-                                        slotProps={{
-                                            textField: {
-                                                size: 'small',
-                                                sx: { 
-                                                    minWidth: { xs: "100%", sm: 180 },
-                                                    borderRadius: '8px',
-                                                    '& .MuiOutlinedInput-root': {
-                                                        height: 40,
-                                                        backgroundColor: 'rgba(0,0,0,0.02)',
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                    />
-                                </LocalizationProvider>
-
-                                {/* Filter Dropdown */}
-                                <FormControl 
-                                    sx={{ 
-                                        minWidth: { xs: "100%", sm: 160 },
-                                        '& .MuiOutlinedInput-root': {
-                                            height: 40,
-                                            borderRadius: '8px',
-                                            backgroundColor: 'rgba(0,0,0,0.02)',
                                         }
                                     }}
-                                >
-                                    <InputLabel>Filter</InputLabel>
-                                    <Select
-                                        value={selectedValue}
-                                        label="Filter"
-                                        onChange={(e) => setSelectedValue(e.target.value)}
-                                    >
-                                        <MenuItem value="">Default</MenuItem>
-                                        <MenuItem value="mlm_id">User Id</MenuItem>
-                                        <MenuItem value="first_name">Name</MenuItem>
-                                        <MenuItem value="mobile">Mobile</MenuItem>
-                                        <MenuItem value="email">Email</MenuItem>
-                                        <MenuItem value="ref_mlm_id">Referral User Id</MenuItem>
-                                        <MenuItem value="ref_first_name">Referral Name</MenuItem>
-                                        <MenuItem value="wallet_balance">Wallet Balance</MenuItem>
-                                        <MenuItem value="cashback_balance">Cashback</MenuItem>
-                                        <MenuItem value="city">City</MenuItem>
-                                        <MenuItem value="state">State</MenuItem>
-                                        <MenuItem value="pincode">Pincode</MenuItem>
-                                    </Select>
-                                </FormControl>
-
-                                {/* Search Button */}
-                                <Button
-                                    variant="contained"
-                                    size="small"
-                                    onClick={handleOKButtonClick}
-                                    sx={{
-                                        borderRadius: '8px',
-                                        fontWeight: 600,
-                                        fontSize: '14px',
-                                        px: 4,
-                                        py: 1,
-                                        background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
-                                        boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
-                                        textTransform: "none",
-                                        whiteSpace: "nowrap",
-                                        height: '40px',
-                                        minWidth: '120px',
-                                        transition: 'all 0.3s ease-in-out',
-                                        '&:hover': {
-                                            background: "linear-gradient(90deg, #21cbf3 0%, #2196f3 100%)",
-                                            boxShadow: "0 4px 12px 0 rgba(33, 203, 243, 0.3)",
-                                            transform: 'translateY(-2px)',
-                                        }
-                                    }}
-                                >
-                                    Search
-                                </Button>
+                                />
                             </Box>
-                        </Box>
-                    </FilterCard>
-                </Grid>
-            </Grid>
+                        </LocalizationProvider>
 
-            <Transactions showServiceTrans={showServiceTrans} />
+                        {/* Search Button */}
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={handleOKButtonClick}
+                            sx={{
+                                borderRadius: '6px',
+                                fontWeight: 600,
+                                fontSize: '0.8rem',
+                                px: 3,
+                                py: 0.8,
+                                background: "#2198f3",
+                                textTransform: "none",
+                                whiteSpace: "nowrap",
+                                height: '36px',
+                                minWidth: '100px',
+                                '&:hover': {
+                                    background: "#1976d2",
+                                }
+                            }}
+                        >
+                            Search
+                        </Button>
+                    </Box>
+                </Paper>
+
+                {/* Table Section */}
+                <Transactions showServiceTrans={showServiceTrans} />
+            </Box>
         </Layout>
     );
 }

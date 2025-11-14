@@ -8,85 +8,70 @@ import Layout from "@/components/Dashboard/layout";
 import OtpTransactions from "@/components/Otp/Otp";
 import { 
     Grid,
-    TableContainer, 
     Paper, 
     Typography, 
     Box, 
     TextField,
     Card,
-    CardContent 
+    CardContent,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from "@mui/material";
 import dayjs from "dayjs";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
-import { styled } from "@mui/material/styles";
 import MessageIcon from "@mui/icons-material/Message";
 import TimerOffIcon from "@mui/icons-material/TimerOff";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { DataDecrypt, DataEncrypt } from "../../utils/encryption";
-
-const drawWidth = 220;
-
-const getDate = (timeZone) => {
-  const dateString = timeZone;
-  const dateObject = new Date(dateString);
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-  return formattedDateTime;
-};
-
-// New StatCard Design
-const StatCard = styled(Card)(({ theme }) => ({
-  borderRadius: '8px',
-  height: '120px',
-  display: 'flex',
-  alignItems: 'center',
-  transition: 'all 0.3s ease-in-out',
-  position: 'relative',
-  overflow: 'hidden',
-  minWidth: '280px',
-}));
-
-const FilterCard = styled(Paper)(({ theme }) => ({
-  background: 'white',
-  borderRadius: '12px',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-  marginBottom: '24px',
-  border: '1px solid rgba(0,0,0,0.05)',
-}));
 
 function OtpReport(props) {
-    const [showServiceTrans, setShowServiceTrans] = useState({});
+    const [showServiceTrans, setShowServiceTrans] = useState([]);
     const [masterReport, setmasterReport] = useState({});
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [fromDate, setFromDate] = useState(dayjs().startOf("month"));
+    const [toDate, setToDate] = useState(dayjs());
     const dispatch = useDispatch();
     const uid = Cookies.get('uid');
 
-    const [fromDate, setFromDate] = React.useState(dayjs(getDate.date));
-    const [toDate, setToDate] = React.useState(dayjs(getDate.date));
-    const [searchTerm, setSearchTerm] = useState("");
+    // Fetch OTP data with filters
+    const fetchOtpData = async (filters = {}) => {
+        try {
+            const reqData = {
+                from_date: fromDate.toISOString().split("T")[0],
+                to_date: toDate.toISOString().split("T")[0],
+                searchTerm,
+                status: selectedStatus,
+                ...filters
+            };
+
+            const response = await api.post("/api/report/otp", reqData);
+            if (response.status === 200) {
+                setShowServiceTrans(response.data.otpResult || []);
+                setmasterReport(response.data.report || {});
+            }
+        } catch (error) {
+            console.error("Error fetching OTP data:", error);
+            // Add error handling if needed
+        }
+    };
 
     useEffect(() => {
-        const getTnx = async () => {
-            try {
-                const response = await api.post("/api/report/otp");
-                if (response.status === 200) {
-                    setShowServiceTrans(response.data.otpResult)
-                    setmasterReport(response.data.report)
-                }
-            } catch (error) {
-                // Error handling commented out in original code
-            }
-        }
+        fetchOtpData();
+    }, [fromDate, toDate]);
 
-        if (fromDate || toDate) {
-            getTnx();
-        }
-    }, [fromDate, toDate, dispatch])
+    // Handle search and filter changes
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleStatusChange = (e) => {
+        setSelectedStatus(e.target.value);
+    };
 
     const handleFromDateChange = (date) => {
         setFromDate(date);
@@ -96,163 +81,243 @@ function OtpReport(props) {
         setToDate(date);
     };
 
-    // Card configurations
+    // Apply filters
+    const handleApplyFilters = () => {
+        fetchOtpData({
+            searchTerm,
+            status: selectedStatus
+        });
+    };
+
+    // Reset filters
+    const handleResetFilters = () => {
+        setSearchTerm("");
+        setSelectedStatus("");
+        setFromDate(dayjs().startOf("month"));
+        setToDate(dayjs());
+        fetchOtpData();
+    };
+
+    // Compact card configurations with icons
     const cards = [
         {
             label: "Total OTP",
             value: masterReport.totalSms ?? 0,
             color: "#FFC107",
-            icon: <MessageIcon />
+            icon: <MessageIcon sx={{ fontSize: 28, color: "#FFC107" }} />
         },
         {
-            label: "Expired OTP",
+            label: "Expired",
             value: masterReport.totalExpsms ?? 0,
             color: "#5C6BC0",
-            icon: <TimerOffIcon />
+            icon: <TimerOffIcon sx={{ fontSize: 28, color: "#5C6BC0" }} />
         },
         {
-            label: "Active OTP",
+            label: "Active",
             value: masterReport.totalActivesms ?? 0,
             color: "#26A69A",
-            icon: <AccessTimeIcon />
+            icon: <AccessTimeIcon sx={{ fontSize: 28, color: "#26A69A" }} />
         }
     ];
 
     return (
         <Layout>
-            <Grid container spacing={2} sx={{ p: 2 }}>
-                {/* Statistics Cards - New Design */}
-                <Grid item xs={12}>
+            <Box sx={{ p: 1.5 }}>
+                {/* Compact Stats Cards */}
+                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+                    {cards.map((card, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Card sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: `4px solid ${card.color}`,
+                                boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                height: '70px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px',
+                                '&:hover': {
+                                    backgroundColor: card.color,
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: `0 4px 12px ${card.color}80`,
+                                    '& .MuiTypography-root': { color: '#fff' },
+                                    '& .stat-icon': { color: '#fff' }
+                                }
+                            }}>
+                                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                                    <Typography variant="subtitle2" sx={{ 
+                                        fontSize: '12px', 
+                                        fontWeight: 600, 
+                                        color: '#666', 
+                                        mb: 0.5,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.label}
+                                    </Typography>
+                                    <Typography sx={{ 
+                                        color: '#000', 
+                                        fontSize: '18px', 
+                                        fontWeight: 700, 
+                                        lineHeight: 1,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.value}
+                                    </Typography>
+                                </Box>
+                                <Box className="stat-icon" sx={{ transition: 'color 0.3s ease' }}>
+                                    {card.icon}
+                                </Box>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+
+                {/* Compact Filter Row */}
+                <Paper sx={{ p: 1.5, mb: 2 }}>
                     <Box sx={{ 
                         display: "flex", 
-                        gap: 2, 
-                        flexWrap: "wrap", 
-                        justifyContent: "center", 
-                        mb: 3 
+                        alignItems: "center", 
+                        gap: 1.5,
+                        flexWrap: 'wrap'
                     }}>
-                        {cards.map((card, index) => (
-                            <StatCard 
-                                key={index}
-                                sx={{ 
-                                    backgroundColor: '#f5f5f5', 
-                                    borderLeft: `4px solid ${card.color}`,
-                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                    '&:hover': {
-                                        backgroundColor: card.color,
-                                        boxShadow: `0 8px 25px ${card.color}80`,
-                                        transform: 'translateY(-4px)',
-                                        '& .MuiTypography-root': {
-                                            color: 'white',
-                                        },
-                                        '& .stat-icon': {
-                                            color: 'white',
-                                            opacity: 0.8
+                        {/* Title */}
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: "bold",
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            whiteSpace: "nowrap",
+                            fontSize: '16px',
+                            minWidth: 'fit-content'
+                        }}>
+                            OTP Report
+                        </Typography>
+
+                        {/* Search Field */}
+                        <TextField
+                            placeholder="Search mobile, OTP..."
+                            variant="outlined"
+                            size="small"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+                            }}
+                            sx={{
+                                width: "180px",
+                                '& .MuiOutlinedInput-root': {
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                }
+                            }}
+                        />
+
+                        {/* Status Filter */}
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                            <InputLabel>Status</InputLabel>
+                            <Select
+                                value={selectedStatus}
+                                label="Status"
+                                onChange={handleStatusChange}
+                                sx={{ height: '36px', fontSize: '0.8rem' }}
+                            >
+                                <MenuItem value="">All</MenuItem>
+                                <MenuItem value="active">Active</MenuItem>
+                                <MenuItem value="expired">Expired</MenuItem>
+                                <MenuItem value="used">Used</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        {/* Date Range */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <DatePicker
+                                    value={fromDate}
+                                    format="DD/MM"
+                                    onChange={handleFromDateChange}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "From",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem'
+                                                }
+                                            }
                                         }
-                                    }
-                                }}
-                            >
-                                <CardContent sx={{ 
-                                    padding: '16px !important', 
-                                    width: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between'
-                                }}>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography 
-                                            variant="h4" 
-                                            sx={{ 
-                                                color: '#000000', 
-                                                transition: 'color 0.3s ease', 
-                                                fontWeight: 700, 
-                                                fontSize: '24px', 
-                                                mb: 1,
-                                                lineHeight: 1.2
-                                            }}
-                                        >
-                                            {card.value}
-                                        </Typography>
-                                        <Typography 
-                                            variant="body1" 
-                                            sx={{ 
-                                                color: '#000000', 
-                                                transition: 'color 0.3s ease', 
-                                                fontWeight: 600,
-                                                fontSize: '14px',
-                                                lineHeight: 1.2
-                                            }}
-                                        >
-                                            {card.label}
-                                        </Typography>
-                                    </Box>
-                                    <Box 
-                                        className="stat-icon"
-                                        sx={{ 
-                                            color: card.color, 
-                                            transition: 'color 0.3s ease',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            ml: 2
-                                        }}
-                                    >
-                                        {React.cloneElement(card.icon, { sx: { fontSize: 40 } })}
-                                    </Box>
-                                </CardContent>
-                            </StatCard>
-                        ))}
-                    </Box>
-                </Grid>
-
-                {/* Filter Section */}
-                <Grid item xs={12}>
-                    <FilterCard>
-                        <Box sx={{ p: 3 }}>
-                            <Typography 
-                                variant="h5" 
-                                sx={{ 
-                                    mb: 3,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    backgroundClip: 'text',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    fontWeight: 'bold'
-                                }}
-                            >
-                                OTP Report
-                            </Typography>
-
-                            <Box sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 2,
-                                flexWrap: 'wrap'
-                            }}>
-                                <TextField 
-                                    id="standard-basic" 
-                                    placeholder="Search" 
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={e => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: <SearchIcon color="action" />,
                                     }}
-                                    sx={{ 
-                                        width: { xs: '100%', sm: '300px' },
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '8px',
-                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                                />
+                                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                                    to
+                                </Typography>
+                                <DatePicker
+                                    value={toDate}
+                                    format="DD/MM"
+                                    onChange={handleToDateChange}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "To",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem'
+                                                }
+                                            }
                                         }
-                                    }} 
+                                    }}
                                 />
                             </Box>
-                        </Box>
-                    </FilterCard>
-                </Grid>
-            </Grid>
+                        </LocalizationProvider>
 
-            <OtpTransactions showServiceTrans={showServiceTrans} searchTerm={searchTerm} />
+                        {/* Action Buttons */}
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                            <button
+                                onClick={handleApplyFilters}
+                                style={{
+                                    backgroundColor: '#2196f3',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    padding: '8px 16px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    height: '36px',
+                                    minWidth: '80px'
+                                }}
+                            >
+                                Apply
+                            </button>
+                            <button
+                                onClick={handleResetFilters}
+                                style={{
+                                    backgroundColor: '#f5f5f5',
+                                    color: '#666',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '6px',
+                                    padding: '8px 16px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    height: '36px',
+                                    minWidth: '80px'
+                                }}
+                            >
+                                Reset
+                            </button>
+                        </Box>
+                    </Box>
+                </Paper>
+
+                {/* Table Section */}
+                <OtpTransactions showServiceTrans={showServiceTrans} searchTerm={searchTerm} />
+            </Box>
         </Layout>
     );
 }

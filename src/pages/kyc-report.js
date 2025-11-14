@@ -24,28 +24,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
-import { styled } from "@mui/material/styles";
-
-// Compact StatCard Design
-const StatCard = styled(Card)(({ theme }) => ({
-  borderRadius: '8px',
-  height: '90px',
-  display: 'flex',
-  alignItems: 'center',
-  transition: 'all 0.3s ease-in-out',
-  position: 'relative',
-  overflow: 'hidden',
-  flex: 1,
-  minWidth: '160px',
-}));
-
-const FilterCard = styled(Paper)(({ theme }) => ({
-  background: 'white',
-  borderRadius: '12px',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-  marginBottom: '16px',
-  border: '1px solid rgba(0,0,0,0.05)',
-}));
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 function KycReport() {
   const [showServiceTrans, setShowServiceTrans] = useState([]);
@@ -59,11 +41,8 @@ function KycReport() {
   const [selectedValue, setSelectedValue] = useState("");
   const dispatch = useDispatch();
 
-  const currentDate = new Date();
-  const [fromDate, setFromDate] = useState(
-    dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  );
-  const [toDate, setToDate] = useState(dayjs(new Date()));
+  const [fromDate, setFromDate] = useState(dayjs().startOf("month"));
+  const [toDate, setToDate] = useState(dayjs());
 
   useEffect(() => {
     const getTnx = async () => {
@@ -104,189 +83,193 @@ function KycReport() {
     return row.status !== undefined && row.status === parseInt(selectedValue) && matchSearch;
   });
 
+  // Compact cards with icons
   const cards = [
     {
-      label: "Total KYC",
+      label: "Total",
       value: masterReport.totalKyc ?? 0,
-      color: "#FFC107"
+      color: "#FFC107",
+      icon: <AssignmentIcon sx={{ fontSize: 24, color: "#FFC107" }} />
     },
     {
-      label: "Pending KYC",
+      label: "Pending",
       value: masterReport.totalPendingKyc ?? 0,
-      color: "#5C6BC0"
+      color: "#5C6BC0",
+      icon: <PendingActionsIcon sx={{ fontSize: 24, color: "#5C6BC0" }} />
     },
     {
-      label: "Approved KYC",
+      label: "Approved",
       value: masterReport.totalApprovedKyc ?? 0,
-      color: "#26A69A"
+      color: "#26A69A",
+      icon: <VerifiedIcon sx={{ fontSize: 24, color: "#26A69A" }} />
     },
     {
-      label: "Rejected KYC",
+      label: "Rejected",
       value: masterReport.totalRejectedKyc ?? 0,
-      color: "#EC407A"
+      color: "#EC407A",
+      icon: <CancelIcon sx={{ fontSize: 24, color: "#EC407A" }} />
     }
   ];
 
   return (
     <Layout>
-      <Grid container spacing={1.5} sx={{ p: 1.5 }}>
-        {/* Compact Statistics Cards */}
-        <Grid item xs={12}>
-          <Box sx={{ 
-            display: "flex", 
-            gap: 1.5, 
-            flexWrap: "wrap",
-            mb: 2 
-          }}>
-            {cards.map((card, index) => (
-              <StatCard 
-                key={index}
-                sx={{ 
-                  backgroundColor: '#f5f5f5', 
-                  borderLeft: `4px solid ${card.color}`,
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                  '&:hover': {
-                    backgroundColor: card.color,
-                    boxShadow: `0 8px 25px ${card.color}80`,
-                    transform: 'translateY(-2px)',
-                    '& .MuiTypography-root': {
-                      color: 'white',
-                    }
-                  }
-                }}
-              >
-                <CardContent sx={{ 
-                  padding: '12px !important', 
-                  width: '100%',
-                  textAlign: 'center',
-                  '&:last-child': { pb: '12px' }
-                }}>
-                  <Typography 
-                    variant="h5" 
-                    sx={{ 
-                      color: '#000000', 
-                      transition: 'color 0.3s ease', 
-                      fontWeight: 700, 
-                      fontSize: '20px', 
-                      mb: 0.5,
-                      lineHeight: 1.2
-                    }}
-                  >
-                    {card.value}
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      color: '#000000', 
-                      transition: 'color 0.3s ease', 
-                      fontWeight: 600,
-                      fontSize: '12px',
-                      lineHeight: 1.2
-                    }}
-                  >
+      <Box sx={{ p: 1 }}>
+        {/* Ultra Compact Stats Cards */}
+        <Grid container spacing={1} sx={{ mb: 1.5 }}>
+          {cards.map((card, index) => (
+            <Grid item xs={6} sm={3} key={index}>
+              <Card sx={{ 
+                backgroundColor: '#f5f5f5', 
+                borderLeft: `3px solid ${card.color}`,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                transition: 'all 0.2s ease-in-out',
+                height: '60px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px',
+                '&:hover': {
+                  backgroundColor: card.color,
+                  transform: 'translateY(-1px)',
+                  '& .MuiTypography-root': { color: '#fff' },
+                  '& .stat-icon': { color: '#fff' }
+                }
+              }}>
+                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    fontSize: '10px', 
+                    fontWeight: 600, 
+                    color: '#666', 
+                    mb: 0.25,
+                    transition: 'color 0.2s ease'
+                  }}>
                     {card.label}
                   </Typography>
-                </CardContent>
-              </StatCard>
-            ))}
-          </Box>
+                  <Typography sx={{ 
+                    color: '#000', 
+                    fontSize: '16px', 
+                    fontWeight: 700, 
+                    lineHeight: 1,
+                    transition: 'color 0.2s ease'
+                  }}>
+                    {card.value}
+                  </Typography>
+                </Box>
+                <Box className="stat-icon" sx={{ transition: 'color 0.2s ease' }}>
+                  {card.icon}
+                </Box>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
 
-        {/* Compact Filter Section */}
-        <Grid item xs={12}>
-          <FilterCard>
-            <Box sx={{ p: 2 }}>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  mb: 2,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontWeight: 'bold',
-                  fontSize: '1.1rem'
-                }}
+        {/* Ultra Compact Filter Row */}
+        <Paper sx={{ p: 1, mb: 1.5 }}>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 1,
+            flexWrap: 'wrap'
+          }}>
+            {/* Title */}
+            <Typography variant="h6" sx={{ 
+              fontWeight: "bold",
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              whiteSpace: "nowrap",
+              fontSize: '14px',
+              minWidth: 'fit-content'
+            }}>
+              KYC Report
+            </Typography>
+
+            {/* Status Filter */}
+            <FormControl size="small" sx={{ minWidth: 100 }}>
+              <InputLabel sx={{ fontSize: '0.8rem' }}>Status</InputLabel>
+              <Select
+                value={selectedValue}
+                label="Status"
+                onChange={handleChange}
+                sx={{ height: '32px', fontSize: '0.75rem' }}
               >
-                KYC Report
-              </Typography>
+                <MenuItem value="" sx={{ fontSize: '0.75rem' }}>All</MenuItem>
+                <MenuItem value="0" sx={{ fontSize: '0.75rem' }}>Pending</MenuItem>
+                <MenuItem value="1" sx={{ fontSize: '0.75rem' }}>Approved</MenuItem>
+                <MenuItem value="2" sx={{ fontSize: '0.75rem' }}>Rejected</MenuItem>
+              </Select>
+            </FormControl>
 
-              <Box sx={{ 
-                display: 'flex', 
-                flexWrap: 'wrap',
-                gap: 1.5,
-                alignItems: 'center'
-              }}>
-                <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    value={selectedValue}
-                    label="Status"
-                    onChange={handleChange}
-                  >
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="0">Pending</MenuItem>
-                    <MenuItem value="1">Approved</MenuItem>
-                    <MenuItem value="2">Rejected</MenuItem>
-                  </Select>
-                </FormControl>
+            {/* Search Field */}
+            <TextField
+              placeholder="Search..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ color: '#666', mr: 0.5, fontSize: 18 }} />,
+              }}
+              sx={{
+                width: "140px",
+                '& .MuiOutlinedInput-root': {
+                  height: '32px',
+                  fontSize: '0.75rem',
+                }
+              }}
+            />
 
-                <TextField
-                  placeholder="Search"
-                  variant="outlined"
-                  size="small"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />
-                    ),
-                  }}
-                  sx={{ 
-                    minWidth: { xs: '100%', sm: '180px' },
-                    flex: 1,
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: '8px',
-                      backgroundColor: 'rgba(0,0,0,0.02)',
+            {/* Date Range */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                <DatePicker
+                  value={fromDate}
+                  format="DD/MM"
+                  onChange={(newDate) => setFromDate(newDate)}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "From",
+                      sx: {
+                        width: 90,
+                        '& .MuiInputBase-root': {
+                          height: 32,
+                          fontSize: '0.75rem'
+                        }
+                      }
                     }
                   }}
                 />
-
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
-                    <DatePicker
-                      label="From Date"
-                      value={fromDate}
-                      format="DD-MM-YYYY"
-                      onChange={(newDate) => setFromDate(newDate)}
-                      slotProps={{ 
-                        textField: { 
-                          size: "small",
-                          sx: { minWidth: '140px' }
-                        } 
-                      }}
-                    />
-                    <DatePicker
-                      label="To Date"
-                      value={toDate}
-                      format="DD-MM-YYYY"
-                      onChange={(newDate) => setToDate(newDate)}
-                      slotProps={{ 
-                        textField: { 
-                          size: "small",
-                          sx: { minWidth: '140px' }
-                        } 
-                      }}
-                    />
-                  </Box>
-                </LocalizationProvider>
+                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.25, fontSize: '0.7rem' }}>
+                  to
+                </Typography>
+                <DatePicker
+                  value={toDate}
+                  format="DD/MM"
+                  onChange={(newDate) => setToDate(newDate)}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "To",
+                      sx: {
+                        width: 90,
+                        '& .MuiInputBase-root': {
+                          height: 32,
+                          fontSize: '0.75rem'
+                        }
+                      }
+                    }
+                  }}
+                />
               </Box>
-            </Box>
-          </FilterCard>
-        </Grid>
-      </Grid>
-      
-      <KycTransactions showServiceTrans={filteredRows} />
+            </LocalizationProvider>
+          </Box>
+        </Paper>
+
+        {/* Table Section */}
+        <KycTransactions showServiceTrans={filteredRows} />
+      </Box>
     </Layout>
   );
 }

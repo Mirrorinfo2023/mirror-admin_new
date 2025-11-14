@@ -119,13 +119,13 @@ function BannersReport() {
                                     fontSize: 16,
                                     px: 3,
                                     py: 1,
-                                    background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                                    background: "#2198f3",
                                     boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
                                     textTransform: "none",
                                     whiteSpace: "nowrap",
                                     "&:hover": {
                                         background:
-                                            "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                                            "#2198f3",
                                         opacity: 0.9,
                                     },
                                 }}

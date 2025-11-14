@@ -60,9 +60,9 @@ const Transactions = ({ showServiceTrans }) => {
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
          [`&.${tableCellClasses.head}`]: {
-            background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+            background: "#2198f3",
             color: "white",
-          fontSize: 12,
+          fontSize: 14,
           linHeight: 15,
           padding: 7,
           borderRight: "1px solid rgba(224, 224, 224, 1)"

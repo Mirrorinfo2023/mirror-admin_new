@@ -23,6 +23,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import RedeemIcon from '@mui/icons-material/Redeem';
 
 function IncomeReport() {
     const [showServiceTrans, setShowServiceTrans] = useState([]);
@@ -31,8 +35,7 @@ function IncomeReport() {
     const [selectedValue, setSelectedValue] = useState("");
 
     const dispatch = useDispatch();
-    const currentDate = new Date();
-    const [fromDate, setFromDate] = useState(dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)));
+    const [fromDate, setFromDate] = useState(dayjs().startOf('month'));
     const [toDate, setToDate] = useState(dayjs());
 
     useEffect(() => {
@@ -84,124 +87,199 @@ function IncomeReport() {
 
     return (
         <Layout>
-    <Grid container spacing={3} sx={{ paddingY: 2 }}>
-        {/* ======= Cards Row ======= */}
-        <Grid container spacing={2} sx={{ px: 5, mb: 4 }}>
-            {[
-                { label: "Total Income Count", value: report?.total_incomeCount || 0, color: "#FFC107" },
-                { label: "Total Repurchase Count", value: report?.total_repurchaseCount || 0, color: "#5C6BC0" },
-                { label: "Affiliate To Wallet", value: report?.total_affiliateToWallet || 0, color: "#26A69A" },
-                { label: "Redeem Count", value: report?.total_RedeemCount || 0, color: "#EC407A" },
-            ].map((card, index) => (
-                <Grid item xs={12} sm={6} md={3} key={index}>
-                    <Paper
-                        elevation={3}
-                        sx={{
-                            height: 90,
-                            backgroundColor: '#f5f5f5',
-                            borderLeft: `4px solid ${card.color}`,
-                            borderRadius: "10px",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            color: "#000",
-                            textAlign: "center",
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s ease-in-out',
-                            padding: '16px',
-                            '&:hover': {
-                                backgroundColor: card.color,
-                                boxShadow: `0 8px 25px ${card.color}80`,
-                                transform: 'translateY(-4px)',
-                                color: '#fff',
-                            }
-                        }}
-                    >
-                        <Typography variant="h5" fontWeight="bold" sx={{ transition: 'color 0.3s ease' }}>
-                            {card.value}
-                        </Typography>
-                        <Typography variant="body1" sx={{ transition: 'color 0.3s ease' }}>
-                            {card.label}
-                        </Typography>
-                    </Paper>
+            <Box sx={{ p: 1.5 }}>
+                {/* ======= Compact Stats Cards ======= */}
+                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+                    {[
+                        { 
+                            label: "Income Count", 
+                            value: report?.total_incomeCount || 0, 
+                            color: "#FFC107",
+                            icon: <AttachMoneyIcon sx={{ fontSize: 28, color: "#FFC107" }} />
+                        },
+                        { 
+                            label: "Repurchase", 
+                            value: report?.total_repurchaseCount || 0, 
+                            color: "#5C6BC0",
+                            icon: <ShoppingCartIcon sx={{ fontSize: 28, color: "#5C6BC0" }} />
+                        },
+                        { 
+                            label: "Affiliate Wallet", 
+                            value: report?.total_affiliateToWallet || 0, 
+                            color: "#26A69A",
+                            icon: <AccountBalanceWalletIcon sx={{ fontSize: 28, color: "#26A69A" }} />
+                        },
+                        { 
+                            label: "Redeem Count", 
+                            value: report?.total_RedeemCount || 0, 
+                            color: "#EC407A",
+                            icon: <RedeemIcon sx={{ fontSize: 28, color: "#EC407A" }} />
+                        },
+                    ].map((card, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Paper
+                                sx={{
+                                    height: 70,
+                                    backgroundColor: '#f5f5f5',
+                                    borderLeft: `4px solid ${card.color}`,
+                                    borderRadius: "6px",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    padding: '12px',
+                                    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+                                    transition: 'all 0.3s ease-in-out',
+                                    '&:hover': {
+                                        backgroundColor: card.color,
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: `0 4px 12px ${card.color}80`,
+                                        '& .MuiTypography-root, & .stat-value': {
+                                            color: '#fff',
+                                        },
+                                        '& .stat-icon': {
+                                            opacity: 0.8,
+                                        }
+                                    }
+                                }}
+                            >
+                                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                                    <Typography variant="subtitle2" sx={{ 
+                                        fontSize: '12px', 
+                                        fontWeight: 600, 
+                                        color: '#666', 
+                                        mb: 0.5,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.label}
+                                    </Typography>
+                                    <Typography className="stat-value" sx={{ 
+                                        color: '#000', 
+                                        fontSize: '18px', 
+                                        fontWeight: 700, 
+                                        lineHeight: 1,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.value}
+                                    </Typography>
+                                </Box>
+                                <Box className="stat-icon" sx={{ transition: 'all 0.3s ease' }}>
+                                    {card.icon}
+                                </Box>
+                            </Paper>
+                        </Grid>
+                    ))}
                 </Grid>
-            ))}
-        </Grid>
 
-        {/* ======= Filters Row ======= */}
-        <Grid container spacing={2} alignItems="center" sx={{ px: 5, py: 3, bgcolor: "white", mb: 3, borderRadius: 2 }}> {/* ✅ py: 3, mb: 3, borderRadius added */}
-            <Grid item xs={12} md={2}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    Income Report
-                </Typography>
-            </Grid>
+                {/* ======= Compact Filter Row ======= */}
+                <TableContainer component={Paper} sx={{ p: 1.5, mb: 2 }}>
+                    <Box sx={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: 2,
+                        flexWrap: 'wrap'
+                    }}>
+                        {/* Title */}
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: "bold",
+                            whiteSpace: "nowrap",
+                            fontSize: '16px',
+                            minWidth: 'fit-content'
+                        }}>
+                            Income Report
+                        </Typography>
 
-            <Grid item xs={12} md={2}>
-                <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Filter</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        value={selectedValue}
-                        label="Filter"
-                        onChange={handleChange}
-                    >
-                        <MenuItem value="">Default</MenuItem>
-                        <MenuItem value="Hybrid Prime">Hybrid Prime</MenuItem>
-                        <MenuItem value="Booster Prime">Booster Plan</MenuItem>
-                        <MenuItem value="Prime">Prime</MenuItem>
-                        <MenuItem value="Prime B">Prime B</MenuItem>
-                        <MenuItem value="Royality">Royality</MenuItem>
-                        <MenuItem value="Repurchase">Repurchase</MenuItem>
-                        <MenuItem value="Redeem">Redeem</MenuItem>
-                    </Select>
-                </FormControl>
-            </Grid>
+                        {/* Filter Dropdown */}
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                            <InputLabel>Filter</InputLabel>
+                            <Select
+                                value={selectedValue}
+                                label="Filter"
+                                onChange={handleChange}
+                                sx={{ height: '36px' }}
+                            >
+                                <MenuItem value="">Default</MenuItem>
+                                <MenuItem value="Hybrid Prime">Hybrid Prime</MenuItem>
+                                <MenuItem value="Booster Prime">Booster Plan</MenuItem>
+                                <MenuItem value="Prime">Prime</MenuItem>
+                                <MenuItem value="Prime B">Prime B</MenuItem>
+                                <MenuItem value="Royality">Royality</MenuItem>
+                                <MenuItem value="Repurchase">Repurchase</MenuItem>
+                                <MenuItem value="Redeem">Redeem</MenuItem>
+                            </Select>
+                        </FormControl>
 
-            <Grid item xs={12} md={2}>
-                <TextField
-                    placeholder="Search"
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                        startAdornment: <SearchIcon sx={{ marginRight: 1 }} />,
-                    }}
-                />
-            </Grid>
+                        {/* Search Field */}
+                        <TextField
+                            placeholder="Search..."
+                            variant="outlined"
+                            size="small"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+                            }}
+                            sx={{
+                                width: "160px",
+                                '& .MuiOutlinedInput-root': {
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                }
+                            }}
+                        />
 
-            <Grid item xs={12} md={3}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="From Date"
-                        value={fromDate}
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFromDate(date)}
-                        slotProps={{ textField: { fullWidth: true, size: "small" } }}
-                    />
-                </LocalizationProvider>
-            </Grid>
+                        {/* Date Pickers */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <DatePicker
+                                    value={fromDate}
+                                    format="DD/MM"
+                                    onChange={(date) => setFromDate(date)}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "From",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem'
+                                                }
+                                            }
+                                        }
+                                    }}
+                                />
+                                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                                    to
+                                </Typography>
+                                <DatePicker
+                                    value={toDate}
+                                    format="DD/MM"
+                                    onChange={(date) => setToDate(date)}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "To",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem'
+                                                }
+                                            }
+                                        }
+                                    }}
+                                />
+                            </Box>
+                        </LocalizationProvider>
+                    </Box>
+                </TableContainer>
 
-            <Grid item xs={12} md={3}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                        label="To Date"
-                        value={toDate}
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setToDate(date)}
-                        slotProps={{ textField: { fullWidth: true, size: "small" } }}
-                    />
-                </LocalizationProvider>
-            </Grid>
-        </Grid>
-    </Grid>
-
-    <Box sx={{ mt: 3 }}> 
-        <IncomeTransactions showServiceTrans={filteredRows} />
-    </Box>
-</Layout>
+                {/* Table Component */}
+                <Box sx={{ mt: 2 }}> 
+                    <IncomeTransactions showServiceTrans={filteredRows} />
+                </Box>
+            </Box>
+        </Layout>
     );
 }
 

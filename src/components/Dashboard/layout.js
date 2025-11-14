@@ -35,7 +35,153 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import WidgetsIcon from '@mui/icons-material/Widgets';
 import { useSelector, useDispatch } from 'react-redux';
 
+// Add this CSS for the loader
+const loaderStyles = `
+.loaderRedirect {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    z-index: 9999;
+}
 
+.loaderRedirect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loaderRedirectBar {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.loaderRedirectBar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #1976d2;
+    border-radius: 4px;
+    animation: loaderBig 2s ease-in-out infinite;
+}
+
+@keyframes loaderBig {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.loaderRedirectProgress {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.loaderRedirectProgress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #1976d2, #42a5f5, #1976d2);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: progressBig 1.5s ease-in-out infinite, shimmer 2s ease-in-out infinite;
+}
+
+@keyframes progressBig {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.menuIconDesign {
+    position: fixed !important;
+    background: #1976d2 !important;
+    left: 8px;
+    top: 20%;
+    transform: translateY(-50%);
+    color: #fff !important;
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    z-index: 11 !important;
+}
+
+/* Fallback loader styles */
+.fallback-loader {
+    display: none;
+    width: 80px;
+    height: 80px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+    const styleSheet = document.createElement('style');
+    styleSheet.innerText = loaderStyles;
+    document.head.appendChild(styleSheet);
+}
 
 const drawerWidth = 200;
 
@@ -136,7 +282,7 @@ const FireNav = styled(List)({
 });
 
 const RECENT_TABS_KEY = 'recentTabs';
-const RECENT_TABS_LIMIT = 5;
+const RECENT_TABS_LIMIT = 8;
 
 function getMenuNameByPath(path) {
   // Remove leading slash
@@ -537,24 +683,92 @@ function Layout(props) {
 
   return (
     <Box sx={{ width: '100%', bgcolor: '#f2f5f9', minHeight: '100vh' }}>
+      {/* Fixed Loading Component - Centered with your GIF */}
       {loading && (
         <Box
           sx={{
-            position: 'fixed',
+            position: "fixed",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: 9999,
+            width: "100%",
+            height: "100%",
+            background: "rgba(255,255,255,0.95)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <CircularProgress sx={{ color: '#fff' }} />
+          {/* Centered Loader with your GIF */}
+          <Box 
+            sx={{ 
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Box
+              sx={{
+                width: 150,
+                height: 150,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative'
+              }}
+            >
+              <img 
+                src="/loader.gif" 
+                alt="Loading..." 
+                width="150" 
+                height="150"
+                style={{
+                  borderRadius: '50%',
+                  boxShadow: '0 8px 32px rgba(25, 118, 210, 0.3)',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                }}
+                onError={(e) => {
+                  // Hide broken image and show CSS loader
+                  e.target.style.display = 'none';
+                  const fallback = document.querySelector('.fallback-loader');
+                  if (fallback) fallback.style.display = 'block';
+                }}
+              />
+              {/* Fallback CSS loader - hidden by default */}
+              <Box
+                sx={{
+                  width: 80,
+                  height: 80,
+                  border: '6px solid #f3f3f3',
+                  borderTop: '6px solid #1976d2',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  display: 'none', // Hidden by default
+                }}
+                className="fallback-loader"
+              />
+            </Box>
+            
+            <Typography 
+              sx={{ 
+                mt: 3, 
+                fontWeight: 600, 
+                color: "#1976d2", 
+                fontSize: '1.3rem',
+              }}
+            >
+              Loading...
+            </Typography>
+          </Box>
         </Box>
       )}
+      
       {/* First Row: Header */}
       <Box sx={{
         width: '100%',
@@ -610,7 +824,7 @@ function Layout(props) {
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             PaperProps={{ sx: { mt: 1, boxShadow: '0 4px 20px rgba(103,58,183,0.10)', borderRadius: 2 } }}
           >
-            <MenuItem onClick={handleClose} sx={{ py: 1, px: 2 }}>Profile</MenuItem>
+            {/* <MenuItem onClick={handleClose} sx={{ py: 1, px: 2 }}>Profile</MenuItem> */}
             <MenuItem sx={{ py: 1, px: 2 }}>
               <Link style={{ textDecoration: 'none', color: 'inherit' }} href={`/reset-password`}>
                 Reset Password
@@ -759,7 +973,5 @@ function Layout(props) {
     </Box>
   );
 }
-
-
 
 export default Layout;

@@ -197,7 +197,7 @@ function GraphicsReport() {
                   href={`/add-new-graphics/`}
                   sx={{
                     background:
-                      "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
+                      "#2198f3",
                     borderRadius: "12px",
                     color: "#fff",
                     fontWeight: "bold",
@@ -214,7 +214,7 @@ function GraphicsReport() {
                   href={`/graphics-category-list/`}
                   sx={{
                     background:
-                      "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
+                      "#2198f3",
                     borderRadius: "12px",
                     color: "#fff",
                     fontWeight: "bold",

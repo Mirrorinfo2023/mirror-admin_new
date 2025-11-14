@@ -341,27 +341,44 @@ function LeadsHistory(props) {
           </Typography>
 
 
-          <Box
-            display={"inline-block"}
-            justifyContent={"space-between"}
-            alignItems={"right"}
-            mt={3}
-            mb={1}
-            sx={{ width: "30%", verticalAlign: "top" }}
-          >
-            <TextField
-              id="standard-basic"
-              placeholder="Search"
-              variant="standard"
-              mt={2}
-              style={{ width: "100%" }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon />,
-              }}
-            />
-          </Box>
+        <Box
+  display={"inline-block"}
+  justifyContent={"space-between"}
+  alignItems={"right"}
+  mt={3}
+  mb={1}
+  sx={{ width: "30%", verticalAlign: "top" }}
+>
+  <TextField
+    id="standard-basic"
+    placeholder="Search"
+    variant="standard"
+    mt={2}
+    style={{ width: "100%" }}
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    InputProps={{
+      startAdornment: <SearchIcon />,
+    }}
+    sx={{
+      '& .MuiInputBase-root': {
+        border: '1px solid #e0e0e0',
+        borderRadius: 1,
+        padding: '8px 12px',
+        backgroundColor: '#fff',
+        '&:before, &:after': {
+          display: 'none', // Remove standard variant lines
+        }
+      },
+      '& .MuiInputBase-root:hover': {
+        border: '1px solid #bdbdbd',
+      },
+      '& .MuiInputBase-root.Mui-focused': {
+        border: '2px solid #1976d2',
+      }
+    }}
+  />
+</Box>
 
           <Box
             display={"inline-block"}

@@ -171,26 +171,26 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
                                         style={{
                                             fontWeight: "bold",
                                             whiteSpace: "nowrap",
-                                            background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                                            background: "#2198f3",
                                             color: "white", // makes text visible on gradient
                                         }}
                                     >
                                         Sr No.
                                     </StyledTableCell>
 
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Royality Date</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Shoot Date</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Royality Date</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Shoot Date</StyledTableCell>
 
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Type</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Total User 555</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Total User 1499</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Total User 2360A</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Total User 2360B</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Total Business Royalty %</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color: "#fff", fontSize: "14px" }} >Royality</StyledTableCell>
-                                    {/* <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color:"#fff",fontSize:"14px" }} >Level</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color:"#fff",fontSize:"14px" }} >Income</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)", color:"#fff",fontSize:"14px" }} >Rank</StyledTableCell> */}
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Type</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Total User 555</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Total User 1499</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Total User 2360A</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Total User 2360B</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Total Business Royalty %</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color: "#fff", fontSize: "14px" }} >Royality</StyledTableCell>
+                                    {/* <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color:"#fff",fontSize:"14px" }} >Level</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color:"#fff",fontSize:"14px" }} >Income</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap', background: "#2198f3", color:"#fff",fontSize:"14px" }} >Rank</StyledTableCell> */}
                                 </TableRow>
                             </TableHead>
                             <TableBody>

@@ -22,30 +22,13 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
 import DownloadIcon from "@mui/icons-material/Download";
 
-const getDate = (timeZone) => {
-    const dateString = timeZone;
-    const dateObject = new Date(dateString);
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObject.getDate()).padStart(2, "0");
-    const hours = String(dateObject.getHours()).padStart(2, "0");
-    const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-    const amOrPm = hours >= 12 ? "PM" : "AM";
-    const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-    const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-    return formattedDateTime;
-};
-
 function MeetingReport() {
     const [searchTerm, setSearchTerm] = useState("");
     const [showServiceTrans, setShowServiceTrans] = useState([]);
     const dispatch = useDispatch();
-    const currentDate = new Date();
 
-    const [fromDate, setFromDate] = useState(
-        dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-    );
-    const [toDate, setToDate] = useState(dayjs(getDate.date));
+    const [fromDate, setFromDate] = useState(dayjs().startOf('month'));
+    const [toDate, setToDate] = useState(dayjs());
 
     // Fetch Data
     const getTnx = async () => {
@@ -71,121 +54,112 @@ function MeetingReport() {
 
     return (
         <Layout>
-            <Grid container spacing={4} sx={{ padding: 2 }}>
+            <Grid container sx={{ padding: 1.5 }}>
                 <Grid item xs={12}>
-                    <TableContainer component={Paper} sx={{ p: 2 }}>
-                        {/* 🔹 Header Section */}
+                    <TableContainer component={Paper} sx={{ p: 1.5 }}>
+                        {/* 🔹 Compact Single Row Header */}
                         <Box
                             sx={{
                                 display: "flex",
-                                flexWrap: "wrap", //  makes it responsive
                                 alignItems: "center",
-                                justifyContent: "space-between",
                                 gap: 2,
+                                flexWrap: 'wrap'
                             }}
                         >
                             {/* Title */}
                             <Typography
-                                variant="h5"
+                                variant="h6"
                                 sx={{
                                     fontWeight: "bold",
                                     whiteSpace: "nowrap",
-                                    flexShrink: 0,
+                                    fontSize: '16px',
+                                    minWidth: 'fit-content'
                                 }}
                             >
                                 Meeting
                             </Typography>
 
-                           
-
                             {/* Search Field */}
-                            <Box sx={{ flex: 1, minWidth: 200 }}>
-                                <TextField
-                                    placeholder="Search"
-                                    variant="standard"
-                                    fullWidth
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: <SearchIcon sx={{ mr: 1 }} />,
-                                    }}
-                                />
-                            </Box>
+                            <TextField
+                                placeholder="Search..."
+                                variant="outlined"
+                                size="small"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                InputProps={{
+                                    startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+                                }}
+                                sx={{
+                                    width: "160px",
+                                    '& .MuiOutlinedInput-root': {
+                                        height: '36px',
+                                        fontSize: '0.8rem',
+                                    }
+                                }}
+                            />
 
                             {/* Date Pickers */}
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    flexWrap: "nowrap",
-                                    alignItems: "center",
-                                    gap: 2,
-                                    minWidth: 240,
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                     <DatePicker
-                                        label="From Date"
                                         value={fromDate}
-                                        format="DD-MM-YYYY"
+                                        format="DD/MM"
                                         onChange={(newValue) => setFromDate(newValue)}
                                         slotProps={{
                                             textField: {
                                                 size: "small",
+                                                placeholder: "From",
                                                 sx: {
-                                                    minWidth: 130,
-                                                    "& .MuiInputBase-root": {
-                                                        height: 40,
-                                                        fontSize: "0.875rem",
-                                                    },
-                                                },
+                                                    width: 100,
+                                                    '& .MuiInputBase-root': {
+                                                        height: 36,
+                                                        fontSize: '0.8rem'
+                                                    }
+                                                }
                                             },
                                         }}
                                     />
+                                    <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                                        to
+                                    </Typography>
                                     <DatePicker
-                                        label="To Date"
                                         value={toDate}
-                                        format="DD-MM-YYYY"
+                                        format="DD/MM"
                                         onChange={(newValue) => setToDate(newValue)}
                                         slotProps={{
                                             textField: {
                                                 size: "small",
+                                                placeholder: "To",
                                                 sx: {
-                                                    minWidth: 130,
-                                                    "& .MuiInputBase-root": {
-                                                        height: 40,
-                                                        fontSize: "0.875rem",
-                                                    },
-                                                },
+                                                    width: 100,
+                                                    '& .MuiInputBase-root': {
+                                                        height: 36,
+                                                        fontSize: '0.8rem'
+                                                    }
+                                                }
                                             },
                                         }}
                                     />
-                                </LocalizationProvider>
-                            </Box>
+                                </Box>
+                            </LocalizationProvider>
 
-                             {/* Buttons */}
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    flexWrap: "nowrap",
-                                    alignItems: "center",
-                                    gap: 2,
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
+                            {/* Buttons */}
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                 <Button
                                     variant="contained"
+                                    size="small"
                                     sx={{
-                                        background: "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
-                                        borderRadius: "12px",
+                                        background: "#2198f3",
+                                        borderRadius: "6px",
                                         color: "#fff",
-                                        fontWeight: "bold",
+                                        fontWeight: "600",
                                         boxShadow: "none",
                                         textTransform: "none",
-                                        fontSize: "1rem",
-                                        px: 3,
-                                        py: 1,
+                                        fontSize: "0.8rem",
+                                        px: 2,
+                                        py: 0.8,
                                         whiteSpace: "nowrap",
+                                        minWidth: 'fit-content',
                                         "&:hover": { opacity: 0.9 },
                                     }}
                                     href="/add-new-meeting/"
@@ -195,23 +169,25 @@ function MeetingReport() {
 
                                 <Button
                                     variant="contained"
+                                    size="small"
                                     sx={{
-                                        background: "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
-                                        borderRadius: "12px",
+                                        background: "#2198f3",
+                                        borderRadius: "6px",
                                         color: "#fff",
-                                        fontWeight: "bold",
+                                        fontWeight: "600",
                                         boxShadow: "none",
                                         textTransform: "none",
-                                        fontSize: "1rem",
-                                        px: 3,
-                                        py: 1,
+                                        fontSize: "0.8rem",
+                                        px: 2,
+                                        py: 0.8,
                                         whiteSpace: "nowrap",
+                                        minWidth: 'fit-content',
                                         "&:hover": { opacity: 0.9 },
                                     }}
-                                    startIcon={<DownloadIcon />}
+                                    startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
                                     onClick={getTnx}
                                 >
-                                    Generate Report
+                                    Report
                                 </Button>
                             </Box>
                         </Box>

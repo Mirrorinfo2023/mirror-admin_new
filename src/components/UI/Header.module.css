@@ -11,19 +11,113 @@
 }
 
 .loaderRedirect {
-    position: absolute;
-    top: 0;
-    height: 3px;
-    left: 0;
-    background: #1976d2;
-    animation: loader 3s forwards;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    z-index: 9999;
 }
 
-@keyframes loader {
-    from {
-        right: 100%;
+.loaderRedirect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Alternative: Big horizontal bar loader */
+.loaderRedirectBar {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.loaderRedirectBar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #1976d2;
+    border-radius: 4px;
+    animation: loaderBig 2s ease-in-out infinite;
+}
+
+@keyframes loaderBig {
+    0% {
+        transform: translateX(-100%);
     }
-    to {
-        right: 0%;
+    50% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Big centered progress bar */
+.loaderRedirectProgress {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.loaderRedirectProgress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #1976d2, #42a5f5, #1976d2);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: progressBig 1.5s ease-in-out infinite, shimmer 2s ease-in-out infinite;
+}
+
+@keyframes progressBig {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
     }
 }

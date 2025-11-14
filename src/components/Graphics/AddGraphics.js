@@ -164,7 +164,7 @@ const AddGraphicsTransactions = () => {
                   startIcon={<CloudUploadIcon />}
                   fullWidth
                   sx={{
-                    background: "linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)",
+                    background: "#2198f3",
                     borderRadius: 2,
                     textTransform: "none",
                     fontWeight: "bold",

@@ -16,6 +16,7 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -28,15 +29,10 @@ import { callAlert } from "../../redux/actions/alert";
 import Layout from "@/components/Dashboard/layout";
 import Transactions from "@/components/Partners/transactions";
 import SearchIcon from "@mui/icons-material/Search";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddIcon from "@mui/icons-material/Add";
 import { useDispatch } from "react-redux";
-
-const FormCard = styled(Paper)(({ theme }) => ({
-    padding: theme.spacing(3),
-    borderRadius: 12,
-    boxShadow: "0px 4px 16px rgba(0,0,0,0.08)",
-    marginBottom: theme.spacing(3),
-    backgroundColor: "#fff",
-}));
 
 function TransactionHistory() {
     const dispatch = useDispatch();
@@ -63,7 +59,7 @@ function TransactionHistory() {
         const getPartners = async () => {
             try {
                 const res = await api.post("/api/partner/get-partners");
-                if (res.status === 200) setPartners(res.data.data);
+                if (res.status === 200) setPartners(res.data.data || []);
             } catch (error) {
                 dispatch(
                     callAlert({
@@ -77,32 +73,33 @@ function TransactionHistory() {
     }, [dispatch]);
 
     //  Fetch transactions
-    useEffect(() => {
-        const getTnx = async () => {
-            const reqData = {
-                from_date: fromDate.toISOString().split("T")[0],
-                to_date: toDate.toISOString().split("T")[0],
-                partner_id,
-            };
-            try {
-                const response = await api.post(
-                    "/api/partner/get-partner-transactions",
-                    reqData
-                );
-                if (response.status === 200) {
-                    setShowServiceTrans(response.data.data);
-                    setTotalPageCount(response.data.totalPageCount);
-                }
-            } catch (error) {
-                dispatch(
-                    callAlert({
-                        message: error?.response?.data?.error || error.message,
-                        type: "FAILED",
-                    })
-                );
-            }
+    const fetchData = async () => {
+        const reqData = {
+            from_date: fromDate.toISOString().split("T")[0],
+            to_date: toDate.toISOString().split("T")[0],
+            partner_id,
         };
-        if (fromDate || toDate || partner_id) getTnx();
+        try {
+            const response = await api.post(
+                "/api/partner/get-partner-transactions",
+                reqData
+            );
+            if (response.status === 200) {
+                setShowServiceTrans(response.data.data || []);
+                setTotalPageCount(response.data.totalPageCount);
+            }
+        } catch (error) {
+            dispatch(
+                callAlert({
+                    message: error?.response?.data?.error || error.message,
+                    type: "FAILED",
+                })
+            );
+        }
+    };
+
+    useEffect(() => {
+        if (fromDate || toDate || partner_id) fetchData();
     }, [fromDate, toDate, partner_id, dispatch]);
 
     //  Validation
@@ -150,167 +147,272 @@ function TransactionHistory() {
         );
     });
 
+    const resetFilters = () => {
+        setSearchTerm("");
+        setPartnerId("");
+        setFromDate(dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)));
+        setToDate(dayjs(new Date()));
+    };
+
     return (
         <Layout>
-            <Grid container justifyContent="center" sx={{ padding: 2 }}>
-                <Grid item xs={12}>
-                    {/*  Title + Button Row */}
-                    <FormCard sx={{ position: "sticky", top: 0, zIndex: 10 }}>
-                        <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            mb={2}
-                            flexWrap="wrap"
-                            gap={2}
-                        >
-                            <Typography variant="h6" fontWeight="bold">
-                                Partner Transactions
-                            </Typography>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => setOpenDialog(true)}
-                                sx={{
-                                    flex: { xs: "1 1 100%", sm: "0 0 auto" },
-                                    background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
-                                    boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
-                                    textTransform: "none",
-                                    whiteSpace: "nowrap",
+            <Box sx={{ p: 0.5 }}>
+                {/* Ultra Compact Filter Section */}
+                <Paper sx={{ 
+                    p: 0.75, 
+                    mb: 1,
+                    backgroundColor: '#fafafa',
+                    border: '1px solid #e0e0e0'
+                }}>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        flexWrap: 'wrap',
+                        gap: 0.5,
+                        alignItems: 'center'
+                    }}>
+                        {/* Title with Icon */}
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            mr: 0.5,
+                            minWidth: 'fit-content'
+                        }}>
+                            <FilterAltIcon sx={{ fontSize: 16, color: '#667eea', mr: 0.5 }} />
+                            <Typography 
+                                variant="subtitle2" 
+                                sx={{ 
+                                    fontWeight: 600,
+                                    color: '#667eea',
+                                    fontSize: '13px',
                                 }}
                             >
-                                Add Credit / Debit
-                            </Button>
+                                Partner Transactions
+                            </Typography>
                         </Box>
 
-                        {/*  Filter Row */}
-                        <Box
-                            display="flex"
-                            alignItems="center"
-                            flexWrap="wrap"
-                            gap={2}
-                            justifyContent="space-between"
-                        >
+                        {/* Search Field */}
+                        <TextField
+                            placeholder="Search transactions..."
+                            variant="outlined"
+                            size="small"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ fontSize: 16, mr: 0.5, color: '#666' }} />,
+                            }}
+                            sx={{ 
+                                minWidth: { xs: '100%', sm: '140px' },
+                                flex: 1,
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '4px',
+                                    backgroundColor: 'white',
+                                    fontSize: '0.7rem',
+                                    height: '30px',
+                                    '& input': {
+                                        padding: '6px 8px',
+                                        height: '18px'
+                                    }
+                                }
+                            }}
+                        />
 
-                            {/* Search */}
-                            <Box
-                                display="flex"
-                                alignItems="center"
-                                gap={1}
-                                sx={{ flex: 1, minWidth: 200 }}
+                        {/* Partner Dropdown */}
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                            <InputLabel sx={{ fontSize: '0.7rem' }}>Partner</InputLabel>
+                            <Select
+                                value={partner_id}
+                                label="Partner"
+                                onChange={(e) => setPartnerId(e.target.value)}
+                                sx={{ 
+                                    height: '30px', 
+                                    fontSize: '0.7rem',
+                                    '& .MuiSelect-select': {
+                                        padding: '6px 8px'
+                                    }
+                                }}
                             >
-                                <SearchIcon color="action" />
-                                <TextField
-                                    placeholder="Search..."
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    sx={{ width: "100%" }}
+                                <MenuItem value="" sx={{ fontSize: '0.7rem' }}>All Partners</MenuItem>
+                                {partners.map((partner) => (
+                                    <MenuItem key={partner.id} value={partner.id} sx={{ fontSize: '0.7rem' }}>
+                                        {partner.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        {/* Compact Date Range */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box display="flex" gap={0.5} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+                                <DatePicker
+                                    value={fromDate}
+                                    format="DD/MM"
+                                    onChange={(date) => setFromDate(date)}
+                                    slotProps={{ 
+                                        textField: { 
+                                            size: "small",
+                                            sx: { 
+                                                minWidth: '90px',
+                                                '& .MuiInputBase-root': {
+                                                    height: '30px',
+                                                    fontSize: '0.7rem'
+                                                }
+                                            }
+                                        } 
+                                    }}
+                                />
+                                <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem' }}>
+                                    to
+                                </Typography>
+                                <DatePicker
+                                    value={toDate}
+                                    format="DD/MM"
+                                    onChange={(date) => setToDate(date)}
+                                    slotProps={{ 
+                                        textField: { 
+                                            size: "small",
+                                            sx: { 
+                                                minWidth: '90px',
+                                                '& .MuiInputBase-root': {
+                                                    height: '30px',
+                                                    fontSize: '0.7rem'
+                                                }
+                                            }
+                                        } 
+                                    }}
                                 />
                             </Box>
+                        </LocalizationProvider>
 
+                        {/* Action Buttons */}
+                        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', ml: 'auto' }}>
+                            {/* Refresh Button */}
+                            <IconButton 
+                                size="small" 
+                                onClick={fetchData}
+                                sx={{ 
+                                    width: '30px', 
+                                    height: '30px',
+                                    backgroundColor: '#f0f0f0',
+                                    '&:hover': { backgroundColor: '#e0e0e0' }
+                                }}
+                            >
+                                <RefreshIcon sx={{ fontSize: 16, color: '#666' }} />
+                            </IconButton>
 
-                            {/* Partner Dropdown */}
-                            <FormControl sx={{ minWidth: 180, flex: 1 }}>
-                                <InputLabel>Partner</InputLabel>
-                                <Select
-                                    value={partner_id}
-                                    label="Partner"
-                                    onChange={(e) => setPartnerId(e.target.value)}
-                                    size="small"
-                                >
-                                    <MenuItem value="">Choose Partner</MenuItem>
-                                    {partners.map((partner) => (
-                                        <MenuItem key={partner.id} value={partner.id}>
-                                            {partner.name} - {partner.company_code}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            {/* Dates */}
-                            <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                    label="From Date"
-                                    value={fromDate}
-                                    onChange={(date) => setFromDate(date)}
-                                    format="DD-MM-YYYY"
-                                    slotProps={{ textField: { size: "small" } }}
-                                />
-                                <DatePicker
-                                    label="To Date"
-                                    value={toDate}
-                                    onChange={(date) => setToDate(date)}
-                                    format="DD-MM-YYYY"
-                                    slotProps={{ textField: { size: "small" } }}
-                                />
-                            </LocalizationProvider>
-
+                            {/* Add Credit/Debit Button */}
+                            <Button
+                                variant="contained"
+                                startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+                                onClick={() => setOpenDialog(true)}
+                                size="small"
+                                sx={{
+                                    minWidth: '110px',
+                                    background: '#2196f3',
+                                    borderRadius: '4px',
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    fontSize: '0.7rem',
+                                    height: '30px',
+                                    px: 1
+                                }}
+                            >
+                                Credit/Debit
+                            </Button>
                         </Box>
-                    </FormCard>
-                </Grid>
-            </Grid>
+                    </Box>
+                </Paper>
 
-            {/*  Transactions Table */}
-            <Transactions
-                showServiceTrans={filteredRows}
-                totalPageCount={totalPageCount}
-                setTotalPageCount={setTotalPageCount}
-            />
+                {/* Results Count */}
+                <Box sx={{ mb: 0.5, px: 0.5 }}>
+                    <Typography variant="caption" sx={{ 
+                        color: 'text.secondary', 
+                        fontSize: '0.7rem',
+                        fontWeight: 500
+                    }}>
+                        Showing {filteredRows.length} transactions
+                    </Typography>
+                </Box>
+            </Box>
 
-            {/*  Credit/Debit Dialog */}
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="md">
-                <DialogTitle>Credit / Debit Wallet</DialogTitle>
-                <DialogContent dividers>
-                    <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mt={1}>
-                        <FormControl sx={{ minWidth: 180, flex: 1 }} error={!!errors.selectedValue}>
-                            <InputLabel>Transaction Type</InputLabel>
+            {/* Transactions Table */}
+            <Box sx={{ px: 0.5, pb: 0.5 }}>
+                <Transactions
+                    showServiceTrans={filteredRows}
+                    totalPageCount={totalPageCount}
+                    setTotalPageCount={setTotalPageCount}
+                />
+            </Box>
+
+            {/* Credit/Debit Dialog */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
+                <DialogTitle sx={{ p: 1.5, fontSize: '1rem', fontWeight: 600 }}>
+                    Credit / Debit Wallet
+                </DialogTitle>
+                <DialogContent dividers sx={{ p: 1.5 }}>
+                    <Box display="flex" flexDirection="column" gap={1}>
+                        <FormControl size="small" error={!!errors.selectedValue}>
+                            <InputLabel sx={{ fontSize: '0.8rem' }}>Transaction Type</InputLabel>
                             <Select
                                 value={selectedValue}
                                 label="Transaction Type"
                                 onChange={(e) => setSelectedValue(e.target.value)}
+                                sx={{ fontSize: '0.8rem' }}
                             >
-                                <MenuItem value="">Select</MenuItem>
-                                <MenuItem value="Credit">Credit</MenuItem>
-                                <MenuItem value="Debit">Debit</MenuItem>
+                                <MenuItem value="" sx={{ fontSize: '0.8rem' }}>Select</MenuItem>
+                                <MenuItem value="Credit" sx={{ fontSize: '0.8rem' }}>Credit</MenuItem>
+                                <MenuItem value="Debit" sx={{ fontSize: '0.8rem' }}>Debit</MenuItem>
                             </Select>
-                            {errors.selectedValue && <FormHelperText>{errors.selectedValue}</FormHelperText>}
+                            {errors.selectedValue && (
+                                <FormHelperText sx={{ fontSize: '0.7rem' }}>{errors.selectedValue}</FormHelperText>
+                            )}
                         </FormControl>
 
                         <TextField
                             label="Amount"
                             variant="outlined"
                             type="number"
+                            size="small"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             error={!!errors.amount}
                             helperText={errors.amount}
-                            sx={{ flex: 1, minWidth: 150 }}
+                            sx={{ 
+                                '& .MuiInputBase-root': { fontSize: '0.8rem' },
+                                '& .MuiFormHelperText-root': { fontSize: '0.7rem' }
+                            }}
                         />
 
                         <TextField
                             label="Narration"
                             variant="outlined"
+                            size="small"
                             fullWidth
                             value={narration}
                             onChange={(e) => setNarration(e.target.value)}
                             error={!!errors.narration}
                             helperText={errors.narration}
-                            sx={{ flex: 2, minWidth: 250 }}
+                            sx={{ 
+                                '& .MuiInputBase-root': { fontSize: '0.8rem' },
+                                '& .MuiFormHelperText-root': { fontSize: '0.7rem' }
+                            }}
                         />
                     </Box>
                 </DialogContent>
 
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} color="secondary">
+                <DialogActions sx={{ p: 1.5 }}>
+                    <Button 
+                        onClick={() => setOpenDialog(false)} 
+                        size="small"
+                        sx={{ fontSize: '0.8rem' }}
+                    >
                         Cancel
                     </Button>
                     <Button
                         variant="contained"
-                        color="success"
                         onClick={handleSubmit}
                         disabled={buttonHidden}
+                        size="small"
+                        sx={{ fontSize: '0.8rem' }}
                     >
                         Submit
                     </Button>

@@ -7,12 +7,11 @@ import withAuth from "../../utils/withAuth";
 import { callAlert } from "../../redux/actions/alert";
 import Layout from "@/components/Dashboard/layout";
 import Transactions from "@/components/leads/leads_user_form";
-import { Grid, Paper, TableContainer } from "@mui/material";
+import { Grid, Paper, TableContainer, Typography, Box, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { Typography, Box, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled } from "@mui/material/styles";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
@@ -26,59 +25,16 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const drawWidth = 220;
-const getDate = (timeZone) => {
-  const dateString = timeZone;
-  const dateObject = new Date(dateString);
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-
-  // Determine if it's AM or PM
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-
-  // Convert hours to 12-hour format
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-
-  const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-
-  return formattedDateTime;
-};
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-
-  bgcolor: "background.paper",
-  borderRadius: 2,
-  boxShadow: 24,
-  overflow: "auto",
-};
-
-const innerStyle = {
-  overflow: "auto",
-  width: 400,
-  height: 400,
-};
-
 function LeadsHistory(props) {
   const [showServiceTrans, setShowServiceTrans] = useState({});
   const dispatch = useDispatch();
   const [report, setReport] = useState(null);
   const uid = Cookies.get("uid");
-  let rows;
-  if (showServiceTrans && showServiceTrans.length > 0) {
-    rows = [...showServiceTrans];
-  } else {
-    rows = [];
-  }
-
-  const [fromDate, setFromDate] = React.useState(dayjs(getDate.dateObject));
-  const [toDate, setToDate] = React.useState(dayjs(getDate.dateObject));
+  
+  let rows = showServiceTrans && showServiceTrans.length > 0 ? [...showServiceTrans] : [];
+ const [fromDate, setFromDate] = React.useState(dayjs().startOf('month'));
+  const [toDate, setToDate] = React.useState(dayjs());
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getTnx = async () => {
@@ -88,20 +44,14 @@ function LeadsHistory(props) {
       };
 
       try {
-        const response = await api.post(
-          "/api/leads/lead-user-action-report",
-          reqData
-        );
-
+        const response = await api.post("/api/leads/lead-user-action-report", reqData);
         if (response.status === 200) {
           setShowServiceTrans(response.data.data);
           setReport(response.data.report);
         }
       } catch (error) {
         if (error?.response?.data?.error) {
-          dispatch(
-            callAlert({ message: error.response.data.error, type: "FAILED" })
-          );
+          dispatch(callAlert({ message: error.response.data.error, type: "FAILED" }));
         } else {
           dispatch(callAlert({ message: error.message, type: "FAILED" }));
         }
@@ -113,263 +63,173 @@ function LeadsHistory(props) {
     }
   }, [fromDate, toDate, dispatch]);
 
-  const handleFromDateChange = (date) => {
-    setFromDate(date);
-  };
-
-  const handleToDateChange = (date) => {
-    setToDate(date);
-  };
-
-  const [searchTerm, setSearchTerm] = useState("");
+  const handleFromDateChange = (date) => setFromDate(date);
+  const handleToDateChange = (date) => setToDate(date);
 
   const filteredRows = rows.filter((row) => {
     return (
-      (row.first_name &&
-        row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (row.first_name && row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (row.mlm_id && row.mlm_id.includes(searchTerm)) ||
       (row.mobile && row.mobile.includes(searchTerm))
     );
   });
+
   return (
     <Layout>
-      <Grid container  sx={{ padding: 2 }}>
-     <Grid container spacing={2} sx={{ padding: 2 }}>
-  {/* First Row - Stat Cards */}
-  <Grid item xs={12}>
-    <Grid container spacing={2} alignItems="stretch" sx={{ width: "100%", flexWrap: "nowrap", mb: 3 }}>
-      <Grid item xs={12} md={6}>
-        <Item
-          sx={{
-            height: 100,
-            backgroundColor: "#f5f5f5",
-            borderLeft: "4px solid #FFC107",
-            color: "#000",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: "8px",
-            padding: "16px",
-            paddingBottom: "20px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease-in-out",
-            width: "100%",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            '&:hover': {
-              backgroundColor: "#FFC107",
-              transform: "translateY(-2px)",
-              boxShadow: "0 4px 12px rgba(255, 193, 7, 0.3)",
-              '& .MuiTypography-root, & .stat-value': {
-                color: "#fff",
-              },
-              '& .stat-icon': {
-                opacity: 0.8,
-              }
-            }
-          }}
-        >
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{ 
-                fontSize: "16px", 
-                fontWeight: 600, 
-                color: "inherit",
-                whiteSpace: "nowrap",
-                mb: 0.5
-              }}
-            >
-              Total Count
-            </Typography>
-            <Box className="stat-value" sx={{ 
-              color: "inherit", 
-              fontSize: "22px", 
-              fontWeight: 700,
-              whiteSpace: "nowrap" 
+      {/* Ultra Compact Single Row Layout */}
+      <Box sx={{ p: 1.5 }}>
+        {/* Stats Cards - Single Row */}
+        <Grid container spacing={1.5} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <Item sx={{
+              height: 70,
+              backgroundColor: '#f5f5f5',
+              borderLeft: '4px solid #FFC107',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: '6px',
+              padding: '12px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
             }}>
-              {report?.total_count || 0}
-            </Box>
-          </Box>
-          <LeaderboardIcon 
-            className="stat-icon"
-            sx={{
-              fontSize: 36,
-              color: "#FFC107",
-              transition: "all 0.3s ease",
-              flexShrink: 0
-            }}
-          />
-        </Item>
-      </Grid>
+              <Box sx={{ flex: 1, textAlign: 'left' }}>
+                <Typography variant="subtitle2" sx={{ fontSize: '12px', fontWeight: 600, color: '#666', mb: 0.5 }}>
+                  Total Count
+                </Typography>
+                <Typography sx={{ color: '#000', fontSize: '18px', fontWeight: 700, lineHeight: 1 }}>
+                  {report?.total_count || 0}
+                </Typography>
+              </Box>
+              <LeaderboardIcon sx={{ fontSize: 28, color: "#FFC107", flexShrink: 0 }} />
+            </Item>
+          </Grid>
 
-      <Grid item xs={12} md={6}>
-        <Item
-          sx={{
-            height: 100,
-            backgroundColor: "#f5f5f5",
-            borderLeft: "4px solid #2196f3",
-            color: "#000",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: "8px",
-            padding: "16px",
-            paddingBottom: "20px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-            transition: "all 0.3s ease-in-out",
-            width: "100%",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            '&:hover': {
-              backgroundColor: "#2196f3",
-              transform: "translateY(-2px)",
-              boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
-              '& .MuiTypography-root, & .stat-value': {
-                color: "#fff",
-              },
-              '& .stat-icon': {
-                opacity: 0.8,
-              }
-            }
-          }}
-        >
-          <Box sx={{ flex: 1 }}>
-            <Typography
-              variant="h6"
-              sx={{ 
-                fontSize: "16px", 
-                fontWeight: 600, 
-                color: "inherit",
-                whiteSpace: "nowrap",
-                mb: 0.5
-              }}
-            >
-              Total Distributed Amt.
-            </Typography>
-            <Box className="stat-value" sx={{ 
-              color: "inherit", 
-              fontSize: "22px", 
-              fontWeight: 700,
-              whiteSpace: "nowrap" 
+          <Grid item xs={12} sm={6}>
+            <Item sx={{
+              height: 70,
+              backgroundColor: '#f5f5f5',
+              borderLeft: '4px solid #2196f3',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderRadius: '6px',
+              padding: '12px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
             }}>
-              {report?.total_distributed_amount ?? 0}
-            </Box>
-          </Box>
-          <PaidIcon 
-            className="stat-icon"
-            sx={{
-              fontSize: 36,
-              color: "#2196f3",
-              transition: "all 0.3s ease",
-              flexShrink: 0
-            }}
-          />
-        </Item>
-      </Grid>
-    </Grid>
-  </Grid>
+              <Box sx={{ flex: 1, textAlign: 'left' }}>
+                <Typography variant="subtitle2" sx={{ fontSize: '12px', fontWeight: 600, color: '#666', mb: 0.5 }}>
+                  Distributed Amt.
+                </Typography>
+                <Typography sx={{ color: '#000', fontSize: '18px', fontWeight: 700, lineHeight: 1 }}>
+                  {report?.total_distributed_amount ?? 0}
+                </Typography>
+              </Box>
+              <PaidIcon sx={{ fontSize: 28, color: "#2196f3", flexShrink: 0 }} />
+            </Item>
+          </Grid>
+        </Grid>
 
-  {/* Second Row - Table Header with Search and Date */}
-  <Grid item xs={12}>
-    <TableContainer 
-      component={Paper} 
-      sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        padding: '16px',
-        borderRadius: '8px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e0e0e0'
-      }}
-    >
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          padding: 1,
-          whiteSpace: "nowrap",
-          flex: 1
-        }}
-      >
-        User Lead Form Request List
-      </Typography>
-
-      <Box
-        sx={{ 
+        {/* Filter Bar - Single Compact Row */}
+        <TableContainer component={Paper} sx={{ 
           display: 'flex', 
           alignItems: 'center', 
+          padding: '12px 16px',
+          borderRadius: '6px',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+          border: '1px solid #e0e0e0',
           gap: 2,
-          flexWrap: 'wrap',
-          justifyContent: 'flex-end'
-        }}
-      >
-        {/* Search Field */}
-        <TextField
-          id="standard-basic"
-          placeholder="Search"
-          variant="outlined"
-          size="small"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon color="action" />,
-          }}
-          sx={{ 
-            width: "200px",
-            '& .MuiOutlinedInput-root': {
-              height: '40px'
-            }
-          }}
-        />
+          flexWrap: 'wrap'
+        }}>
+          <Typography variant="h6" sx={{ 
+            whiteSpace: "nowrap",
+            fontSize: '16px',
+            fontWeight: 600,
+            flex: 1,
+            minWidth: 'fit-content'
+          }}>
+            Lead Form Requests
+          </Typography>
 
-        {/* Date Pickers */}
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <DatePicker
-              value={fromDate}
-              format="DD-MM-YYYY"
-              onChange={handleFromDateChange}
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: {
-                    width: 140,
-                    '& .MuiInputBase-root': {
-                      height: 40,
-                      fontSize: '0.875rem'
-                    }
+          {/* Search and Date in single line */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1.5,
+            flexWrap: 'wrap'
+          }}>
+            {/* Search Field */}
+            <TextField
+              placeholder="Search..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+              }}
+              sx={{ 
+                width: "160px",
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.8rem',
+                  '& input': {
+                    padding: '8px 12px'
                   }
                 }
               }}
             />
-            <DatePicker
-              value={toDate}
-              format="DD-MM-YYYY"
-              onChange={handleToDateChange}
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: {
-                    width: 140,
-                    '& .MuiInputBase-root': {
-                      height: 40,
-                      fontSize: '0.875rem'
+
+            {/* Date Pickers */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <DatePicker
+                  value={fromDate}
+                  format="DD/MM"
+                  onChange={handleFromDateChange}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "From",
+                      sx: {
+                        width: 110,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
                     }
-                  }
-                }
-              }}
-            />
+                  }}
+                />
+                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                  to
+                </Typography>
+                <DatePicker
+                  value={toDate}
+                  format="DD/MM"
+                  onChange={handleToDateChange}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "To",
+                      sx: {
+                        width: 110,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
+                  }}
+                />
+              </Box>
+            </LocalizationProvider>
           </Box>
-        </LocalizationProvider>
+        </TableContainer>
       </Box>
-    </TableContainer>
-  </Grid>
-</Grid>
-      </Grid>
 
       <Transactions showServiceTrans={filteredRows} />
     </Layout>
   );
 }
+
 export default withAuth(LeadsHistory);

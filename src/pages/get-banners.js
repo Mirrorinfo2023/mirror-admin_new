@@ -100,9 +100,95 @@ const FilterRow = styled(Box)(({ theme }) => ({
     },
 }));
 
+// Loading Component
+const LoadingOverlay = () => (
+    <Box
+        sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            width: "100%",
+            height: "100%",
+            background: "rgba(255,255,255,0.95)",
+            backdropFilter: "blur(8px)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+        }}
+    >
+        <Box 
+            sx={{ 
+                textAlign: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
+        >
+            <Box
+                sx={{
+                    width: 150,
+                    height: 150,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative'
+                }}
+            >
+                <img 
+                    src="/loader.gif" 
+                    alt="Loading..." 
+                    width="150" 
+                    height="150"
+                    style={{
+                        borderRadius: '50%',
+                        boxShadow: '0 8px 32px rgba(25, 118, 210, 0.3)',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                    }}
+                    onError={(e) => {
+                        // Hide broken image and show CSS loader
+                        e.target.style.display = 'none';
+                        const fallback = document.querySelector('.fallback-loader');
+                        if (fallback) fallback.style.display = 'block';
+                    }}
+                />
+                {/* Fallback CSS loader - hidden by default */}
+                <Box
+                    sx={{
+                        width: 80,
+                        height: 80,
+                        border: '6px solid #f3f3f3',
+                        borderTop: '6px solid #1976d2',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        display: 'none',
+                    }}
+                    className="fallback-loader"
+                />
+            </Box>
+            
+            <Typography 
+                sx={{ 
+                    mt: 3, 
+                    fontWeight: 600, 
+                    color: "#1976d2", 
+                    fontSize: '1.3rem',
+                }}
+            >
+                Loading Report...
+            </Typography>
+        </Box>
+    </Box>
+);
+
 function BannersReport() {
     const [report, setReport] = useState(null);
     const [showServiceTrans, setShowServiceTrans] = useState({});
+    const [loading, setLoading] = useState(false); // Loading state
     const dispatch = useDispatch();
 
     const today = dayjs();
@@ -114,6 +200,8 @@ function BannersReport() {
     }, []);
 
     const generateReport = async () => {
+        setLoading(true); // Start loading
+        
         const reqData = {
             from_date: fromDate.toISOString().split("T")[0],
             to_date: toDate.toISOString().split("T")[0],
@@ -129,123 +217,128 @@ function BannersReport() {
         } catch (error) {
             const msg = error?.response?.data?.error || error.message;
             dispatch(callAlert({ message: msg, type: "FAILED" }));
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
     return (
         <Layout>
+            {/* Loading Overlay */}
+            {loading && <LoadingOverlay />}
+
             <Grid container spacing={2} sx={{ p: 2 }}>
                 {/* --- STAT CARDS --- */}
-<Grid item xs={12}>
-    <Box
-        sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
-            justifyContent: { xs: "center", sm: "flex-start" },
-        }}
-    >
-        <StatCard 
-            sx={{ 
-                backgroundColor: '#f5f5f5', 
-                borderLeft: '4px solid #667eea',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                    backgroundColor: '#667eea',
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)',
-                    transform: 'translateY(-4px)',
-                    '& .MuiTypography-root': {
-                        color: 'white',
-                    }
-                }
-            }}
-        >
-            <StatContent>
-                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_count || 0}</StatValue>
-                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Total</StatLabel>
-            </StatContent>
-            <StatIcon>
-                <LeaderboardIcon sx={{ fontSize: 64, color: "#667eea", transition: 'color 0.3s ease' }} />
-            </StatIcon>
-        </StatCard>
+                <Grid item xs={12}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 2,
+                            justifyContent: { xs: "center", sm: "flex-start" },
+                        }}
+                    >
+                        <StatCard 
+                            sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: '4px solid #667eea',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                '&:hover': {
+                                    backgroundColor: '#667eea',
+                                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)',
+                                    transform: 'translateY(-4px)',
+                                    '& .MuiTypography-root': {
+                                        color: 'white',
+                                    }
+                                }
+                            }}
+                        >
+                            <StatContent>
+                                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_count || 0}</StatValue>
+                                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Total</StatLabel>
+                            </StatContent>
+                            <StatIcon>
+                                <LeaderboardIcon sx={{ fontSize: 64, color: "#667eea", transition: 'color 0.3s ease' }} />
+                            </StatIcon>
+                        </StatCard>
 
-        <StatCard 
-            sx={{ 
-                backgroundColor: '#f5f5f5', 
-                borderLeft: '4px solid #11998e',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                    backgroundColor: '#11998e',
-                    boxShadow: '0 8px 25px rgba(17, 153, 142, 0.5)',
-                    transform: 'translateY(-4px)',
-                    '& .MuiTypography-root': {
-                        color: 'white',
-                    }
-                }
-            }}
-        >
-            <StatContent>
-                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_active || 0}</StatValue>
-                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Active</StatLabel>
-            </StatContent>
-            <StatIcon>
-                <CheckCircleIcon sx={{ fontSize: 64, color: "#11998e", transition: 'color 0.3s ease' }} />
-            </StatIcon>
-        </StatCard>
+                        <StatCard 
+                            sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: '4px solid #11998e',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                '&:hover': {
+                                    backgroundColor: '#11998e',
+                                    boxShadow: '0 8px 25px rgba(17, 153, 142, 0.5)',
+                                    transform: 'translateY(-4px)',
+                                    '& .MuiTypography-root': {
+                                        color: 'white',
+                                    }
+                                }
+                            }}
+                        >
+                            <StatContent>
+                                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_active || 0}</StatValue>
+                                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Active</StatLabel>
+                            </StatContent>
+                            <StatIcon>
+                                <CheckCircleIcon sx={{ fontSize: 64, color: "#11998e", transition: 'color 0.3s ease' }} />
+                            </StatIcon>
+                        </StatCard>
 
-        <StatCard 
-            sx={{ 
-                backgroundColor: '#f5f5f5', 
-                borderLeft: '4px solid #ff6b6b',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                    backgroundColor: '#ff6b6b',
-                    boxShadow: '0 8px 25px rgba(255, 107, 107, 0.5)',
-                    transform: 'translateY(-4px)',
-                    '& .MuiTypography-root': {
-                        color: 'white',
-                    }
-                }
-            }}
-        >
-            <StatContent>
-                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_inactive || 0}</StatValue>
-                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Inactive</StatLabel>
-            </StatContent>
-            <StatIcon>
-                <HighlightOffIcon sx={{ fontSize: 64, color: "#ff6b6b", transition: 'color 0.3s ease' }} />
-            </StatIcon>
-        </StatCard>
+                        <StatCard 
+                            sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: '4px solid #ff6b6b',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                '&:hover': {
+                                    backgroundColor: '#ff6b6b',
+                                    boxShadow: '0 8px 25px rgba(255, 107, 107, 0.5)',
+                                    transform: 'translateY(-4px)',
+                                    '& .MuiTypography-root': {
+                                        color: 'white',
+                                    }
+                                }
+                            }}
+                        >
+                            <StatContent>
+                                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_inactive || 0}</StatValue>
+                                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Inactive</StatLabel>
+                            </StatContent>
+                            <StatIcon>
+                                <HighlightOffIcon sx={{ fontSize: 64, color: "#ff6b6b", transition: 'color 0.3s ease' }} />
+                            </StatIcon>
+                        </StatCard>
 
-        <StatCard 
-            sx={{ 
-                backgroundColor: '#f5f5f5', 
-                borderLeft: '4px solid #a8a8a8',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                    backgroundColor: '#a8a8a8',
-                    boxShadow: '0 8px 25px rgba(168, 168, 168, 0.5)',
-                    transform: 'translateY(-4px)',
-                    '& .MuiTypography-root': {
-                        color: 'white',
-                    }
-                }
-            }}
-        >
-            <StatContent>
-                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_deleted || 0}</StatValue>
-                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Deleted</StatLabel>
-            </StatContent>
-            <StatIcon>
-                <DeleteForeverIcon sx={{ fontSize: 64, color: "#a8a8a8", transition: 'color 0.3s ease' }} />
-            </StatIcon>
-        </StatCard>
-    </Box>
-</Grid>
+                        <StatCard 
+                            sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: '4px solid #a8a8a8',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                '&:hover': {
+                                    backgroundColor: '#a8a8a8',
+                                    boxShadow: '0 8px 25px rgba(168, 168, 168, 0.5)',
+                                    transform: 'translateY(-4px)',
+                                    '& .MuiTypography-root': {
+                                        color: 'white',
+                                    }
+                                }
+                            }}
+                        >
+                            <StatContent>
+                                <StatValue sx={{ color: '#000000', transition: 'color 0.3s ease' }}>{report?.total_deleted || 0}</StatValue>
+                                <StatLabel sx={{ color: '#000000', transition: 'color 0.3s ease' }}>Deleted</StatLabel>
+                            </StatContent>
+                            <StatIcon>
+                                <DeleteForeverIcon sx={{ fontSize: 64, color: "#a8a8a8", transition: 'color 0.3s ease' }} />
+                            </StatIcon>
+                        </StatCard>
+                    </Box>
+                </Grid>
                 {/* --- FILTER ROW --- */}
                 <Grid item xs={12}>
                     <FilterRow>
@@ -288,33 +381,43 @@ function BannersReport() {
                                 <Button
                                     variant="contained"
                                     onClick={generateReport}
+                                    disabled={loading} // Disable button when loading
                                     sx={{
                                         borderRadius: 2,
                                         fontWeight: 700,
                                         fontSize: 16,
                                         px: 3,
                                         py: 1,
-                                        background: 'linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)',
+                                        background: '#2198f3',
                                         boxShadow: '0 2px 8px 0 rgba(33, 203, 243, 0.15)',
                                         textTransform: 'none',
                                         whiteSpace: 'nowrap',
+                                        '&:disabled': {
+                                            background: '#ccc',
+                                            boxShadow: 'none',
+                                        }
                                     }}
                                 >
-                                    Generate Report
+                                    {loading ? 'Generating...' : 'Generate Report'}
                                 </Button>
                                 <Button
                                     variant="contained"
                                     href="/add-new-banner/"
+                                    disabled={loading} // Disable button when loading
                                     sx={{
                                         borderRadius: 2,
                                         fontWeight: 700,
                                         fontSize: 16,
                                         px: 3,
                                         py: 1,
-                                        background: 'linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)',
+                                        background: '#2198f3',
                                         boxShadow: '0 2px 8px 0 rgba(33, 203, 243, 0.15)',
                                         textTransform: 'none',
                                         whiteSpace: 'nowrap',
+                                        '&:disabled': {
+                                            background: '#ccc',
+                                            boxShadow: 'none',
+                                        }
                                     }}
                                 >
                                     Add New
@@ -327,6 +430,14 @@ function BannersReport() {
 
             {/* --- REPORT TABLE --- */}
             <BannersTransactions showServiceTrans={showServiceTrans} />
+
+            {/* Add CSS for fallback loader */}
+            <style jsx global>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </Layout>
     );
 }

@@ -81,7 +81,7 @@ const PrimeUserTransactions = ({ showServiceTrans }) => {
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         [`&.${tableCellClasses.head}`]: {
-            background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+            background: "#2198f3",
             color: "white", // makes text visible on gradient
             fontSize: 12,
             linHeight: 15,

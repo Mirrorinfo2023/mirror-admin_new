@@ -6,7 +6,6 @@ import withAuth from "../../utils/withAuth";
 import { callAlert } from "../../redux/actions/alert";
 import Layout from "@/components/Dashboard/layout";
 import MeetingDetailsTransactions from "@/components/Meeting/MeetingDetailsReport";
-
 import {
   Grid,
   Button,
@@ -22,30 +21,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
 
-const getDate = (timeZone) => {
-  const dateString = timeZone;
-  const dateObject = new Date(dateString);
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-  return `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-};
-
 function MeetingDetailsReport() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [showServiceTrans, setShowServiceTrans] = useState([]);
   const dispatch = useDispatch();
 
-  const currentDate = new Date();
-  const [fromDate, setFromDate] = useState(
-    dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  );
-  const [toDate, setToDate] = useState(dayjs(getDate.date));
+  const [fromDate, setFromDate] = useState(dayjs().startOf('month'));
+  const [toDate, setToDate] = useState(dayjs());
 
   const handleSearch = (text) => {
     setSearchTerm(text);
@@ -113,114 +96,117 @@ function MeetingDetailsReport() {
 
   return (
     <Layout>
-      <Grid container spacing={4} sx={{ padding: 2 }}>
+      <Grid container sx={{ padding: 1.5 }}>
         <Grid item xs={12}>
-          <TableContainer component={Paper} sx={{ p: 2 }}>
+          <TableContainer component={Paper} sx={{ p: 1.5 }}>
+            {/* 🔹 Compact Single Row Layout */}
             <Box
               sx={{
                 display: "flex",
-                flexWrap: "wrap",
                 alignItems: "center",
-                justifyContent: "space-between",
                 gap: 2,
+                flexWrap: 'wrap'
               }}
             >
-              {/* Label */}
+              {/* Title */}
               <Typography
-                variant="h5"
+                variant="h6"
                 sx={{
                   fontWeight: "bold",
                   whiteSpace: "nowrap",
-                  flexShrink: 0,
+                  fontSize: '16px',
+                  minWidth: 'fit-content'
                 }}
               >
-                Meeting Enroll Report
+                Meeting Enroll
               </Typography>
 
               {/* Search Field */}
-              <Box sx={{ flex: 1, minWidth: 200 }}>
-                <TextField
-                  variant="standard"
-                  placeholder="Search"
-                  fullWidth
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1 }} />,
-                  }}
-                />
-              </Box>
+              <TextField
+                placeholder="Search..."
+                variant="outlined"
+                size="small"
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+                }}
+                sx={{
+                  width: "180px",
+                  '& .MuiOutlinedInput-root': {
+                    height: '36px',
+                    fontSize: '0.8rem',
+                  }
+                }}
+              />
 
               {/* Date Pickers */}
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "nowrap",
-                  alignItems: "center",
-                  gap: 2,
-                }}
-              >
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                   <DatePicker
-                    label="From Date"
                     value={fromDate}
-                    format="DD-MM-YYYY"
+                    format="DD/MM"
                     onChange={(newValue) => setFromDate(newValue)}
                     slotProps={{
                       textField: {
                         size: "small",
+                        placeholder: "From",
                         sx: {
-                          minWidth: 130,
-                          "& .MuiInputBase-root": {
-                            height: 40,
-                            fontSize: "0.875rem",
-                          },
-                        },
+                          width: 100,
+                          '& .MuiInputBase-root': {
+                            height: 36,
+                            fontSize: '0.8rem'
+                          }
+                        }
                       },
                     }}
                   />
+                  <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                    to
+                  </Typography>
                   <DatePicker
-                    label="To Date"
                     value={toDate}
-                    format="DD-MM-YYYY"
+                    format="DD/MM"
                     onChange={(newValue) => setToDate(newValue)}
                     slotProps={{
                       textField: {
                         size: "small",
+                        placeholder: "To",
                         sx: {
-                          minWidth: 130,
-                          "& .MuiInputBase-root": {
-                            height: 40,
-                            fontSize: "0.875rem",
-                          },
-                        },
+                          width: 100,
+                          '& .MuiInputBase-root': {
+                            height: 36,
+                            fontSize: '0.8rem'
+                          }
+                        }
                       },
                     }}
                   />
-                </LocalizationProvider>
-              </Box>
+                </Box>
+              </LocalizationProvider>
 
-              {/* Button */}
+              {/* Generate Report Button */}
               <Button
                 variant="contained"
+                size="small"
                 onClick={handleGenerateReport}
                 sx={{
-                  borderRadius: 2,
-                  fontWeight: 700,
-                  fontSize: 16,
-                  px: 3,
-                  py: 1,
-                  background:
-                    "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
-                  boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
+                  borderRadius: "6px",
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  px: 2,
+                  py: 0.8,
+                  background: "#2198f3",
+                  boxShadow: "none",
                   textTransform: "none",
                   whiteSpace: "nowrap",
+                  minWidth: 'fit-content',
                   "&:hover": {
                     opacity: 0.9,
                   },
                 }}
               >
-                Generate Report
+                Generate
               </Button>
             </Box>
           </TableContainer>

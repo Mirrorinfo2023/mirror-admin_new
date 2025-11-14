@@ -16,33 +16,29 @@ import {
     TextField,
     Card,
     CardContent,
+    IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddIcon from "@mui/icons-material/Add";
+import CategoryIcon from "@mui/icons-material/Category";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-// Compact StatCard Design
+// Ultra Compact StatCard Design with Hover Effect
 const StatCard = styled(Card)(({ theme }) => ({
-  borderRadius: '8px',
-  height: '90px',
+  borderRadius: '6px',
+  height: '52px',
   display: 'flex',
   alignItems: 'center',
-  transition: 'all 0.3s ease-in-out',
-  position: 'relative',
-  overflow: 'hidden',
-  flex: 1,
-  minWidth: '160px',
-}));
-
-const FilterCard = styled(Paper)(({ theme }) => ({
-  background: 'white',
-  borderRadius: '12px',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-  marginBottom: '16px',
-  border: '1px solid rgba(0,0,0,0.05)',
+  transition: 'all 0.15s ease',
+  flex: '1 1 120px',
+  minWidth: '110px',
+  border: '1px solid rgba(0,0,0,0.04)',
 }));
 
 function AffiliateHistory() {
@@ -55,26 +51,27 @@ function AffiliateHistory() {
     const [toDate, setToDate] = useState(dayjs(new Date()));
     const [searchTerm, setSearchTerm] = useState("");
 
-    useEffect(() => {
-        const getTnx = async () => {
-            const reqData = {
-                from_date: fromDate.toISOString().split("T")[0],
-                to_date: toDate.toISOString().split("T")[0],
-            };
-            try {
-                const response = await api.post("/api/affiliate_link/get-affiliate-links-Admin", reqData);
-                if (response.status === 200) {
-                    setShowServiceTrans(response.data.data || []);
-                    setmasterReport(response.data.report || {});
-                }
-            } catch (error) {
-                dispatch(callAlert({
-                    message: error?.response?.data?.error || error.message,
-                    type: "FAILED",
-                }));
-            }
+    const fetchData = async () => {
+        const reqData = {
+            from_date: fromDate.toISOString().split("T")[0],
+            to_date: toDate.toISOString().split("T")[0],
         };
-        getTnx();
+        try {
+            const response = await api.post("/api/affiliate_link/get-affiliate-links-Admin", reqData);
+            if (response.status === 200) {
+                setShowServiceTrans(response.data.data || []);
+                setmasterReport(response.data.report || {});
+            }
+        } catch (error) {
+            dispatch(callAlert({
+                message: error?.response?.data?.error || error.message,
+                type: "FAILED",
+            }));
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
     }, [fromDate, toDate, dispatch]);
 
     const filteredRows = showServiceTrans.filter((row) =>
@@ -88,34 +85,60 @@ function AffiliateHistory() {
     );
 
     const cards = [
-        { label: "Total Count", value: masterReport.totalAffilatelinkListCount ?? 0, color: "#FFC107" },
-        { label: "Active", value: masterReport.totalActiveAffilatelinkList ?? 0, color: "#5C6BC0" },
-        { label: "Inactive", value: masterReport.totalInactiveAffilatelinkList ?? 0, color: "#26A69A" },
-        { label: "Deleted", value: masterReport.totalDeleteAffilatelinkList ?? 0, color: "#EC407A" },
+        { 
+            label: "Total", 
+            value: masterReport.totalAffilatelinkListCount ?? 0, 
+            color: "#FFC107",
+            bgColor: "#FFF8E1"
+        },
+        { 
+            label: "Active", 
+            value: masterReport.totalActiveAffilatelinkList ?? 0, 
+            color: "#10B981",
+            bgColor: "#ECFDF5"
+        },
+        { 
+            label: "Inactive", 
+            value: masterReport.totalInactiveAffilatelinkList ?? 0, 
+            color: "#6B7280",
+            bgColor: "#F9FAFB"
+        },
+        { 
+            label: "Deleted", 
+            value: masterReport.totalDeleteAffilatelinkList ?? 0, 
+            color: "#EF4444",
+            bgColor: "#FEF2F2"
+        },
     ];
+
+    const resetFilters = () => {
+        setSearchTerm("");
+        setFromDate(dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)));
+        setToDate(dayjs(new Date()));
+    };
 
     return (
         <Layout>
-            <Box sx={{ p: 1.5 }}>
-                {/* Compact Statistics Cards */}
-                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+            <Box sx={{ p: 0.5 }}>
+                {/* Ultra Compact Statistics Cards with Hover Effect */}
+                <Grid container spacing={0.5} sx={{ mb: 1 }}>
                     <Grid item xs={12}>
                         <Box sx={{ 
                             display: "flex", 
-                            gap: 1.5, 
+                            gap: 0.5, 
                             flexWrap: "wrap",
                         }}>
                             {cards.map((card, index) => (
                                 <StatCard 
                                     key={index}
                                     sx={{ 
-                                        backgroundColor: '#f5f5f5', 
-                                        borderLeft: `4px solid ${card.color}`,
-                                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                        backgroundColor: card.bgColor, 
+                                        borderLeft: `3px solid ${card.color}`,
+                                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
                                         '&:hover': {
                                             backgroundColor: card.color,
-                                            boxShadow: `0 8px 25px ${card.color}80`,
-                                            transform: 'translateY(-2px)',
+                                            boxShadow: `0 4px 12px ${card.color}60`,
+                                            transform: 'translateY(-1px)',
                                             '& .MuiTypography-root': {
                                                 color: 'white',
                                             }
@@ -123,32 +146,31 @@ function AffiliateHistory() {
                                     }}
                                 >
                                     <CardContent sx={{ 
-                                        padding: '12px !important', 
+                                        padding: '4px 8px !important', 
                                         width: '100%',
                                         textAlign: 'center',
-                                        '&:last-child': { pb: '12px' }
+                                        '&:last-child': { pb: '4px' }
                                     }}>
                                         <Typography 
-                                            variant="h5" 
                                             sx={{ 
                                                 color: '#000000', 
-                                                transition: 'color 0.3s ease', 
+                                                transition: 'color 0.2s ease',
                                                 fontWeight: 700, 
-                                                fontSize: '20px', 
-                                                mb: 0.5,
+                                                fontSize: '14px', 
+                                                mb: 0.1,
                                                 lineHeight: 1.2
                                             }}
                                         >
                                             {card.value}
                                         </Typography>
                                         <Typography 
-                                            variant="body2" 
+                                            variant="caption" 
                                             sx={{ 
-                                                color: '#000000', 
-                                                transition: 'color 0.3s ease', 
-                                                fontWeight: 600,
-                                                fontSize: '12px',
-                                                lineHeight: 1.2
+                                                color: '#666666', 
+                                                transition: 'color 0.2s ease',
+                                                fontWeight: 500,
+                                                fontSize: '10px',
+                                                lineHeight: 1.2,
                                             }}
                                         >
                                             {card.label}
@@ -160,124 +182,184 @@ function AffiliateHistory() {
                     </Grid>
                 </Grid>
 
-                {/* Compact Filter Section */}
-                <Grid item xs={12}>
-                    <FilterCard>
-                        <Box sx={{ p: 2 }}>
+                {/* Ultra Compact Filter Section */}
+                <Paper sx={{ 
+                    p: 0.75, 
+                    mb: 1,
+                    backgroundColor: '#fafafa',
+                    border: '1px solid #e0e0e0'
+                }}>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        flexWrap: 'wrap',
+                        gap: 0.5,
+                        alignItems: 'center'
+                    }}>
+                        {/* Title with Icon */}
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            mr: 0.5,
+                            minWidth: 'fit-content'
+                        }}>
+                            <FilterAltIcon sx={{ fontSize: 16, color: '#667eea', mr: 0.5 }} />
                             <Typography 
-                                variant="h6" 
+                                variant="subtitle2" 
                                 sx={{ 
-                                    mb: 2,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    backgroundClip: 'text',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    fontWeight: 'bold',
-                                    fontSize: '1.1rem'
+                                    fontWeight: 600,
+                                    color: '#667eea',
+                                    fontSize: '13px',
                                 }}
                             >
-                                Affiliate Link List
+                                Affiliate Links
                             </Typography>
+                        </Box>
 
-                            <Box sx={{ 
-                                display: 'flex', 
-                                flexWrap: 'wrap',
-                                gap: 1.5,
-                                alignItems: 'center'
-                            }}>
-                                <TextField
-                                    placeholder="Search"
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: <SearchIcon color="action" sx={{ fontSize: 20, mr: 1 }} />,
-                                    }}
-                                    sx={{ 
-                                        minWidth: { xs: '100%', sm: '180px' },
-                                        flex: 1,
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '8px',
-                                            backgroundColor: 'rgba(0,0,0,0.02)',
-                                        }
+                        {/* Search Field */}
+                        <TextField
+                            placeholder="Search..."
+                            variant="outlined"
+                            size="small"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ fontSize: 16, mr: 0.5, color: '#666' }} />,
+                            }}
+                            sx={{ 
+                                minWidth: { xs: '100%', sm: '120px' },
+                                flex: 1,
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '4px',
+                                    backgroundColor: 'white',
+                                    fontSize: '0.7rem',
+                                    height: '30px',
+                                    '& input': {
+                                        padding: '6px 8px',
+                                        height: '18px'
+                                    }
+                                }
+                            }}
+                        />
+
+                        {/* Compact Date Range */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box display="flex" gap={0.5} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+                                <DatePicker
+                                    value={fromDate}
+                                    format="DD/MM"
+                                    onChange={(date) => setFromDate(date)}
+                                    slotProps={{ 
+                                        textField: { 
+                                            size: "small",
+                                            sx: { 
+                                                minWidth: '90px',
+                                                '& .MuiInputBase-root': {
+                                                    height: '30px',
+                                                    fontSize: '0.7rem'
+                                                }
+                                            }
+                                        } 
                                     }}
                                 />
-
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <Box display="flex" gap={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
-                                        <DatePicker
-                                            label="From Date"
-                                            value={fromDate}
-                                            format="DD-MM-YYYY"
-                                            onChange={(date) => setFromDate(date)}
-                                            slotProps={{ 
-                                                textField: { 
-                                                    size: "small",
-                                                    sx: { minWidth: '140px' }
-                                                } 
-                                            }}
-                                        />
-                                        <DatePicker
-                                            label="To Date"
-                                            value={toDate}
-                                            format="DD-MM-YYYY"
-                                            onChange={(date) => setToDate(date)}
-                                            slotProps={{ 
-                                                textField: { 
-                                                    size: "small",
-                                                    sx: { minWidth: '140px' }
-                                                } 
-                                            }}
-                                        />
-                                    </Box>
-                                </LocalizationProvider>
-
-                                <Box display="flex" gap={1} sx={{ flexWrap: 'wrap' }}>
-                                    <Button
-                                        variant="contained"
-                                        href={`/add-new-affiliate-link/`}
-                                        sx={{
-                                            minWidth: '100px',
-                                            background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
-                                            borderRadius: '8px',
-                                            fontWeight: 600,
-                                            textTransform: 'none',
-                                            fontSize: '0.875rem',
-                                            py: 1,
-                                            '&:hover': {
-                                                opacity: 0.9,
+                                <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem' }}>
+                                    to
+                                </Typography>
+                                <DatePicker
+                                    value={toDate}
+                                    format="DD/MM"
+                                    onChange={(date) => setToDate(date)}
+                                    slotProps={{ 
+                                        textField: { 
+                                            size: "small",
+                                            sx: { 
+                                                minWidth: '90px',
+                                                '& .MuiInputBase-root': {
+                                                    height: '30px',
+                                                    fontSize: '0.7rem'
+                                                }
                                             }
-                                        }}
-                                    >
-                                        Add New
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        href={`/affiliate-link-category/`}
-                                        sx={{
-                                            minWidth: '100px',
-                                            background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
-                                            borderRadius: '8px',
-                                            fontWeight: 600,
-                                            textTransform: 'none',
-                                            fontSize: '0.875rem',
-                                            py: 1,
-                                            '&:hover': {
-                                                opacity: 0.9,
-                                            }
-                                        }}
-                                    >
-                                        Category
-                                    </Button>
-                                </Box>
+                                        } 
+                                    }}
+                                />
                             </Box>
+                        </LocalizationProvider>
+
+                        {/* Action Buttons */}
+                        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', ml: 'auto' }}>
+                            {/* Refresh Button */}
+                            <IconButton 
+                                size="small" 
+                                onClick={fetchData}
+                                sx={{ 
+                                    width: '30px', 
+                                    height: '30px',
+                                    backgroundColor: '#f0f0f0',
+                                    '&:hover': { backgroundColor: '#e0e0e0' }
+                                }}
+                            >
+                                <RefreshIcon sx={{ fontSize: 16, color: '#666' }} />
+                            </IconButton>
+
+                            {/* Add New Button */}
+                            <Button
+                                variant="contained"
+                                startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+                                href={`/add-new-affiliate-link/`}
+                                size="small"
+                                sx={{
+                                    minWidth: '80px',
+                                    background: '#2196f3',
+                                    borderRadius: '4px',
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    fontSize: '0.7rem',
+                                    height: '30px',
+                                    px: 1
+                                }}
+                            >
+                                Add New
+                            </Button>
+
+                            {/* Category Button */}
+                            <Button
+                                variant="outlined"
+                                startIcon={<CategoryIcon sx={{ fontSize: 16 }} />}
+                                href={`/affiliate-link-category/`}
+                                size="small"
+                                sx={{
+                                    minWidth: '80px',
+                                    borderColor: '#ddd',
+                                    color: '#666',
+                                    borderRadius: '4px',
+                                    fontWeight: 600,
+                                    textTransform: 'none',
+                                    fontSize: '0.7rem',
+                                    height: '30px',
+                                    px: 1
+                                }}
+                            >
+                                Category
+                            </Button>
                         </Box>
-                    </FilterCard>
-                </Grid>
+                    </Box>
+                </Paper>
+
+                {/* Results Count */}
+                <Box sx={{ mb: 0.5, px: 0.5 }}>
+                    <Typography variant="caption" sx={{ 
+                        color: 'text.secondary', 
+                        fontSize: '0.7rem',
+                        fontWeight: 500
+                    }}>
+                        Showing {filteredRows.length} affiliate links
+                    </Typography>
+                </Box>
             </Box>
             
-            <AffiliateTrackDetailsTransactions showServiceTrans={filteredRows} />
+            {/* Table Section */}
+            <Box sx={{ px: 0.5, pb: 0.5 }}>
+                <AffiliateTrackDetailsTransactions showServiceTrans={filteredRows} />
+            </Box>
         </Layout>
     );
 }

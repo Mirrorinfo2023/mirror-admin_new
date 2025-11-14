@@ -14,41 +14,12 @@ import {
   Typography,
   Box,
   TextField,
-  useMediaQuery,
 } from "@mui/material";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import SearchIcon from "@mui/icons-material/Search";
-import { styled } from "@mui/material/styles";
-
-const getDate = (timeZone) => {
-  const dateString = timeZone;
-  const dateObject = new Date(dateString);
-
-  const year = dateObject.getFullYear();
-  const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-  const day = String(dateObject.getDate()).padStart(2, "0");
-  const hours = String(dateObject.getHours()).padStart(2, "0");
-  const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-  const amOrPm = hours >= 12 ? "PM" : "AM";
-  const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-  return `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-};
-
-const StyledBox = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexWrap: "wrap",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: theme.spacing(2),
-  padding: theme.spacing(2),
-  [theme.breakpoints.down("sm")]: {
-    flexDirection: "column",
-    alignItems: "stretch",
-  },
-}));
 
 function TransactionHistory() {
   const [showServiceTrans, setShowServiceTrans] = useState([]);
@@ -56,11 +27,8 @@ function TransactionHistory() {
   const dispatch = useDispatch();
   const uid = Cookies.get("uid");
 
-  const currentDate = new Date();
-  const [fromDate, setFromDate] = useState(
-    dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1))
-  );
-  const [toDate, setToDate] = useState(dayjs(new Date()));
+  const [fromDate, setFromDate] = useState(dayjs().startOf("month"));
+  const [toDate, setToDate] = useState(dayjs());
 
   useEffect(() => {
     const getTnx = async () => {
@@ -102,100 +70,94 @@ function TransactionHistory() {
 
   return (
     <Layout>
-      <Grid container spacing={3} sx={{ p: 2 }}>
-        <Grid item xs={12}>
-          <Paper
-            elevation={3}
-            sx={{
-              borderRadius: 3,
-              overflow: "hidden",
-              p: 2,
-              backgroundColor: "#f9fafc",
-            }}
-          >
-            {/*  Responsive Filter Toolbar */}
-            <StyledBox>
-              {/* Title */}
-              <Typography
-                variant="h5"
-                sx={{
-                
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Insurance Report
-              </Typography>
+      <Box sx={{ p: 1.5 }}>
+        {/* Compact Filter Row */}
+        <TableContainer component={Paper} sx={{ p: 1.5, mb: 2 }}>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 2,
+            flexWrap: 'wrap'
+          }}>
+            {/* Title */}
+            <Typography variant="h6" sx={{ 
+              fontWeight: "bold",
+              whiteSpace: "nowrap",
+              fontSize: '16px',
+              minWidth: 'fit-content'
+            }}>
+              Insurance Report
+            </Typography>
 
-              {/* Search */}
-              <TextField
-                variant="outlined"
-                placeholder="Search by name, ID, or number..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <SearchIcon sx={{ mr: 1, color: "gray" }} />,
-                }}
-                sx={{
-                  flex: 1,
-                  minWidth: { xs: "100%", sm: "220px" },
-                  backgroundColor: "white",
-                  borderRadius: 2,
-                }}
-              />
+            {/* Search Field */}
+            <TextField
+              placeholder="Search..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+              }}
+              sx={{
+                width: "180px",
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.8rem',
+                }
+              }}
+            />
 
-              {/* Date Filters */}
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box
-                  display="flex"
-                  gap={2}
-                  flexWrap="wrap"
-                  sx={{
-                    width: { xs: "100%", sm: "auto" },
-                    justifyContent: "flex-end",
+            {/* Date Pickers */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <DatePicker
+                  value={fromDate}
+                  format="DD/MM"
+                  onChange={(newDate) => setFromDate(newDate)}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "From",
+                      sx: {
+                        width: 100,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
                   }}
-                >
-                  <DatePicker
-                    label="From Date"
-                    value={fromDate}
-                    format="DD-MM-YYYY"
-                    onChange={(newDate) => setFromDate(newDate)}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: {
-                          backgroundColor: "white",
-                          borderRadius: 2,
-                          width: { xs: "100%", sm: "180px" },
-                        },
-                      },
-                    }}
-                  />
-                  <DatePicker
-                    label="To Date"
-                    value={toDate}
-                    format="DD-MM-YYYY"
-                    onChange={(newDate) => setToDate(newDate)}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: {
-                          backgroundColor: "white",
-                          borderRadius: 2,
-                          width: { xs: "100%", sm: "180px" },
-                        },
-                      },
-                    }}
-                  />
-                </Box>
-              </LocalizationProvider>
-            </StyledBox>
-          </Paper>
-        </Grid>
+                />
+                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                  to
+                </Typography>
+                <DatePicker
+                  value={toDate}
+                  format="DD/MM"
+                  onChange={(newDate) => setToDate(newDate)}
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "To",
+                      sx: {
+                        width: 100,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
+                  }}
+                />
+              </Box>
+            </LocalizationProvider>
+          </Box>
+        </TableContainer>
 
-   
-        
-      </Grid>
-          <Transactions showServiceTrans={filteredRows} />
+        {/* Table Component */}
+        <Transactions showServiceTrans={filteredRows} />
+      </Box>
     </Layout>
   );
 }

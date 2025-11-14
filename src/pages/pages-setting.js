@@ -85,7 +85,7 @@ function PagesReport() {
                         href="/add-new-page/"
                         sx={{
                             flex: { xs: "1 1 100%", sm: "0 0 auto" },
-                            background: "linear-gradient(90deg, #2196f3 0%, #21cbf3 100%)",
+                            background: "#2198f3",
                             boxShadow: "0 2px 8px 0 rgba(33, 203, 243, 0.15)",
                             textTransform: "none",
                             whiteSpace: "nowrap",

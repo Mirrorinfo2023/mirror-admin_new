@@ -27,17 +27,11 @@ import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
-// New StatCard Design
-const StatCard = styled(Card)(({ theme }) => ({
-  borderRadius: '8px',
-  height: '120px',
-  display: 'flex',
-  alignItems: 'center',
-  transition: 'all 0.3s ease-in-out',
-  position: 'relative',
-  overflow: 'hidden',
-}));
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import MoneyOffIcon from '@mui/icons-material/MoneyOff';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import SavingsIcon from '@mui/icons-material/Savings';
 
 function TransactionHistory() {
   const dispatch = useDispatch();
@@ -91,208 +85,199 @@ function TransactionHistory() {
     return matchType && matchSearch;
   });
 
-  // Card configurations with new design
+  // Compact card configurations with icons
   const cards = [
     { 
-      label: "Total Count", 
+      label: "Total", 
       value: report?.total_count || 0, 
-      color: "#1976d2" 
+      color: "#1976d2",
+      icon: <AccountBalanceIcon sx={{ fontSize: 28, color: "#1976d2" }} />
     },
     {
-      label: "Total Credit Amount",
+      label: "Credit",
       value: report?.total_credit || 0,
       color: "#2e7d32",
+      icon: <CreditCardIcon sx={{ fontSize: 28, color: "#2e7d32" }} />
     },
     { 
-      label: "Total Debit", 
+      label: "Debit", 
       value: report?.total_debit || 0, 
-      color: "#ed6c02" 
+      color: "#ed6c02",
+      icon: <MoneyOffIcon sx={{ fontSize: 28, color: "#ed6c02" }} />
     },
     {
-      label: "Total Old Balance",
+      label: "Old Bal",
       value: report?.total_oldbalance || 0,
       color: "#6a1b9a",
+      icon: <AccountBalanceWalletIcon sx={{ fontSize: 28, color: "#6a1b9a" }} />
     },
     {
-      label: "Total New Balance",
+      label: "New Bal",
       value: report?.total_newbalance || 0,
       color: "#00838f",
+      icon: <SavingsIcon sx={{ fontSize: 28, color: "#00838f" }} />
     },
   ];
 
   return (
     <Layout>
-      <Box sx={{ p: 2 }}>
-        {/* Top Summary Cards - New Design */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
+      <Box sx={{ p: 1.5 }}>
+        {/* Compact Stats Cards */}
+        <Grid container spacing={1.5} sx={{ mb: 2 }}>
           {cards.map((item, index) => (
             <Grid key={index} item xs={12} sm={6} md={2.4}>
-              <StatCard sx={{ 
+              <Card sx={{ 
                 backgroundColor: '#f5f5f5', 
                 borderLeft: `4px solid ${item.color}`,
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease-in-out',
+                height: '70px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px',
                 '&:hover': {
                   backgroundColor: item.color,
-                  boxShadow: `0 8px 25px ${item.color}80`,
-                  transform: 'translateY(-4px)',
-                  '& .MuiTypography-root': {
-                    color: 'white',
-                  }
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 4px 12px ${item.color}80`,
+                  '& .MuiTypography-root': { color: '#fff' },
+                  '& .stat-icon': { color: '#fff' }
                 }
               }}>
-                <CardContent sx={{ 
-                  textAlign: 'center', 
-                  padding: '16px !important', 
-                  width: '100%' 
-                }}>
-                  <Typography 
-                    variant="h4" 
-                    sx={{ 
-                      color: '#000000', 
-                      transition: 'color 0.3s ease', 
-                      fontWeight: 700, 
-                      fontSize: '24px', 
-                      mb: 1 
-                    }}
-                  >
-                    {item.value}
-                  </Typography>
-                  <Typography 
-                    variant="body1" 
-                    sx={{ 
-                      color: '#000000', 
-                      transition: 'color 0.3s ease', 
-                      fontWeight: 600,
-                      fontSize: '14px'
-                    }}
-                  >
+                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                  <Typography variant="subtitle2" sx={{ 
+                    fontSize: '12px', 
+                    fontWeight: 600, 
+                    color: '#666', 
+                    mb: 0.5,
+                    transition: 'color 0.3s ease'
+                  }}>
                     {item.label}
                   </Typography>
-                </CardContent>
-              </StatCard>
+                  <Typography sx={{ 
+                    color: '#000', 
+                    fontSize: '18px', 
+                    fontWeight: 700, 
+                    lineHeight: 1,
+                    transition: 'color 0.3s ease'
+                  }}>
+                    {item.value}
+                  </Typography>
+                </Box>
+                <Box className="stat-icon" sx={{ transition: 'color 0.3s ease' }}>
+                  {item.icon}
+                </Box>
+              </Card>
             </Grid>
           ))}
         </Grid>
 
-        {/* Filter Row */}
-        <TableContainer
-          component={Paper}
-          sx={{
-            mt: 3,
-            p: 2,
-            borderRadius: "12px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-            border: '1px solid #e0e0e0'
-          }}
-        >
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              mb: 2, 
-              fontWeight: 600,
+        {/* Compact Filter Row */}
+        <TableContainer component={Paper} sx={{ p: 1.5, mb: 2 }}>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: 1.5,
+            flexWrap: 'wrap'
+          }}>
+            {/* Title */}
+            <Typography variant="h6" sx={{ 
+              fontWeight: "bold",
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            User Summary
-          </Typography>
+              WebkitTextFillColor: 'transparent',
+              whiteSpace: "nowrap",
+              fontSize: '16px',
+              minWidth: 'fit-content'
+            }}>
+              User Summary
+            </Typography>
 
-          <Grid
-            container
-            spacing={2}
-            alignItems="center"
-            sx={{
-              "& .MuiTextField-root, & .MuiFormControl-root": {
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "8px",
-                  height: "40px",
-                  backgroundColor: 'rgba(0,0,0,0.02)',
-                },
-              },
-            }}
-          >
             {/* Transaction Type */}
-            <Grid item xs={12} sm={6} md={2.4}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Transaction Type</InputLabel>
-                <Select
-                  value={selectedValue}
-                  label="Transaction Type"
-                  onChange={(e) => setSelectedValue(e.target.value)}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  <MenuItem value="Add Money">Add Money</MenuItem>
-                  <MenuItem value="Recharge">Recharge</MenuItem>
-                  <MenuItem value="Plan Purchase">Plan Purchase</MenuItem>
-                  <MenuItem value="Send Money">Send Money</MenuItem>
-                  <MenuItem value="Receive Money">Receive Money</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={selectedValue}
+                label="Type"
+                onChange={(e) => setSelectedValue(e.target.value)}
+                sx={{ height: '36px', fontSize: '0.8rem' }}
+              >
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="Add Money">Add Money</MenuItem>
+                <MenuItem value="Recharge">Recharge</MenuItem>
+                <MenuItem value="Plan Purchase">Plan Purchase</MenuItem>
+                <MenuItem value="Send Money">Send Money</MenuItem>
+                <MenuItem value="Receive Money">Receive Money</MenuItem>
+              </Select>
+            </FormControl>
 
             {/* Search */}
-            <Grid item xs={12} sm={6} md={2.4}>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="Search..."
-                variant="outlined"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: <SearchIcon sx={{ mr: 1, color: "gray" }} />,
-                }}
-              />
-            </Grid>
+            <TextField
+              placeholder="Search..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+              }}
+              sx={{
+                width: "160px",
+                '& .MuiOutlinedInput-root': {
+                  height: '36px',
+                  fontSize: '0.8rem',
+                }
+              }}
+            />
 
-            {/* From Date */}
-            <Grid item xs={12} sm={6} md={2.4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+            {/* Date Range */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                 <DatePicker
-                  label="From Date"
                   value={fromDate}
-                  format="DD-MM-YYYY"
+                  format="DD/MM"
                   onChange={(date) => setFromDate(date)}
-                  slotProps={{ 
-                    textField: { 
-                      fullWidth: true, 
-                      size: 'small',
-                    } 
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "From",
+                      sx: {
+                        width: 100,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
                   }}
                 />
-              </LocalizationProvider>
-            </Grid>
-
-            {/* To Date */}
-            <Grid item xs={12} sm={6} md={2.4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                  to
+                </Typography>
                 <DatePicker
-                  label="To Date"
                   value={toDate}
-                  format="DD-MM-YYYY"
+                  format="DD/MM"
                   onChange={(date) => setToDate(date)}
-                  slotProps={{ 
-                    textField: { 
-                      fullWidth: true, 
-                      size: 'small',
-                    } 
+                  slotProps={{
+                    textField: {
+                      size: "small",
+                      placeholder: "To",
+                      sx: {
+                        width: 100,
+                        '& .MuiInputBase-root': {
+                          height: 36,
+                          fontSize: '0.8rem'
+                        }
+                      }
+                    }
                   }}
                 />
-              </LocalizationProvider>
-            </Grid>
+              </Box>
+            </LocalizationProvider>
 
             {/* Action Buttons */}
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={2.4}
-              display="flex"
-              justifyContent="flex-start"
-              gap={1}
-            >
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               <Button
                 variant="contained"
                 size="small"
@@ -300,13 +285,12 @@ function TransactionHistory() {
                   backgroundColor: "#4CAF50",
                   "&:hover": { 
                     backgroundColor: "#43A047",
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
                   },
                   textTransform: "none",
-                  width: "100px",
-                  transition: 'all 0.3s ease-in-out',
-                  borderRadius: '6px'
+                  width: "80px",
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  height: '36px'
                 }}
                 href={`/credit-balance-to-user/?action=Credit`}
               >
@@ -320,24 +304,23 @@ function TransactionHistory() {
                   backgroundColor: "#FFA000",
                   "&:hover": { 
                     backgroundColor: "#FB8C00",
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 12px rgba(255, 160, 0, 0.3)'
                   },
                   textTransform: "none",
-                  width: "100px",
-                  transition: 'all 0.3s ease-in-out',
-                  borderRadius: '6px'
+                  width: "80px",
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  height: '36px'
                 }}
                 href={`/credit-balance-to-user/?action=Debit`}
               >
                 Debit
               </Button>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </TableContainer>
 
         {/* Transactions Table */}
-        <Box sx={{ mt: 3 }}>
+        <Box sx={{ mt: 2 }}>
           <Transactions
             showServiceTrans={filteredRows}
             totalPageCount={totalPageCount}

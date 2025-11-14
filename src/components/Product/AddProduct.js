@@ -343,7 +343,7 @@ const AddBannersTransactions = () => {
                                             disabled={!newbenefitRow.benefit.trim()}
                                             sx={{
                                                 height: '40px',
-                                                background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
+                                                background: '#2198f3',
                                             }}
                                         >
                                             Add Benefit
@@ -441,7 +441,7 @@ const AddBannersTransactions = () => {
                                         variant="contained" 
                                         startIcon={<CloudUploadIcon />}
                                         sx={{
-                                            background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
+                                            background: '#2198f3',
                                             mb: 2
                                         }}
                                     >
@@ -536,7 +536,7 @@ const AddBannersTransactions = () => {
                                 onClick={handleSubmit}
                                 sx={{ 
                                     minWidth: '120px',
-                                    background: 'linear-gradient(90deg, #2196F3 0%, #21CBF3 100%)',
+                                    background: '#2198f3',
                                 }}
                             >
                                 {action === 'update' ? 'Update Product' : 'Add Product'}

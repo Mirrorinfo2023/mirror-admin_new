@@ -1,4 +1,4 @@
-import { Grid, TextField, FormControlLabel, Checkbox, Button, FormHelperText, Snackbar, Alert, Typography, InputAdornment, IconButton, FormControl, InputLabel, OutlinedInput } from "@mui/material";
+import { Grid, TextField, FormControlLabel, Checkbox, Button, FormHelperText, Snackbar, Alert, Typography, InputAdornment, IconButton, FormControl, InputLabel, OutlinedInput, Box, CircularProgress } from "@mui/material";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -15,6 +15,7 @@ const UserName = ({ handleChange }) => {
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [captchaToken, setCaptchaToken] = useState(null);
+    const [loading, setLoading] = useState(false); // Loading state
 
     const [alert, setAlert] = useState({ open: false, type: false, message: null });
 
@@ -84,18 +85,21 @@ const UserName = ({ handleChange }) => {
     const submitHandler = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
+        setLoading(true); // Start loading
 
         const attempt = Cookies.get('attempt');
 
         // Check if account is temporarily locked
         if (attempt && attempt >= 3) {
             setAlert({ open: true, type: false, message: 'Your account has been temporarily locked due to multiple incorrect login attempts!' });
+            setLoading(false); // Stop loading
             return;
         }
 
         // Validate form before submission
         if (!validateForm()) {
             setAlert({ open: true, type: false, message: 'Please fix the errors in the form before submitting.' });
+            setLoading(false); // Stop loading
             return;
         }
 
@@ -137,6 +141,7 @@ const UserName = ({ handleChange }) => {
 
             } else {
                 setAlert({ open: true, type: false, message: response.data.message });
+                setLoading(false); // Stop loading
             }
 
         } catch (error) {
@@ -160,6 +165,7 @@ const UserName = ({ handleChange }) => {
                     setAlert({ open: true, type: false, message: error.message });
                 }
             }
+            setLoading(false); // Stop loading
         }
     }
 
@@ -208,6 +214,92 @@ const UserName = ({ handleChange }) => {
 
     return (
         <>
+            {/* Loading Overlay */}
+            {loading && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        zIndex: 9999,
+                        width: "100%",
+                        height: "100%",
+                        background: "rgba(255,255,255,0.95)",
+                        backdropFilter: "blur(8px)",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
+                    {/* Centered Loader with your GIF */}
+                    <Box 
+                        sx={{ 
+                            textAlign: 'center',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                width: 150,
+                                height: 150,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                position: 'relative'
+                            }}
+                        >
+                            <img 
+                                src="/loader.gif" 
+                                alt="Loading..." 
+                                width="150" 
+                                height="150"
+                                style={{
+                                    borderRadius: '50%',
+                                    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.3)',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                }}
+                                onError={(e) => {
+                                    // Hide broken image and show CSS loader
+                                    e.target.style.display = 'none';
+                                    const fallback = document.querySelector('.fallback-loader');
+                                    if (fallback) fallback.style.display = 'block';
+                                }}
+                            />
+                            {/* Fallback CSS loader - hidden by default */}
+                            <Box
+                                sx={{
+                                    width: 80,
+                                    height: 80,
+                                    border: '6px solid #f3f3f3',
+                                    borderTop: '6px solid #1976d2',
+                                    borderRadius: '50%',
+                                    animation: 'spin 1s linear infinite',
+                                    display: 'none', // Hidden by default
+                                }}
+                                className="fallback-loader"
+                            />
+                        </Box>
+                        
+                        <Typography 
+                            sx={{ 
+                                mt: 3, 
+                                fontWeight: 600, 
+                                color: "#1976d2", 
+                                fontSize: '1.3rem',
+                            }}
+                        >
+                            Logging in...
+                        </Typography>
+                    </Box>
+                </Box>
+            )}
+
             <Grid spacing={2} container>
                 <Grid item xs={12}>
                     <TextField
@@ -281,8 +373,9 @@ const UserName = ({ handleChange }) => {
                         fullWidth
                         onClick={submitHandler}
                         size='large'
+                        disabled={loading} // Disable button when loading
                     >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                     </Button>
                 </Grid>
             </Grid>
@@ -297,6 +390,14 @@ const UserName = ({ handleChange }) => {
                     {alert.message}
                 </Alert>
             </Snackbar>
+
+            {/* Add CSS for fallback loader */}
+            <style jsx global>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </>
     )
 }

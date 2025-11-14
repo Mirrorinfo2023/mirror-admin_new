@@ -1,7 +1,6 @@
 "use client"
-import React, { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import Cookies from "js-cookie";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from 'react-redux';
 import api from "../../utils/api";
 import withAuth from "../../utils/withAuth";
 import { callAlert } from "../../redux/actions/alert";
@@ -18,63 +17,17 @@ import {
     InputLabel,
     Select,
     MenuItem,
-    Container,
     Paper,
-    useTheme,
-    useMediaQuery
 } from "@mui/material";
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { styled } from '@mui/material/styles';
-
-// Styled components for modern UI
-const FilterCard = styled(Card)(({ theme }) => ({
-    background: 'white',
-    borderRadius: '16px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-    marginBottom: '24px',
-    border: '1px solid rgba(0,0,0,0.05)',
-}));
-
-const StatCard = styled(Card)(({ theme }) => ({
-    borderRadius: '12px',
-    height: '120px',
-    display: 'flex',
-    alignItems: 'center',
-    transition: 'all 0.3s ease-in-out',
-    position: 'relative',
-    overflow: 'hidden',
-}));
-
-const CardContentStyled = styled(CardContent)(({ theme }) => ({
-    position: 'relative',
-    zIndex: 2,
-    textAlign: 'center',
-    padding: '16px !important',
-    width: '100%',
-}));
-
-const getDate = (timeZone) => {
-    const dateString = timeZone;
-    const dateObject = new Date(dateString);
-
-    const year = dateObject.getFullYear();
-    const month = String(dateObject.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObject.getDate()).padStart(2, "0");
-    const hours = String(dateObject.getHours()).padStart(2, "0");
-    const minutes = String(dateObject.getMinutes()).padStart(2, "0");
-
-    const amOrPm = hours >= 12 ? "PM" : "AM";
-    const formattedHours = hours % 12 === 0 ? "12" : String(hours % 12);
-
-    const formattedDateTime = `${day}-${month}-${year} ${formattedHours}:${minutes} ${amOrPm}`;
-
-    return formattedDateTime;
-};
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PendingActionsIcon from '@mui/icons-material/PendingActions';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 function PrimeUserReport(props) {
     const [showServiceTrans, setShowServiceTrans] = useState({});
@@ -86,21 +39,12 @@ function PrimeUserReport(props) {
         rejected: 0
     });
 
-    let rows;
-
-    if (showServiceTrans && showServiceTrans.length > 0) {
-        rows = [...showServiceTrans];
-    } else {
-        rows = [];
-    }
+    let rows = showServiceTrans && showServiceTrans.length > 0 ? [...showServiceTrans] : [];
 
     const dispatch = useDispatch();
-    const currentDate = new Date();
-    const [fromDate, setFromDate] = React.useState(dayjs(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)));
-    const [toDate, setToDate] = React.useState(dayjs());
-
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const [fromDate, setFromDate] = useState(dayjs().startOf("month"));
+    const [toDate, setToDate] = useState(dayjs());
+    const [selectedValue, setSelectedValue] = useState('');
 
     useEffect(() => {
         const getTnx = async () => {
@@ -111,10 +55,8 @@ function PrimeUserReport(props) {
 
             try {
                 const response = await api.post("/api/package/package-purchase-request", reqData);
-
                 if (response.status === 200) {
                     setShowServiceTrans(response.data.data);
-                    // Calculate stats from the data
                     if (response.data.data) {
                         const data = response.data.data;
                         setStats({
@@ -125,7 +67,6 @@ function PrimeUserReport(props) {
                         });
                     }
                 }
-
             } catch (error) {
                 if (error?.response?.data?.error) {
                     dispatch(callAlert({ message: error.response.data.error, type: 'FAILED' }))
@@ -140,314 +81,232 @@ function PrimeUserReport(props) {
         }
     }, [fromDate, toDate, dispatch]);
 
-    const handleFromDateChange = (date) => {
-        setFromDate(date);
-    };
+    const handleFromDateChange = (date) => setFromDate(date);
+    const handleToDateChange = (date) => setToDate(date);
+    const handleChange = (event) => setSelectedValue(event.target.value);
 
-    const handleToDateChange = (date) => {
-        setToDate(date);
-    };
-
-    const [selectedValue, setSelectedValue] = useState('');
-
-    const handleChange = (event) => {
-        setSelectedValue(event.target.value);
-    };
-
-    let filteredRows;
-
-    if (selectedValue != '') {
-        filteredRows = rows.filter(row => {
-            return (
-                (row.plan && row.plan.toLowerCase() === selectedValue.toLowerCase())
-            );
-        });
-    } else {
-        filteredRows = rows.filter(row => {
-            return (
-                (row.first_name && row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (row.last_name && row.last_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                (row.mlm_id && row.mlm_id.includes(searchTerm)) ||
-                (row.mobile && row.mobile.includes(searchTerm)) ||
-                (row.order_no && row.order_no.includes(searchTerm)) ||
-                (row.transaction_id && row.transaction_id.includes(searchTerm))
-            );
-        });
-    }
+    let filteredRows = selectedValue !== '' 
+        ? rows.filter(row => row.plan && row.plan.toLowerCase() === selectedValue.toLowerCase())
+        : rows.filter(row => 
+            (row.first_name && row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (row.last_name && row.last_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (row.mlm_id && row.mlm_id.includes(searchTerm)) ||
+            (row.mobile && row.mobile.includes(searchTerm)) ||
+            (row.order_no && row.order_no.includes(searchTerm)) ||
+            (row.transaction_id && row.transaction_id.includes(searchTerm))
+        );
 
     return (
         <Layout>
-            <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 } }}>
-                {/* Statistics Cards Section */}
-                <Grid container spacing={2} sx={{ mb: 2 }}>
-                    {/* Total Card */}
-                    <Grid item xs={6} sm={3}>
-                        <StatCard sx={{ 
-                            backgroundColor: '#f5f5f5', 
-                            borderLeft: '4px solid #667eea',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s ease-in-out',
-                            borderRadius: '8px',
-                            '&:hover': {
-                                backgroundColor: '#667eea',
-                                boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)',
-                                transform: 'translateY(-4px)',
-                                '& .MuiTypography-root': {
-                                    color: 'white',
+            <Box sx={{ p: 1.5 }}>
+                {/* Compact Stats Cards */}
+                <Grid container spacing={1.5} sx={{ mb: 2 }}>
+                    {[
+                        { 
+                            label: "Total", 
+                            value: stats.total, 
+                            color: "#667eea",
+                            icon: <ShoppingCartIcon sx={{ fontSize: 28, color: "#667eea" }} />
+                        },
+                        { 
+                            label: "Pending", 
+                            value: stats.pending, 
+                            color: "#11998e",
+                            icon: <PendingActionsIcon sx={{ fontSize: 28, color: "#11998e" }} />
+                        },
+                        { 
+                            label: "Approved", 
+                            value: stats.approved, 
+                            color: "#ff6b6b",
+                            icon: <CheckCircleIcon sx={{ fontSize: 28, color: "#ff6b6b" }} />
+                        },
+                        { 
+                            label: "Rejected", 
+                            value: stats.rejected, 
+                            color: "#a8a8a8",
+                            icon: <CancelIcon sx={{ fontSize: 28, color: "#a8a8a8" }} />
+                        },
+                    ].map((card, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Card sx={{ 
+                                backgroundColor: '#f5f5f5', 
+                                borderLeft: `4px solid ${card.color}`,
+                                boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                                transition: 'all 0.3s ease-in-out',
+                                height: '70px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '12px',
+                                '&:hover': {
+                                    backgroundColor: card.color,
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: `0 4px 12px ${card.color}80`,
+                                    '& .MuiTypography-root': { color: '#fff' },
+                                    '& .stat-icon': { color: '#fff' }
                                 }
-                            }
-                        }}>
-                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
-                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
-                                    {stats.total}
-                                </Typography>
-                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
-                                    Total
-                                </Typography>
-                            </Box>
-                        </StatCard>
-                    </Grid>
-                    
-                    {/* Pending Card */}
-                    <Grid item xs={6} sm={3}>
-                        <StatCard sx={{ 
-                            backgroundColor: '#f5f5f5', 
-                            borderLeft: '4px solid #11998e',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s ease-in-out',
-                            borderRadius: '8px',
-                            '&:hover': {
-                                backgroundColor: '#11998e',
-                                boxShadow: '0 8px 25px rgba(17, 153, 142, 0.5)',
-                                transform: 'translateY(-4px)',
-                                '& .MuiTypography-root': {
-                                    color: 'white',
-                                }
-                            }
-                        }}>
-                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
-                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
-                                    {stats.pending}
-                                </Typography>
-                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
-                                    Pending
-                                </Typography>
-                            </Box>
-                        </StatCard>
-                    </Grid>
-                    
-                    {/* Approved Card */}
-                    <Grid item xs={6} sm={3}>
-                        <StatCard sx={{ 
-                            backgroundColor: '#f5f5f5', 
-                            borderLeft: '4px solid #ff6b6b',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s ease-in-out',
-                            borderRadius: '8px',
-                            '&:hover': {
-                                backgroundColor: '#ff6b6b',
-                                boxShadow: '0 8px 25px rgba(255, 107, 107, 0.5)',
-                                transform: 'translateY(-4px)',
-                                '& .MuiTypography-root': {
-                                    color: 'white',
-                                }
-                            }
-                        }}>
-                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
-                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
-                                    {stats.approved}
-                                </Typography>
-                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
-                                    Approved
-                                </Typography>
-                            </Box>
-                        </StatCard>
-                    </Grid>
-                    
-                    {/* Rejected Card */}
-                    <Grid item xs={6} sm={3}>
-                        <StatCard sx={{ 
-                            backgroundColor: '#f5f5f5', 
-                            borderLeft: '4px solid #a8a8a8',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                            transition: 'all 0.3s ease-in-out',
-                            borderRadius: '8px',
-                            '&:hover': {
-                                backgroundColor: '#a8a8a8',
-                                boxShadow: '0 8px 25px rgba(168, 168, 168, 0.5)',
-                                transform: 'translateY(-4px)',
-                                '& .MuiTypography-root': {
-                                    color: 'white',
-                                }
-                            }
-                        }}>
-                            <Box sx={{ padding: '16px', width: '100%', textAlign: 'center' }}>
-                                <Typography variant="h4" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 700, fontSize: '24px', mb: 1 }}>
-                                    {stats.rejected}
-                                </Typography>
-                                <Typography variant="body1" sx={{ color: '#000000', transition: 'color 0.3s ease', fontWeight: 600 }}>
-                                    Rejected
-                                </Typography>
-                            </Box>
-                        </StatCard>
-                    </Grid>
+                            }}>
+                                <Box sx={{ flex: 1, textAlign: 'left' }}>
+                                    <Typography variant="subtitle2" sx={{ 
+                                        fontSize: '12px', 
+                                        fontWeight: 600, 
+                                        color: '#666', 
+                                        mb: 0.5,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.label}
+                                    </Typography>
+                                    <Typography sx={{ 
+                                        color: '#000', 
+                                        fontSize: '18px', 
+                                        fontWeight: 700, 
+                                        lineHeight: 1,
+                                        transition: 'color 0.3s ease'
+                                    }}>
+                                        {card.value}
+                                    </Typography>
+                                </Box>
+                                <Box className="stat-icon" sx={{ transition: 'color 0.3s ease' }}>
+                                    {card.icon}
+                                </Box>
+                            </Card>
+                        </Grid>
+                    ))}
                 </Grid>
 
-                {/* Rest of your code remains the same... */}
-                <FilterCard>
-                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                        <Typography
-                            variant="h5"
-                            component="h1"
-                            sx={{
-                                background: 'linear-gradient(135deg, #2f323eff 0%, #383041ff 100%)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                mb: 2,
-                            }}
-                        >
-                            Package Purchase Request
+                {/* Compact Filter Row */}
+                <Paper sx={{ p: 1.5, mb: 2 }}>
+                    <Box sx={{ 
+                        display: "flex", 
+                        alignItems: "center", 
+                        gap: 1.5,
+                        flexWrap: 'wrap' 
+                    }}>
+                        {/* Title */}
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: "bold",
+                            background: 'linear-gradient(135deg, #2f323e 0%, #383041 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            whiteSpace: "nowrap",
+                            fontSize: '16px',
+                            minWidth: 'fit-content'
+                        }}>
+                            Package Requests
                         </Typography>
 
-                        {/* Search and Filters Grid */}
-                        <Grid container spacing={2} alignItems="center">
-                            {/* Search Field */}
-                            <Grid item xs={12} md={4}>
-                                <TextField
-                                    fullWidth
-                                    placeholder="Search by name, ID, mobile, order no..."
-                                    variant="outlined"
-                                    size="small"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-                                    }}
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '8px',
-                                            backgroundColor: 'rgba(0,0,0,0.02)',
+                        {/* Search Field */}
+                        <TextField
+                            placeholder="Search name, ID, mobile, order no..."
+                            variant="outlined"
+                            size="small"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: <SearchIcon sx={{ color: '#666', mr: 1, fontSize: 20 }} />,
+                            }}
+                            sx={{
+                                width: "200px",
+                                '& .MuiOutlinedInput-root': {
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                    backgroundColor: 'rgba(0,0,0,0.02)',
+                                }
+                            }}
+                        />
+
+                        {/* Status Filter */}
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                            <InputLabel>Status</InputLabel>
+                            <Select
+                                value={selectedValue}
+                                label="Status"
+                                onChange={handleChange}
+                                sx={{ 
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                    backgroundColor: 'rgba(0,0,0,0.02)',
+                                }}
+                            >
+                                <MenuItem value="">All</MenuItem>
+                                <MenuItem value="pending">Pending</MenuItem>
+                                <MenuItem value="approved">Approved</MenuItem>
+                                <MenuItem value="rejected">Rejected</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        {/* Date Range */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                <DatePicker
+                                    value={fromDate}
+                                    format="DD/MM"
+                                    onChange={handleFromDateChange}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "From",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem',
+                                                    backgroundColor: 'rgba(0,0,0,0.02)',
+                                                }
+                                            }
                                         }
                                     }}
                                 />
-                            </Grid>
-
-                            {/* Status Filter */}
-                            <Grid item xs={12} md={2}>
-                                <FormControl fullWidth size="small">
-                                    <InputLabel>Status</InputLabel>
-                                    <Select
-                                        value={selectedValue}
-                                        label="Status"
-                                        onChange={handleChange}
-                                        sx={{
-                                            borderRadius: '8px',
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: 'rgba(0,0,0,0.02)',
-                                            }
-                                        }}
-                                    >
-                                        <MenuItem value="">All Status</MenuItem>
-                                        <MenuItem value="pending">Pending</MenuItem>
-                                        <MenuItem value="approved">Approved</MenuItem>
-                                        <MenuItem value="rejected">Rejected</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-
-                            {/* Date Range */}
-                            <Grid item xs={12} md={4}>
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <Box sx={{
-                                        display: 'flex',
-                                        gap: 1,
-                                        alignItems: 'center',
-                                        flexDirection: isMobile ? 'column' : 'row'
-                                    }}>
-                                        <DatePicker
-                                            label="From Date"
-                                            value={fromDate}
-                                            format="DD/MM/YYYY"
-                                            onChange={handleFromDateChange}
-                                            slotProps={{
-                                                textField: {
-                                                    size: 'small',
-                                                    fullWidth: true,
-                                                    sx: {
-                                                        borderRadius: '8px',
-                                                        mb: isMobile ? 1 : 0,
-                                                        '& .MuiOutlinedInput-root': {
-                                                            backgroundColor: 'rgba(0,0,0,0.02)',
-                                                        }
-                                                    }
+                                <Typography variant="caption" sx={{ color: 'text.secondary', mx: 0.5 }}>
+                                    to
+                                </Typography>
+                                <DatePicker
+                                    value={toDate}
+                                    format="DD/MM"
+                                    onChange={handleToDateChange}
+                                    slotProps={{
+                                        textField: {
+                                            size: "small",
+                                            placeholder: "To",
+                                            sx: {
+                                                width: 100,
+                                                '& .MuiInputBase-root': {
+                                                    height: 36,
+                                                    fontSize: '0.8rem',
+                                                    backgroundColor: 'rgba(0,0,0,0.02)',
                                                 }
-                                            }}
-                                        />
-                                        {!isMobile && (
-                                            <Typography variant="body2" sx={{ color: 'text.secondary', mx: 1 }}>
-                                                to
-                                            </Typography>
-                                        )}
-                                        <DatePicker
-                                            label="To Date"
-                                            value={toDate}
-                                            format="DD/MM/YYYY"
-                                            onChange={handleToDateChange}
-                                            slotProps={{
-                                                textField: {
-                                                    size: 'small',
-                                                    fullWidth: true,
-                                                    sx: {
-                                                        borderRadius: '8px',
-                                                        '& .MuiOutlinedInput-root': {
-                                                            backgroundColor: 'rgba(0,0,0,0.02)',
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                        />
-                                    </Box>
-                                </LocalizationProvider>
-                            </Grid>
-
-                            {/* Quick Date Range Selector */}
-                            <Grid item xs={12} md={2}>
-                                <FormControl fullWidth size="small">
-                                    <InputLabel>Quick Select</InputLabel>
-                                    <Select
-                                        value="all"
-                                        label="Quick Select"
-                                        sx={{
-                                            borderRadius: '8px',
-                                            '& .MuiOutlinedInput-root': {
-                                                backgroundColor: 'rgba(0,0,0,0.02)',
                                             }
-                                        }}
-                                    >
-                                        <MenuItem value="all">All Time</MenuItem>
-                                        <MenuItem value="today">Today</MenuItem>
-                                        <MenuItem value="week">This Week</MenuItem>
-                                        <MenuItem value="month">This Month</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </FilterCard>
+                                        }
+                                    }}
+                                />
+                            </Box>
+                        </LocalizationProvider>
+
+                        {/* Quick Select */}
+                        <FormControl size="small" sx={{ minWidth: 110 }}>
+                            <InputLabel>Period</InputLabel>
+                            <Select
+                                value="all"
+                                label="Period"
+                                sx={{ 
+                                    height: '36px',
+                                    fontSize: '0.8rem',
+                                    backgroundColor: 'rgba(0,0,0,0.02)',
+                                }}
+                            >
+                                <MenuItem value="all">All Time</MenuItem>
+                                <MenuItem value="today">Today</MenuItem>
+                                <MenuItem value="week">This Week</MenuItem>
+                                <MenuItem value="month">This Month</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </Paper>
 
                 {/* Table Section */}
-                <Paper
-                    sx={{
-                        borderRadius: '12px',
-                        overflow: 'hidden',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                        border: '1px solid rgba(0,0,0,0.05)'
-                    }}
-                >
-                </Paper>
-            </Container>
-            <PrimeUserTransactions showServiceTrans={filteredRows} />
+                <PrimeUserTransactions showServiceTrans={filteredRows} />
+            </Box>
         </Layout>
     );
 }
