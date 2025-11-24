@@ -1,52 +1,61 @@
-import { Box, Button,Divider,TextField, Container, Grid, Paper, Table, TableBody, StyledTableCell, TableContainer, TableHead, TablePagination, TableRow, Typography,Link } from "@mui/material";
+import {
+    Box,
+    Button,
+    Divider,
+    TextField,
+    Container,
+    Grid,
+    Paper,
+    Table,
+    TableBody,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    Typography,
+    Link,
+} from "@mui/material";
+
 import { useEffect, useState } from "react";
-import * as React from 'react';
+import * as React from "react";
 import Cookies from "js-cookie";
 import { ArrowBack } from "@mui/icons-material";
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { styled } from '@mui/material/styles';
-import Modal from '@mui/material/Modal';
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-
-
+import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import { styled } from "@mui/material/styles";
+import Modal from "@mui/material/Modal";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import api from "../../../utils/api";
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
+    bgcolor: "background.paper",
+    border: "2px solid #000",
     boxShadow: 24,
     p: 4,
-  };
+};
 
 const Transactions = ({ showServiceTrans }) => {
-
     let rows;
 
     if (showServiceTrans && showServiceTrans.length > 0) {
-        rows = [
-            ...showServiceTrans
-        ];
+        rows = [...showServiceTrans];
     } else {
         rows = [];
     }
 
-
     const rowsPerPageOptions = [5, 10, 25];
-
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(100);
+    const [searchTerm, setSearchTerm] = useState("");
 
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const filteredRows = rows.filter(row => {
-        return (
-          (row.category_name && row.category_name.toLowerCase().includes(searchTerm.toLowerCase()))
-          // Add conditions for other relevant columns
-        );
+    const filteredRows = rows.filter((row) => {
+        return row.category_name
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase());
     });
 
     const onPageChange = (event, newPage) => {
@@ -59,186 +68,213 @@ const Transactions = ({ showServiceTrans }) => {
     };
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
-         [`&.${tableCellClasses.head}`]: {
+        [`&.${tableCellClasses.head}`]: {
             background: "#2198f3",
             color: "white",
-          fontSize: 14,
-          linHeight: 15,
-          padding: 7,
-          borderRight: "1px solid rgba(224, 224, 224, 1)"
+            fontSize: 14,
+            padding: 7,
+            borderRight: "1px solid rgba(224, 224, 224, 1)",
         },
         [`&.${tableCellClasses.body}`]: {
             fontSize: 12,
-            linHeight: 15,
             padding: 7,
-            borderRight: "1px solid rgba(224, 224, 224, 1)"
+            borderRight: "1px solid rgba(224, 224, 224, 1)",
         },
-      }));
-      
-      const StyledTableRow = styled(TableRow)(({ theme }) => ({
-        '&:nth-of-type(odd)': {
-          backgroundColor: theme.palette.action.hover,
-        },
-        // hide last border
-        '&:last-child td, &:last-child th': {
-          border: 0,
-        },
-      }));
+    }));
 
-      const [Id, setId] = React.useState(null);
-      const [status, setStatus] = React.useState(null);
-      const [openModal1, setOpenModal1] = React.useState(false);
-      const [addMoneyReqId, setAddMoneyReqId] = React.useState(null);
-      
-    
-      const handleOpenModal1 = (addMoneyReqId,status) => {
-        setAddMoneyReqId(addMoneyReqId);
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        "&:nth-of-type(odd)": {
+            backgroundColor: theme.palette.action.hover,
+        },
+        "&:last-child td, &:last-child th": {
+            border: 0,
+        },
+    }));
+
+    // ------------------------------------------------------------------------------
+    // DELETE MODAL STATES
+    // ------------------------------------------------------------------------------
+    const [openModal1, setOpenModal1] = React.useState(false);
+    const [addMoneyReqId, setAddMoneyReqId] = React.useState(null);
+    const [status, setStatus] = React.useState(null);
+
+    const handleOpenModal1 = (id, status) => {
+        setAddMoneyReqId(id);
         setStatus(status);
         setOpenModal1(true);
-      };
-    
-      const handleCloseModal1 = () => {
+    };
+
+    const handleCloseModal1 = () => {
         setAddMoneyReqId(null);
         setStatus(null);
         setOpenModal1(false);
-      };
-    
-      
-      const handleOKButtonClick = async () => {
-        // alert(status);
-        if (!addMoneyReqId) {
-          console.error('addMoneyReqId is missing.');
-          return;
-        }
-        let note = '';
-        let action='';
-        if (status === 1) {
-            note = 'Approve';
-            action='Approve';
-          } else if (status === 2) {
-            note = rejectionReason; // Use the rejectionReason state
-            action='Reject';
-          } else {
-            note='';
-            action='';
-          }
-        
-        const requestData = {
-          status: status,
-          note: note,
-          id: addMoneyReqId,
-          action:action
-        };
-    
+    };
+
+    // DELETE FUNCTION
+    const handleOKButtonClick = async () => {
         try {
-            const response = await api.post("/api/graphics/update-graphics-status", requestData);
+            const response = await api.post(
+                "/api/graphics/update-graphics-status",
+                {
+                    status: 0,
+                    note: "",
+                    id: addMoneyReqId,
+                    action: "Delete",
+                }
+            );
+
             if (response.data.status === 200) {
                 alert(response.data.message);
                 location.reload();
-            }else{
-               console.log('Failed to update status.');
+            } else {
+                console.log("Failed to delete category.");
             }
-    
         } catch (error) {
             console.error("Error:", error);
         }
         handleCloseModal1();
-      };
-    
-    
-      const handleLinkClick = (img) => {
-      
-        window.open(img, '_blank', 'noopener,noreferrer');
-      };
+    };
+
+    // ------------------------------------------------------------------------------
+    // UPDATE CATEGORY MODAL STATES
+    // ------------------------------------------------------------------------------
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+
+    const [selectedCategory, setSelectedCategory] = useState({
+        id: "",
+        category_name: "",
+        status: 1,
+    });
+
+    // OPEN UPDATE POPUP
+    const openUpdateModal = (row) => {
+        setSelectedCategory({
+            id: row.id,
+            category_name: row.category_name,
+            status: row.status,
+        });
+        setOpenUpdateDialog(true);
+    };
+
+    // CLOSE UPDATE POPUP
+    const closeUpdateModal = () => {
+        setOpenUpdateDialog(false);
+    };
+
+    // SAVE UPDATED CATEGORY
+    const handleUpdateCategory = async () => {
+        try {
+            // Validate before sending to backend
+            if (!selectedCategory.id) {
+                alert("Invalid Category ID");
+                return;
+            }
+
+            if (!selectedCategory.category_name || selectedCategory.category_name.trim() === "") {
+                alert("Category name cannot be empty");
+                return;
+            }
+
+            const payload = {
+                id: selectedCategory.id,
+                category_name: selectedCategory.category_name.trim(),
+                status: Number(selectedCategory.status),
+            };
+
+            const response = await api.post(
+                "/api/affiliate_link/update-affiliate-category",
+                payload
+            );
+
+            if (response.data.status === 200) {
+                alert("Category Updated Successfully");
+                setOpenUpdateDialog(false);
+                location.reload();
+            } else {
+                alert(response.data.message || "Failed to update category");
+            }
+
+        } catch (error) {
+            console.error("Update Error:", error);
+            alert("Something went wrong while updating the category");
+        }
+    };
+
 
     return (
         <main className="p-6 space-y-6">
-            <Grid
-                container
-                spacing={4}
-                sx={{ padding: '0px 16px' }}
-            >
-                <Grid item={true} xs={12}   >
-
-
-                    <TableContainer component={Paper} >
-                    
+            <Grid container spacing={4} sx={{ padding: "0px 16px" }}>
+                <Grid item={true} xs={12}>
+                    <TableContainer component={Paper}>
                         <Divider />
-                        <Table aria-label="User Details" sx={{ size: 2 }} mt={2}>
+                        <Table aria-label="User Details">
                             <TableHead>
                                 <TableRow>
-
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Sr No.</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Category Name</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Status</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Action</StyledTableCell>
-                                    {/* <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Category Image</StyledTableCell> */}
+                                    <StyledTableCell>Sr No.</StyledTableCell>
+                                    <StyledTableCell>Category Name</StyledTableCell>
+                                    <StyledTableCell>Status</StyledTableCell>
+                                    <StyledTableCell>Action</StyledTableCell>
                                 </TableRow>
                             </TableHead>
+
                             <TableBody>
-                                {showServiceTrans.length > 0 ? (rowsPerPage > 0
-                                    ? filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    : filteredRows
-                                ).map((row, index) => (
+                                {showServiceTrans.length > 0 ? (
+                                    (rowsPerPage > 0
+                                        ? filteredRows.slice(
+                                            page * rowsPerPage,
+                                            page * rowsPerPage + rowsPerPage
+                                        )
+                                        : filteredRows
+                                    ).map((row, index) => (
+                                        <StyledTableRow key={index}>
+                                            <StyledTableCell>
+                                                {index + 1 + page * rowsPerPage}
+                                            </StyledTableCell>
 
-                                    <StyledTableRow 
-                                        key={index}
-                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                    >
+                                            <StyledTableCell>{row.category_name}</StyledTableCell>
 
-                                        <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-                                        <StyledTableCell>{row.category_name}</StyledTableCell>
-                                        <StyledTableCell style={{ color:row.status === 1 ? 'Green' : 'Red' }} > 
-                                                         {row.status === 1 ? 'Active' : 
-                                                        'Inactive' }
-                                        </StyledTableCell>
-                                        <StyledTableCell sx={{ '& button': { m: 1 } }}>
-                                            <Link href={`/update-affiliate-link-category/?id=${row.id}`}>
-                                            <a>
-                                                <Button variant="contained" size="small" color="success" style={{ fontWeight: 'bold' }}>Update</Button>
-                                            </a>
-                                            </Link>
-                                            {row.status === 1 && (
-                                            <>
-                                            <Button variant="contained" size="small" color="error"  style={{ fontWeight: 'bold' }} onClick={() => handleOpenModal1(row.id,0)}>Delete</Button> 
-                                            {/* <Button variant="contained" size="small" color="error" onClick={()=> handleOpenModal2(row.id,2)}>Reject</Button>   */}
-                                            
-                                            </>
-                                            )}
-                                            <Modal 
-                                                    open={openModal1} 
-                                                    onClose={handleCloseModal1}
-                                                    aria-labelledby="modal-modal-title"
-                                                    aria-describedby="modal-modal-description"
+                                            <StyledTableCell
+                                                style={{
+                                                    color: row.status === 1 ? "green" : "red",
+                                                }}
+                                            >
+                                                {row.status === 1 ? "Active" : "Inactive"}
+                                            </StyledTableCell>
+
+                                            <StyledTableCell>
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="success"
+                                                    onClick={() => openUpdateModal(row)}
                                                 >
-                                                    <Box sx={style} alignItems={'center'}  justifyContent={'space-between'}>
-                                                        <HelpOutlineOutlinedIcon sx={{ fontSize: 40 ,marginLeft:20}} color="warning" alignItems={'center'} />
-                                                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                                                     Are you sure to Delete this post?
-                                                    </Typography>
-                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}  alignItems={'center'} >
-                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft:20 }}>OK</Button>
-                                                        
-                                                    </Typography>
-                                                  
-                                                    </Box>
-                                                </Modal>
+                                                    Update
+                                                </Button>
 
-                                                
-                                          
-
-
-                                        </StyledTableCell>
-
-                                    </StyledTableRow >
-                                )) : (
-
+                                                {row.status === 1 && (
+                                                    <Button
+                                                        variant="contained"
+                                                        size="small"
+                                                        color="error"
+                                                        onClick={() =>
+                                                            handleOpenModal1(row.id, 0)
+                                                        }
+                                                        sx={{ ml: 1 }}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                )}
+                                            </StyledTableCell>
+                                        </StyledTableRow>
+                                    ))
+                                ) : (
                                     <TableRow>
-                                        <TableCell colSpan={11} component="th" scope="row">
-                                            <Typography color={'error'}>No Records Found.</Typography>
+                                        <TableCell colSpan={11}>
+                                            <Typography color={"error"}>
+                                                No Records Found.
+                                            </Typography>
                                         </TableCell>
                                     </TableRow>
-
                                 )}
                             </TableBody>
                         </Table>
@@ -255,16 +291,82 @@ const Transactions = ({ showServiceTrans }) => {
                     />
                 </Grid>
 
-                <Grid
-                    container
-                // sx={{ background: "#FFF" }}
-                >
+                {/* --------------------------------------------------------- */}
+                {/* DELETE MODAL */}
+                {/* --------------------------------------------------------- */}
+                <Modal open={openModal1} onClose={handleCloseModal1}>
+                    <Box sx={style}>
+                        <HelpOutlineOutlinedIcon
+                            sx={{ fontSize: 40 }}
+                            color="warning"
+                        />
+                        <Typography variant="h6" sx={{ mt: 1 }}>
+                            Are you sure you want to delete this category?
+                        </Typography>
 
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={handleOKButtonClick}
+                            sx={{ mt: 3 }}
+                        >
+                            Delete
+                        </Button>
+                    </Box>
+                </Modal>
 
+                {/* --------------------------------------------------------- */}
+                {/* UPDATE CATEGORY MODAL */}
+                {/* --------------------------------------------------------- */}
+                <Modal open={openUpdateDialog} onClose={closeUpdateModal}>
+                    <Box sx={style}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Update Category
+                        </Typography>
 
-                </Grid>
+                        <TextField
+                            fullWidth
+                            label="Category Name"
+                            value={selectedCategory.category_name}
+                            onChange={(e) =>
+                                setSelectedCategory({
+                                    ...selectedCategory,
+                                    category_name: e.target.value,
+                                })
+                            }
+                            sx={{ mb: 2 }}
+                        />
+
+                        <TextField
+                            select
+                            fullWidth
+                            label="Status"
+                            SelectProps={{ native: true }}
+                            value={selectedCategory.status}
+                            onChange={(e) =>
+                                setSelectedCategory({
+                                    ...selectedCategory,
+                                    status: Number(e.target.value),
+                                })
+                            }
+                            sx={{ mb: 2 }}
+                        >
+                            <option value={1}>Active</option>
+                            <option value={0}>Inactive</option>
+                        </TextField>
+
+                        <Button
+                            variant="contained"
+                            onClick={handleUpdateCategory}
+                            fullWidth
+                        >
+                            Save Changes
+                        </Button>
+                    </Box>
+                </Modal>
             </Grid>
         </main>
-    )
-}
+    );
+};
+
 export default Transactions;
