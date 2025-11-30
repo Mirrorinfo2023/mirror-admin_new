@@ -199,8 +199,9 @@ let menuArray = [
 let menuArray1 = [
 
   { redirect: 'get-banners', name: 'Banners', parent: 'masters' },
+  { redirect: 'lead-management', name: 'Lead-Management', parent: 'masters' },
   { redirect: 'leads-category', name: 'Lead Category', parent: 'masters' },
-  { redirect: 'leads-report', name: 'Lead List', parent: 'masters' },
+  // { redirect: 'leads-report', name: 'Lead List', parent: 'masters' },
   { redirect: 'leads-user-action-report', name: 'Leads User Action Report', parent: 'masters' },
   { redirect: 'leads-user-form-request-list', name: 'Leads User Form Report', parent: 'masters' },
   //{ redirect: 'leads-user-track-report', name: 'Leads User Track Report', parent: 'masters' },
