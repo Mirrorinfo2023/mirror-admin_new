@@ -209,6 +209,7 @@ let menuArray1 = [
   { redirect: 'meeting', name: 'Meeting Report', parent: 'masters' },
   { redirect: 'get-meeting-enroll-report', name: 'Meeting Enroll Report', parent: 'masters' },
   { redirect: 'product-list', name: 'Product List', parent: 'masters' },
+  // { redirect: 'ott-link', name: 'OTT Link', parent: 'masters' },
 ];
 
 let menuArray2 = [
