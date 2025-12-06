@@ -38,34 +38,24 @@ const style = {
     p: 4,
 };
 
-const Transactions = ({ showServiceTrans }) => {
-    let rows;
+const Transactions = ({ showServiceTrans, onUpdateCategory, onDeleteCategory, onRefresh }) => {
+    let rows = showServiceTrans || [];
 
-    if (showServiceTrans && showServiceTrans.length > 0) {
-        rows = [...showServiceTrans];
-    } else {
-        rows = [];
-    }
-
-    const rowsPerPageOptions = [5, 10, 25];
+    // Pagination
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(100);
-    const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredRows = rows.filter((row) => {
-        return row.category_name
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase());
+    // Update Modal State
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState({
+        id: "",
+        category_name: "",
+        status: 1,
     });
 
-    const onPageChange = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 100));
-        setPage(0);
-    };
+    // Delete Modal
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [deleteCategoryId, setDeleteCategoryId] = useState(null);
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
         [`&.${tableCellClasses.head}`]: {
@@ -86,67 +76,9 @@ const Transactions = ({ showServiceTrans }) => {
         "&:nth-of-type(odd)": {
             backgroundColor: theme.palette.action.hover,
         },
-        "&:last-child td, &:last-child th": {
-            border: 0,
-        },
     }));
 
-    // ------------------------------------------------------------------------------
-    // DELETE MODAL STATES
-    // ------------------------------------------------------------------------------
-    const [openModal1, setOpenModal1] = React.useState(false);
-    const [addMoneyReqId, setAddMoneyReqId] = React.useState(null);
-    const [status, setStatus] = React.useState(null);
-
-    const handleOpenModal1 = (id, status) => {
-        setAddMoneyReqId(id);
-        setStatus(status);
-        setOpenModal1(true);
-    };
-
-    const handleCloseModal1 = () => {
-        setAddMoneyReqId(null);
-        setStatus(null);
-        setOpenModal1(false);
-    };
-
-    // DELETE FUNCTION
-    const handleOKButtonClick = async () => {
-        try {
-            const response = await api.post(
-                "/api/graphics/update-graphics-status",
-                {
-                    status: 0,
-                    note: "",
-                    id: addMoneyReqId,
-                    action: "Delete",
-                }
-            );
-
-            if (response.data.status === 200) {
-                alert(response.data.message);
-                location.reload();
-            } else {
-                console.log("Failed to delete category.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        }
-        handleCloseModal1();
-    };
-
-    // ------------------------------------------------------------------------------
-    // UPDATE CATEGORY MODAL STATES
-    // ------------------------------------------------------------------------------
-    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
-
-    const [selectedCategory, setSelectedCategory] = useState({
-        id: "",
-        category_name: "",
-        status: 1,
-    });
-
-    // OPEN UPDATE POPUP
+    // ------------------------ Open Update Popup ------------------------
     const openUpdateModal = (row) => {
         setSelectedCategory({
             id: row.id,
@@ -156,90 +88,75 @@ const Transactions = ({ showServiceTrans }) => {
         setOpenUpdateDialog(true);
     };
 
-    // CLOSE UPDATE POPUP
-    const closeUpdateModal = () => {
-        setOpenUpdateDialog(false);
-    };
-
-    // SAVE UPDATED CATEGORY
-    const handleUpdateCategory = async () => {
-        try {
-            // Validate before sending to backend
-            if (!selectedCategory.id) {
-                alert("Invalid Category ID");
-                return;
-            }
-
-            if (!selectedCategory.category_name || selectedCategory.category_name.trim() === "") {
-                alert("Category name cannot be empty");
-                return;
-            }
-
-            const payload = {
-                id: selectedCategory.id,
-                category_name: selectedCategory.category_name.trim(),
-                status: Number(selectedCategory.status),
-            };
-
-            const response = await api.post(
-                "/api/affiliate_link/update-affiliate-category",
-                payload
-            );
-
-            if (response.data.status === 200) {
-                alert("Category Updated Successfully");
-                setOpenUpdateDialog(false);
-                location.reload();
-            } else {
-                alert(response.data.message || "Failed to update category");
-            }
-
-        } catch (error) {
-            console.error("Update Error:", error);
-            alert("Something went wrong while updating the category");
+    // ------------------------ Save Updated Category ------------------------
+    const handleSaveUpdate = async () => {
+        const success = await onUpdateCategory(selectedCategory);
+        if (success) {
+            setOpenUpdateDialog(false);
+            onRefresh();
         }
     };
 
+    // ------------------------ Delete Category ------------------------
+    const openDeleteModal = (id) => {
+        setDeleteCategoryId(id);
+        setOpenDeleteDialog(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        const success = await onDeleteCategory(deleteCategoryId);
+        if (success) {
+            setOpenDeleteDialog(false);
+            onRefresh();
+        }
+    };
 
     return (
         <main className="p-6 space-y-6">
             <Grid container spacing={4} sx={{ padding: "0px 16px" }}>
-                <Grid item={true} xs={12}>
+                <Grid item xs={12}>
                     <TableContainer component={Paper}>
                         <Divider />
                         <Table aria-label="User Details">
                             <TableHead>
                                 <TableRow>
                                     <StyledTableCell>Sr No.</StyledTableCell>
-                                    <StyledTableCell>Category Name</StyledTableCell>
+                                    <StyledTableCell>Category</StyledTableCell>
+                                    <StyledTableCell>Sub Category</StyledTableCell>
                                     <StyledTableCell>Status</StyledTableCell>
                                     <StyledTableCell>Action</StyledTableCell>
                                 </TableRow>
                             </TableHead>
 
                             <TableBody>
-                                {showServiceTrans.length > 0 ? (
-                                    (rowsPerPage > 0
-                                        ? filteredRows.slice(
-                                            page * rowsPerPage,
-                                            page * rowsPerPage + rowsPerPage
-                                        )
-                                        : filteredRows
-                                    ).map((row, index) => (
-                                        <StyledTableRow key={index}>
+                                {rows.length > 0 ? (
+                                    rows.map((row, index) => (
+                                        <StyledTableRow key={row.id}>
                                             <StyledTableCell>
-                                                {index + 1 + page * rowsPerPage}
+                                                {index + 1}
                                             </StyledTableCell>
 
                                             <StyledTableCell>{row.category_name}</StyledTableCell>
 
+                                            <StyledTableCell>
+                                                {Array.isArray(row.subcategories)
+                                                    ? row.subcategories.join(", ")
+                                                    : "-"}
+                                            </StyledTableCell>
+
                                             <StyledTableCell
                                                 style={{
-                                                    color: row.status === 1 ? "green" : "red",
+                                                    color:
+                                                        row.status === 1 ? "green" :
+                                                            row.status === 2 ? "orange" :
+                                                                "red"
                                                 }}
                                             >
-                                                {row.status === 1 ? "Active" : "Inactive"}
+                                                {row.status === 1 ? "Active"
+                                                    : row.status === 2 ? "Inactive"
+                                                        : "Deleted"}
                                             </StyledTableCell>
+
 
                                             <StyledTableCell>
                                                 <Button
@@ -251,26 +168,24 @@ const Transactions = ({ showServiceTrans }) => {
                                                     Update
                                                 </Button>
 
-                                                {row.status === 1 && (
+                                                {/* {row.status === 1 && (
                                                     <Button
                                                         variant="contained"
                                                         size="small"
                                                         color="error"
-                                                        onClick={() =>
-                                                            handleOpenModal1(row.id, 0)
-                                                        }
+                                                        onClick={() => openDeleteModal(row.id)}
                                                         sx={{ ml: 1 }}
                                                     >
                                                         Delete
                                                     </Button>
-                                                )}
+                                                )} */}
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     ))
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={11}>
-                                            <Typography color={"error"}>
+                                            <Typography color="error">
                                                 No Records Found.
                                             </Typography>
                                         </TableCell>
@@ -279,46 +194,28 @@ const Transactions = ({ showServiceTrans }) => {
                             </TableBody>
                         </Table>
                     </TableContainer>
-
-                    <TablePagination
-                        rowsPerPageOptions={{}}
-                        component="div"
-                        count={rows.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={onPageChange}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
                 </Grid>
 
-                {/* --------------------------------------------------------- */}
                 {/* DELETE MODAL */}
-                {/* --------------------------------------------------------- */}
-                <Modal open={openModal1} onClose={handleCloseModal1}>
+                <Modal open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                     <Box sx={style}>
-                        <HelpOutlineOutlinedIcon
-                            sx={{ fontSize: 40 }}
-                            color="warning"
-                        />
-                        <Typography variant="h6" sx={{ mt: 1 }}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
                             Are you sure you want to delete this category?
                         </Typography>
 
                         <Button
                             variant="contained"
                             color="error"
-                            onClick={handleOKButtonClick}
-                            sx={{ mt: 3 }}
+                            onClick={handleConfirmDelete}
+                            fullWidth
                         >
                             Delete
                         </Button>
                     </Box>
                 </Modal>
 
-                {/* --------------------------------------------------------- */}
                 {/* UPDATE CATEGORY MODAL */}
-                {/* --------------------------------------------------------- */}
-                <Modal open={openUpdateDialog} onClose={closeUpdateModal}>
+                <Modal open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)}>
                     <Box sx={style}>
                         <Typography variant="h6" sx={{ mb: 2 }}>
                             Update Category
@@ -337,6 +234,23 @@ const Transactions = ({ showServiceTrans }) => {
                             sx={{ mb: 2 }}
                         />
 
+                        {/* Add Subcategories field if needed */}
+                        <TextField
+                            fullWidth
+                            label="Subcategories (comma separated)"
+                            value={Array.isArray(selectedCategory.subcategories)
+                                ? selectedCategory.subcategories.join(", ")
+                                : selectedCategory.subcategories || ""}
+                            onChange={(e) =>
+                                setSelectedCategory({
+                                    ...selectedCategory,
+                                    subcategories: e.target.value.split(",").map(item => item.trim()),
+                                })
+                            }
+                            helperText="Enter subcategories separated by commas"
+                            sx={{ mb: 2 }}
+                        />
+
                         <TextField
                             select
                             fullWidth
@@ -352,16 +266,25 @@ const Transactions = ({ showServiceTrans }) => {
                             sx={{ mb: 2 }}
                         >
                             <option value={1}>Active</option>
-                            <option value={0}>Inactive</option>
+                            <option value={2}>Inactive</option>
                         </TextField>
 
-                        <Button
-                            variant="contained"
-                            onClick={handleUpdateCategory}
-                            fullWidth
-                        >
-                            Save Changes
-                        </Button>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={() => setOpenUpdateDialog(false)}
+                                sx={{ flex: 1 }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleSaveUpdate}
+                                sx={{ flex: 1 }}
+                            >
+                                Save Changes
+                            </Button>
+                        </Box>
                     </Box>
                 </Modal>
             </Grid>
@@ -370,3 +293,4 @@ const Transactions = ({ showServiceTrans }) => {
 };
 
 export default Transactions;
+

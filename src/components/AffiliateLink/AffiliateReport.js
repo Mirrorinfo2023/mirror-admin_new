@@ -1,4 +1,4 @@
-import { Box, Button,Divider,TextField, Container, Grid, Paper, Table, TableBody, StyledTableCell, TableContainer, TableHead, TablePagination, TableRow, Typography,Link } from "@mui/material";
+import { Box, Button, Divider, TextField, Container, Grid, Paper, Table, TableBody, StyledTableCell, TableContainer, TableHead, TablePagination, TableRow, Typography, Link } from "@mui/material";
 import { useEffect, useState } from "react";
 import * as React from 'react';
 import Cookies from "js-cookie";
@@ -21,7 +21,8 @@ const style = {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
-  };
+};
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
 
@@ -44,14 +45,14 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
 
     const filteredRows = rows.filter(row => {
         return (
-          (row.first_name && row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (row.mlm_id && row.mlm_id.includes(searchTerm)) ||
-          (row.mobile && row.mobile.includes(searchTerm)) ||
-          (row.email && row.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (row.category_name && row.category_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          (row.link && row.link.includes(searchTerm)) ||
-          (row.title && row.title.toLowerCase().includes(searchTerm.toLowerCase()))
-          // Add conditions for other relevant columns
+            (row.first_name && row.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (row.mlm_id && row.mlm_id.includes(searchTerm)) ||
+            (row.mobile && row.mobile.includes(searchTerm)) ||
+            (row.email && row.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (row.category_name && row.category_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (row.link && row.link.includes(searchTerm)) ||
+            (row.title && row.title.toLowerCase().includes(searchTerm.toLowerCase()))
+            // Add conditions for other relevant columns
         );
     });
 
@@ -65,13 +66,13 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
     };
 
     const StyledTableCell = styled(TableCell)(({ theme }) => ({
-         [`&.${tableCellClasses.head}`]: {
+        [`&.${tableCellClasses.head}`]: {
             background: "#2198f3",
             color: "white",
-          fontSize: 12,
-          linHeight: 15,
-          padding: 7,
-          borderRight: "1px solid rgba(224, 224, 224, 1)"
+            fontSize: 12,
+            linHeight: 15,
+            padding: 7,
+            borderRight: "1px solid rgba(224, 224, 224, 1)"
         },
         [`&.${tableCellClasses.body}`]: {
             fontSize: 12,
@@ -79,106 +80,106 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
             padding: 7,
             borderRight: "1px solid rgba(224, 224, 224, 1)"
         },
-      }));
-      
-      const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    }));
+
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
         '&:nth-of-type(odd)': {
-          backgroundColor: theme.palette.action.hover,
+            backgroundColor: theme.palette.action.hover,
         },
         // hide last border
         '&:last-child td, &:last-child th': {
-          border: 0,
+            border: 0,
         },
-      }));
+    }));
 
 
-      
+
     const [openModal1, setOpenModal1] = React.useState(false);
     const [openModal2, setOpenModal2] = React.useState(false);
     const [openModal3, setOpenModal3] = React.useState(false);
-  
+
     const [addMoneyReqId, setAddMoneyReqId] = React.useState(null);
     const [status, setStatus] = React.useState(null);
-   
-      const handleOpenModal1 = (addMoneyReqId,status) => {
+
+    const handleOpenModal1 = (addMoneyReqId, status) => {
         setAddMoneyReqId(addMoneyReqId);
         setStatus(status);
         setOpenModal1(true);
-      };
-    
-      const handleCloseModal1 = () => {
+    };
+
+    const handleCloseModal1 = () => {
         setAddMoneyReqId(null);
         setStatus(null);
         setOpenModal1(false);
-      };
+    };
 
-      const handleOpenModal2 = (addMoneyReqId,status) => {
+    const handleOpenModal2 = (addMoneyReqId, status) => {
         setAddMoneyReqId(addMoneyReqId);
         setStatus(status);
         setOpenModal2(true);
-      };
-    
-      const handleCloseModal2 = () => {
+    };
+
+    const handleCloseModal2 = () => {
         setAddMoneyReqId(null);
         setStatus(null);
         setOpenModal2(false);
-      };
-    
-      const handleOpenModal3 = (addMoneyReqId,status) => {
+    };
+
+    const handleOpenModal3 = (addMoneyReqId, status) => {
         setAddMoneyReqId(addMoneyReqId);
         setStatus(status);
         setOpenModal3(true);
-      };
-    
-      const handleCloseModal3 = () => {
+    };
+
+    const handleCloseModal3 = () => {
         setAddMoneyReqId(null);
         setStatus(null);
         setOpenModal3(false);
-      };
+    };
 
-      const handleLinkClick = (img) => {
+    const handleLinkClick = (img) => {
+        const fullUrl = `${BASE_URL}${img}`;
+        window.open(fullUrl, '_blank', 'noopener,noreferrer');
+    };
 
-        window.open(img, '_blank', 'noopener,noreferrer');
-      };
-    
 
-      const handleOKButtonClick = async () => {
+    const handleOKButtonClick = async () => {
         if (!addMoneyReqId) {
-          console.error('Id is missing.');
-          return;
+            console.error('Id is missing.');
+            return;
         }
-       
-        
+
+
         const requestData = {
-          status: status,
-          id: addMoneyReqId,
+            status: status,
+            id: addMoneyReqId,
         };
 
-       
+
         try {
             // console.log(requestData);
             const response = await api.post("/api/affiliate_link/update-affiliate-track-status", requestData);
-              
+
             if (response.data.status === 200) {
                 location.reload();
-             
-            }else{
-               console.log('Failed to update status.');
+
+            } else {
+                console.log('Failed to update status.');
             }
 
         } catch (error) {
             console.error("Error:", error);
-           
+
         }
-       
+
         handleCloseModal1();
         handleCloseModal2();
         handleCloseModal3();
-      
-      };
+
+    };
 
 
-     
+
 
     return (
         <main className="p-6 space-y-6">
@@ -191,14 +192,15 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
 
 
                     <TableContainer component={Paper} >
-              
+
                         <Table aria-label="User Details" sx={{ size: 2 }} mt={2}>
                             <TableHead>
                                 <TableRow>
-               
+
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Sr No.</StyledTableCell>
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Category</StyledTableCell>
-                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Affiliate Name</StyledTableCell>
+                                    <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Sub Category</StyledTableCell>
+
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Link</StyledTableCell>
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Image</StyledTableCell>
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Amount</StyledTableCell>
@@ -206,7 +208,7 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >created Date</StyledTableCell>
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Status</StyledTableCell>
                                     <StyledTableCell style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }} >Action</StyledTableCell>
-                                  
+
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -215,25 +217,21 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
                                     : filteredRows
                                 ).map((row, index) => (
 
-                                    <StyledTableRow 
+                                    <StyledTableRow
                                         key={index}
                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <StyledTableCell>{index + 1 + page * rowsPerPage}</StyledTableCell>
-                                        <StyledTableCell>{row.category_name}</StyledTableCell>
                                         <StyledTableCell>{row.title}</StyledTableCell>
+                                        <StyledTableCell>{row.subtitle}</StyledTableCell>
                                         <StyledTableCell>{row.link}</StyledTableCell>
-                                        <StyledTableCell> {row.image !== '' ? (
-                                            <Link href="#" onClick={() => handleLinkClick(row.image)}>View Image</Link>
-                                            ) : (
-                                                ''
-                                            )}
-                                        </StyledTableCell>
-                                         <StyledTableCell>{row.amount}</StyledTableCell>
+                                        <Link href="#" onClick={() => handleLinkClick(row.image)}>View Image</Link>
+
+                                        <StyledTableCell>{row.amount}</StyledTableCell>
                                         <StyledTableCell>{row.valid_till_date}</StyledTableCell>
                                         <StyledTableCell>{row.link_created_date}</StyledTableCell>
-                                        <StyledTableCell style={{ color:row.status === 1 ? 'Green' : row.status === 2 ? 'orange': 'red'  }} > {row.status === 1 ? 'Active' : row.status === 2 ? 'Inactive': 'delete' }</StyledTableCell>
-                                        <StyledTableCell sx={{ '& button': { m: 1 } }} style={{whiteSpace: 'nowrap' }}>
+                                        <StyledTableCell style={{ color: row.status === 1 ? 'Green' : row.status === 2 ? 'orange' : 'red' }} > {row.status === 1 ? 'Active' : row.status === 2 ? 'Inactive' : 'delete'}</StyledTableCell>
+                                        <StyledTableCell sx={{ '& button': { m: 1 } }} style={{ whiteSpace: 'nowrap' }}>
                                             <Link href={`/update-affiliate-link/?id=${row.id}`} >
                                                 <a>
                                                     <Button variant="contained" size="small" color="success" style={{ fontWeight: 'bold' }}>Update</Button>
@@ -241,98 +239,98 @@ const AffiliateTrackDetailsTransactions = ({ showServiceTrans }) => {
                                             </Link>
                                             {row.status === 0 ? null : (
                                                 <>
-                                                {row.status === 2 && (
-                                                    <>
-                                                    <Button variant="contained" size="small" color="primary" onClick={() => handleOpenModal1(row.id, 1)}>
-                                                        Active
-                                                    </Button>
-                                                    <Button variant="contained" size="small" color="error" onClick={() => handleOpenModal3(row.id, 0)}>
-                                                        Delete
-                                                    </Button>
-                                                   
-                                                    </>
-                                                )}
-                                                {row.status === 1 && (
-                                                    <>
-                                                    {/* <Button variant="contained" size="small" color="success" onClick={() => handleOpenModal1(row.id, 1)}>
+                                                    {row.status === 2 && (
+                                                        <>
+                                                            <Button variant="contained" size="small" color="primary" onClick={() => handleOpenModal1(row.id, 1)}>
+                                                                Active
+                                                            </Button>
+                                                            <Button variant="contained" size="small" color="error" onClick={() => handleOpenModal3(row.id, 0)}>
+                                                                Delete
+                                                            </Button>
+
+                                                        </>
+                                                    )}
+                                                    {row.status === 1 && (
+                                                        <>
+                                                            {/* <Button variant="contained" size="small" color="success" onClick={() => handleOpenModal1(row.id, 1)}>
                                                          Edit
                                                     </Button> */}
-                                                    <Button variant="contained" size="small" color="warning" onClick={() => handleOpenModal2(row.id, 2)}>
-                                                        Inactive
-                                                    </Button>
-                                                    </>
-                                                 
-                                                )}
-                                             
+                                                            <Button variant="contained" size="small" color="warning" onClick={() => handleOpenModal2(row.id, 2)}>
+                                                                Inactive
+                                                            </Button>
+                                                        </>
+
+                                                    )}
+
                                                 </>
                                             )}
 
-                                            <Modal 
-                                                    open={openModal1} 
-                                                    onClose={handleCloseModal1}
-                                                    aria-labelledby="modal-modal-title"
-                                                    aria-describedby="modal-modal-description"
-                                                >
-                                                    <Box sx={style} alignItems={'center'}  justifyContent={'space-between'}>
-                                                        <HelpOutlineOutlinedIcon sx={{ fontSize: 40 ,marginLeft:20}} color="warning" alignItems={'center'} />
+                                            <Modal
+                                                open={openModal1}
+                                                onClose={handleCloseModal1}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box sx={style} alignItems={'center'} justifyContent={'space-between'}>
+                                                    <HelpOutlineOutlinedIcon sx={{ fontSize: 40, marginLeft: 20 }} color="warning" alignItems={'center'} />
                                                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                                                     Are you sure to Active this link ?
+                                                        Are you sure to Active this link ?
                                                     </Typography>
-                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}  alignItems={'center'} >
-                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft:20 }}>OK</Button>
-                                                        
+                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }} alignItems={'center'} >
+                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft: 20 }}>OK</Button>
+
                                                     </Typography>
-                                                  
-                                                    </Box>
-                                                </Modal>
+
+                                                </Box>
+                                            </Modal>
 
 
-                                                <Modal 
-                                                    open={openModal2} 
-                                                    onClose={handleCloseModal2}
-                                                    aria-labelledby="modal-modal-title"
-                                                    aria-describedby="modal-modal-description"
-                                                >
-                                                    <Box sx={style} alignItems={'center'}  justifyContent={'space-between'}>
-                                                        <HelpOutlineOutlinedIcon sx={{ fontSize: 40 ,marginLeft:20}} color="warning" alignItems={'center'} />
+                                            <Modal
+                                                open={openModal2}
+                                                onClose={handleCloseModal2}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box sx={style} alignItems={'center'} justifyContent={'space-between'}>
+                                                    <HelpOutlineOutlinedIcon sx={{ fontSize: 40, marginLeft: 20 }} color="warning" alignItems={'center'} />
                                                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                                                     Are you sure you want to inactive this link?
+                                                        Are you sure you want to inactive this link?
                                                     </Typography>
-                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}  alignItems={'center'} >
-                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft:20 }}>OK</Button>
-                                                        
-                                                    </Typography>
-                                                  
-                                                    </Box>
-                                                </Modal>
+                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }} alignItems={'center'} >
+                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft: 20 }}>OK</Button>
 
-                                                <Modal 
-                                                    open={openModal3} 
-                                                    onClose={handleCloseModal3}
-                                                    aria-labelledby="modal-modal-title"
-                                                    aria-describedby="modal-modal-description"
-                                                >
-                                                    <Box sx={style} alignItems={'center'}  justifyContent={'space-between'}>
-                                                        <HelpOutlineOutlinedIcon sx={{ fontSize: 40 ,marginLeft:20}} color="warning" alignItems={'center'} />
+                                                    </Typography>
+
+                                                </Box>
+                                            </Modal>
+
+                                            <Modal
+                                                open={openModal3}
+                                                onClose={handleCloseModal3}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box sx={style} alignItems={'center'} justifyContent={'space-between'}>
+                                                    <HelpOutlineOutlinedIcon sx={{ fontSize: 40, marginLeft: 20 }} color="warning" alignItems={'center'} />
                                                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                                                     Are you sure to Delete this link ?
+                                                        Are you sure to Delete this link ?
                                                     </Typography>
-                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }}  alignItems={'center'} >
-                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft:20 }}>OK</Button>
-                                                        
-                                                    </Typography>
-                                                  
-                                                    </Box>
-                                                </Modal>
+                                                    <Typography id="modal-modal-description" sx={{ mt: 2 }} alignItems={'center'} >
+                                                        <Button variant="contained" size="large" color="success" onClick={handleOKButtonClick} sx={{ marginLeft: 12, marginLeft: 20 }}>OK</Button>
 
-                                          
-                                          
+                                                    </Typography>
+
+                                                </Box>
+                                            </Modal>
+
+
+
 
 
                                         </StyledTableCell>
-                                   
-                                   
-                                   
+
+
+
                                     </StyledTableRow >
 
                                 )) : (

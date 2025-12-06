@@ -2,7 +2,6 @@
 import {
     Box,
     Button,
-    TextField,
     InputLabel,
     Select,
     MenuItem,
@@ -10,6 +9,7 @@ import {
     Paper,
     Typography,
     FormControl,
+    FormHelperText, TextField
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import api from "../../../utils/api";
@@ -34,21 +34,33 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const AddAffiliateLinkTransactions = () => {
-    const [title, setTitle] = useState("");
-    const [meeting_link, setMeetingLink] = useState("");
-    const [transactionType, setTransactionType] = useState("");
+    const [categoryID, setCategoryID] = useState("");
+    const [subCategory, setSubCategory] = useState("");
     const [categories, setCategories] = useState([]);
+    const [filteredSubCategories, setFilteredSubCategories] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
     const [amount, setAmount] = useState("");
     const [valid_till, setmeetingDate] = useState(dayjs());
+    const [errors, setErrors] = useState({});
+    const [meeting_link, setMeetingLink] = useState("");
 
+    // Fetch categories
     useEffect(() => {
         const getCategories = async () => {
             try {
                 const response = await api.post("/api/affiliate_link/get-affiliate-category");
                 if (response.status === 200) {
                     const decryptedObject = DataDecrypt(response.data);
-                    setCategories(decryptedObject.data);
+                    const categoriesWithId = decryptedObject.data.map((category, index) => ({
+                        ...category,
+                        id: index + 1,
+                        category_id: category.category_id || index + 1,
+                        category_name: category.category_name,
+                        subcategories: category.subcategories
+                            ? category.subcategories.map(sub => (typeof sub === "string" ? sub : sub.name))
+                            : [],
+                    }));
+                    setCategories(categoriesWithId);
                 }
             } catch (error) {
                 console.error("Error fetching categories:", error);
@@ -57,20 +69,62 @@ const AddAffiliateLinkTransactions = () => {
         getCategories();
     }, []);
 
+    // Update subcategories when category changes
+    useEffect(() => {
+        if (categoryID) {
+            const category = categories.find(
+                (c) => String(c.category_id) === String(categoryID)
+            );
+            if (category) {
+                setFilteredSubCategories(category.subcategories || []);
+            } else {
+                setFilteredSubCategories([]);
+            }
+        } else {
+            setFilteredSubCategories([]);
+        }
+    }, [categoryID, categories]);
+
+    // Validation
+    const validate = () => {
+        let newErrors = {};
+        if (!categoryID) newErrors.categoryID = "Category is required";
+        if (!meeting_link.trim()) newErrors.meeting_link = "Affiliate link is required";
+        if (!amount || isNaN(amount)) newErrors.amount = "Valid amount is required";
+        if (!selectedFile) newErrors.file = "Please upload an image/file";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         setSelectedFile(file);
     };
 
     const handleSubmit = async () => {
-        const formData = {
-            image: selectedFile,
-            title: title,
+        if (!validate()) return;
+
+        const selectedCategory = categories.find(cat => String(cat.category_id) === String(categoryID));
+        const title = selectedCategory ? selectedCategory.category_name : "";
+        const subtitle = subCategory;
+
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        formData.append("title", title);
+        formData.append("subtitle", subtitle);
+        formData.append("link", meeting_link);
+        formData.append("category_id", categoryID); // Still required by DB
+        formData.append("amount", amount);
+        formData.append("valid_date", valid_till);
+
+        console.log("formData:", {
+            title,
+            subtitle,
+            category_id: categoryID,
             link: meeting_link,
-            category_id: transactionType,
-            amount: amount,
-            valid_date: valid_till,
-        };
+            amount
+        });
 
         try {
             const response = await api.post("/api/affiliate_link/add-affiliate-Link", formData, {
@@ -80,8 +134,6 @@ const AddAffiliateLinkTransactions = () => {
             if (response) {
                 alert("Link Added successfully");
                 window.history.back();
-            } else {
-                console.error("Failed to add Link");
             }
         } catch (error) {
             console.error("Error uploading file:", error);
@@ -98,58 +150,76 @@ const AddAffiliateLinkTransactions = () => {
                         </Typography>
 
                         <Grid container spacing={2}>
-                            {/* Affiliate Name */}
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    label="Affiliate Name"
-                                    variant="outlined"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                />
-                            </Grid>
-
                             {/* Category */}
                             <Grid item xs={12} sm={6}>
-                                <FormControl fullWidth>
-                                    <InputLabel>Link Category</InputLabel>
+                                <FormControl fullWidth error={!!errors.categoryID}>
+                                    <InputLabel>Category *</InputLabel>
                                     <Select
-                                        value={transactionType}
-                                        label="Link Category"
-                                        onChange={(e) => setTransactionType(e.target.value)}
+                                        value={categoryID}
+                                        label="Category *"
+                                        onChange={(e) => {
+                                            setCategoryID(e.target.value);
+                                            setSubCategory("");
+                                        }}
                                     >
                                         <MenuItem value="">Please Select</MenuItem>
                                         {categories.map((category) => (
-                                            <MenuItem key={category.id} value={category.id}>
+                                            <MenuItem key={category.id} value={category.category_id}>
                                                 {category.category_name}
                                             </MenuItem>
                                         ))}
                                     </Select>
+                                    <FormHelperText>{errors.categoryID}</FormHelperText>
+                                </FormControl>
+                            </Grid>
+
+                            {/* Sub Category */}
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel>Sub Category</InputLabel>
+                                    <Select
+                                        value={subCategory}
+                                        label="Sub Category"
+                                        onChange={(e) => setSubCategory(e.target.value)}
+                                        disabled={filteredSubCategories.length === 0}
+                                    >
+                                        <MenuItem value="">None</MenuItem>
+                                        {filteredSubCategories.map((sub, idx) => (
+                                            <MenuItem key={idx} value={sub}>
+                                                {sub}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    {filteredSubCategories.length === 0 && (
+                                        <FormHelperText>No subcategories available</FormHelperText>
+                                    )}
                                 </FormControl>
                             </Grid>
 
                             {/* Affiliate Link */}
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    label="Affiliate Link"
-                                    variant="outlined"
-                                    value={meeting_link}
-                                    onChange={(e) => setMeetingLink(e.target.value)}
-                                />
+                                <FormControl fullWidth error={!!errors.meeting_link}>
+                                    <InputLabel>Affiliate Link *</InputLabel>
+                                    <TextField
+                                        fullWidth
+                                        label="Affiliate Link *"
+                                        value={meeting_link}
+                                        onChange={(e) => setMeetingLink(e.target.value)}
+                                        error={!!errors.meeting_link}
+                                        helperText={errors.meeting_link}
+                                    />
+                                </FormControl>
                             </Grid>
 
                             {/* Amount */}
                             <Grid item xs={12} sm={6}>
                                 <TextField
-                                    required
                                     fullWidth
                                     label="Amount"
-                                    variant="outlined"
                                     value={amount}
                                     onChange={(e) => setAmount(e.target.value)}
+                                    error={!!errors.amount}
+                                    helperText={errors.amount}
                                 />
                             </Grid>
 
@@ -166,9 +236,8 @@ const AddAffiliateLinkTransactions = () => {
                                 </LocalizationProvider>
                             </Grid>
 
-                            {/* Upload File */}
+                            {/* File Upload */}
                             <Grid item xs={12} sm={6}>
-
                                 <Button
                                     component="label"
                                     variant="contained"
@@ -176,18 +245,20 @@ const AddAffiliateLinkTransactions = () => {
                                     style={{ width: "100%", padding: "2%" }}
                                 >
                                     Upload File
-                                    <VisuallyHiddenInput
-                                        type="file"
-                                        onChange={handleFileChange}
-                                    />
+                                    <VisuallyHiddenInput type="file" onChange={handleFileChange} />
                                 </Button>
+
+                                {errors.file && (
+                                    <Typography color="error" variant="body2">
+                                        {errors.file}
+                                    </Typography>
+                                )}
 
                                 {selectedFile && (
                                     <Typography variant="body2" sx={{ mt: 1 }}>
                                         {selectedFile.name}
                                     </Typography>
                                 )}
-
                             </Grid>
 
                             {/* Buttons */}
@@ -196,7 +267,6 @@ const AddAffiliateLinkTransactions = () => {
                                     <Button
                                         variant="contained"
                                         color="success"
-                                        size="medium"
                                         onClick={handleSubmit}
                                     >
                                         Submit
@@ -204,7 +274,6 @@ const AddAffiliateLinkTransactions = () => {
                                     <Button
                                         variant="outlined"
                                         color="error"
-                                        size="medium"
                                         onClick={() => window.history.back()}
                                     >
                                         Cancel

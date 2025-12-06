@@ -1,127 +1,154 @@
-import { Box, Button,Divider,TextField,InputLabel,Select,MenuItem, Container, Grid, Paper, Table, TableBody, StyledTableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  TextField,
+  Grid,
+  Paper,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 import api from "../../../utils/api";
-import Cookies from "js-cookie";
-import { ArrowBack } from "@mui/icons-material";
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import { styled } from '@mui/material/styles';
-import * as React from 'react';
-import { TextareaAutosize } from '@mui/base/TextareaAutosize';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { DataEncrypt, DataDecrypt } from '../../../utils/encryption';
-
-import FormControl from '@mui/material/FormControl';
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-  };
-
-
 
 const AddAffiliateCategoryTransactions = () => {
 
-  
-    
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 10,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 10,
+  const [title, setTitle] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+
+  const [errors, setErrors] = useState({
+    title: "",
+    subCategory: ""
   });
-  
 
-    const [title, setTitle] = useState('');
-  
-   
-    const handleCancel = async () => {
-      window.history.back();
+  const [serverError, setServerError] = useState("");
+
+  const handleCancel = () => {
+    window.history.back();
+  };
+
+  const validateForm = () => {
+    let formErrors = {};
+    let isValid = true;
+
+    if (!title.trim()) {
+      formErrors.title = "Category name is required";
+      isValid = false;
+    }
+
+    setErrors(formErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async () => {
+    setServerError("");
+
+    if (!validateForm()) return;
+
+    const payload = {
+      category_name: title,
+      sub_category: subCategory,
     };
-  
-   
 
+    try {
+      console.log("Payload sent to backend:", payload);
 
-      const handleSubmit = async () => {
-       
-          const formData ={
-            'category_name':title,
-          }
-        try {
+      const response = await api.post(
+        "/api/affiliate_link/e8c972c374e0499787cf9a6674ee95ba94e2731f",
+        payload   // ⬅ SEND NORMAL JSON
+      );
 
-          const response = await api.post('/api/affiliate_link/add-category',formData);
-        
-          if (response) {
-            window.history.back();
-            alert('Category Saved  successfully');
-          } else {
-            console.error('Failed to save');
-          }
+      console.log("Backend response:", response.data);
 
-        } catch (error) {
-          console.error('Error uploading file:', error);
-        }
-        
-      };
+      if (response.data.status === 201) {
+        alert("Category Saved Successfully");
+        window.history.back();
+      }
 
-    return (
+    } catch (error) {
+      console.log("Error:", error);
 
-        <main className="p-6 space-y-6">
-          
-            <Grid
-                container
-                spacing={4}
-                sx={{ padding: 2 }}
+      if (error.response) {
+        setServerError(error.response.data.message || "Something went wrong");
+      } else {
+        setServerError("Network error");
+      }
+    }
+  };
+
+  return (
+    <main className="p-6 space-y-6" style={{ marginTop: "20px" }}>
+      <Grid container justifyContent="center">
+        <Grid item xs={12} sm={11} md={10} lg={10}>
+          <Paper
+            elevation={4}
+            sx={{
+              padding: 4,
+              borderRadius: 3,
+              background: "#ffffff",
+            }}
+          >
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              textAlign="center"
+              mb={3}
+              sx={{ color: "#333" }}
             >
-            
-            <Grid item={true} xs={12}   >
-                <TableContainer component={Paper} >
+              Add New Affiliate Category
+            </Typography>
 
-                    <Box display={'inline-block'} justifyContent={'space-between'} alignItems={'right'} mt={1} mb={1} style={{width: '30%', verticalAlign: 'top'}} >
-                        <Typography variant="h5"  sx={{ padding: 2 }}>Add New Affiliate Category</Typography>
-                    </Box>
+            {serverError && (
+              <Typography color="error" textAlign="center" mb={2}>
+                {serverError}
+              </Typography>
+            )}
 
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  required
+                  label="Category Name"
+                  variant="outlined"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  error={Boolean(errors.title)}
+                  helperText={errors.title}
+                />
+              </Grid>
 
-                    <Grid spacing={2}   sx={{ padding: 2 }} container>
-
-                        <Box  justifyContent={'space-between'} alignItems={'right'} mt={3} mb={1} style={{width: '50%', verticalAlign: 'top', padding: '0 10px'}} >
-
-                            <TextField required size="normal"
-                            fullWidth label="Category Name" 
-                            variant="outlined" display={'inline-block'}
-                            value={title} 
-                            onChange={(e) => setTitle(e.target.value)}  />
-
-                        </Box>
-                    </Grid>
-           
-                    <Grid item>
-                            <Box display="flex" justifyContent="flex-start" mr={2}  mt={1} ml={2} mb={1} >
-                                <Button variant="contained" color="primary" style={{ marginRight: '8px' }} size="medium" onClick={handleSubmit}>
-                                Submit
-                                </Button>
-                                <Button variant="outlined"  onClick={handleCancel} >Cancel</Button>
-                            </Box>
-                    </Grid>
-       
-                    
-                 </TableContainer>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Sub Category (optional)"
+                  variant="outlined"
+                  value={subCategory}
+                  onChange={(e) => setSubCategory(e.target.value)}
+                />
+              </Grid>
             </Grid>
-            
+
+            <Box mt={4} display="flex" justifyContent="space-between" gap={2}>
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Paper>
         </Grid>
-              
+      </Grid>
     </main>
-    )
-}
+  );
+};
+
 export default AddAffiliateCategoryTransactions;
